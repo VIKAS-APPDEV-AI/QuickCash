@@ -1,0 +1,2 @@
+C:/Users/SYS_169/Documents/QuickCashApp-Code_On_Hold/android/app/.cxx/Debug/1241i1g2/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/SYS_169/Documents/QuickCashApp-Code_On_Hold/android/app/.cxx/Debug/1241i1g2/armeabi-v7a/CMakeFiles/rebuild_cache.dir

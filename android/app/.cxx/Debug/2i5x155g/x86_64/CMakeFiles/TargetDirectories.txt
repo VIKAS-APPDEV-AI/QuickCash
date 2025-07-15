@@ -1,0 +1,2 @@
+D:/GIT CLONE/QuickCashApp/android/app/.cxx/Debug/2i5x155g/x86_64/CMakeFiles/edit_cache.dir
+D:/GIT CLONE/QuickCashApp/android/app/.cxx/Debug/2i5x155g/x86_64/CMakeFiles/rebuild_cache.dir

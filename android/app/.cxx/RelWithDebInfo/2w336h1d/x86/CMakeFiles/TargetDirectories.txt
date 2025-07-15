@@ -1,0 +1,2 @@
+E:/QuickCashApp/android/app/.cxx/RelWithDebInfo/2w336h1d/x86/CMakeFiles/edit_cache.dir
+E:/QuickCashApp/android/app/.cxx/RelWithDebInfo/2w336h1d/x86/CMakeFiles/rebuild_cache.dir

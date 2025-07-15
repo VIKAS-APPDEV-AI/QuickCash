@@ -1,0 +1,2 @@
+C:/Users/SYS_169/Videos/QuickCashApp-BioMetricLogin/android/app/.cxx/RelWithDebInfo/3x48372a/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/SYS_169/Videos/QuickCashApp-BioMetricLogin/android/app/.cxx/RelWithDebInfo/3x48372a/arm64-v8a/CMakeFiles/rebuild_cache.dir
