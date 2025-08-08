@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:country_flags/country_flags.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
@@ -11,6 +12,8 @@ import 'package:quickcash/Screens/DashboardScreen/SendMoneyScreen/UpdateRecipien
 import 'package:quickcash/Screens/DashboardScreen/SendMoneyScreen/UpdateRecipientScreen/RecipientExchangeMoneyModel/recipientExchangeMoneyModel.dart';
 import 'package:quickcash/Screens/DashboardScreen/SendMoneyScreen/UpdateRecipientScreen/UpdateRecipientModel/UpdateRecipientApi.dart';
 import 'package:quickcash/Screens/DashboardScreen/SendMoneyScreen/UpdateRecipientScreen/UpdateRecipientModel/updateRecipientModel.dart';
+import 'package:quickcash/Screens/NotificationsScreen.dart/NotificationScreen.dart';
+import 'package:quickcash/Screens/TicketsScreen/TicketScreen/DashboardTicketScreen.dart';
 import 'package:quickcash/constants.dart';
 import 'package:quickcash/util/currency_utils.dart';
 import '../../../../util/auth_manager.dart';
@@ -78,7 +81,8 @@ class _UpdateRecipientScreenState extends State<UpdateRecipientScreen> {
       mToAmount = mSelectedAmount;
       mToCurrencySymbol = getCurrencySymbol(mToCurrency!);
     });
-    print('Selected Account: accountId=$mToAccountId, currency=$mToCurrency, balance=$mToAmount');
+    print(
+        'Selected Account: accountId=$mToAccountId, currency=$mToCurrency, balance=$mToAmount');
   }
 
   @override
@@ -124,7 +128,7 @@ class _UpdateRecipientScreenState extends State<UpdateRecipientScreen> {
           CustomSnackBar.showSnackBar(
               context: context,
               message: "We are facing some issue!",
-              color: kRedColor);
+              color: Colors.red);
         });
       }
     } catch (error) {
@@ -134,7 +138,7 @@ class _UpdateRecipientScreenState extends State<UpdateRecipientScreen> {
         CustomSnackBar.showSnackBar(
             context: context,
             message: "Something went wrong!",
-            color: kRedColor);
+            color: Colors.red);
       });
     }
   }
@@ -146,7 +150,8 @@ class _UpdateRecipientScreenState extends State<UpdateRecipientScreen> {
     });
 
     try {
-      print('Exchange Money Request: userId=${AuthManager.getUserId()}, amount=${mAmountController.text}, fromCurrency=$mToCurrency, toCurrency=$mFromCurrency, accountId=$mToAccountId');
+      print(
+          'Exchange Money Request: userId=${AuthManager.getUserId()}, amount=${mAmountController.text}, fromCurrency=$mToCurrency, toCurrency=$mFromCurrency, accountId=$mToAccountId');
       final request = RecipientExchangeMoneyRequest(
         userId: AuthManager.getUserId(),
         amount: mAmountController.text,
@@ -164,7 +169,8 @@ class _UpdateRecipientScreenState extends State<UpdateRecipientScreen> {
           isSubmit = true;
           mFees = response.data.totalFees;
           mTotalAmount = response.data.totalCharge.toString();
-          mGetTotalAmount = response.data.convertedAmount; // Use API's convertedAmount
+          mGetTotalAmount =
+              response.data.convertedAmount; // Use API's convertedAmount
         });
       } else {
         setState(() {
@@ -173,7 +179,7 @@ class _UpdateRecipientScreenState extends State<UpdateRecipientScreen> {
           CustomSnackBar.showSnackBar(
             context: context,
             message: response.message ?? "We are facing some issue!",
-            color: kPrimaryColor,
+            color: Theme.of(context).extension<AppColors>()!.primary,
           );
         });
       }
@@ -184,7 +190,7 @@ class _UpdateRecipientScreenState extends State<UpdateRecipientScreen> {
         CustomSnackBar.showSnackBar(
           context: context,
           message: "Something went wrong: $error",
-          color: kRedColor,
+          color: Colors.red,
         );
       });
     }
@@ -197,11 +203,13 @@ class _UpdateRecipientScreenState extends State<UpdateRecipientScreen> {
     });
 
     try {
-      String amountText = '$mToCurrencySymbol ${mAmountController.text}'; // Selected account's currency
+      String amountText =
+          '$mToCurrencySymbol ${mAmountController.text}'; // Selected account's currency
       String conversionAmountText =
           '$mFromCurrencySymbol ${mGetTotalAmount?.toStringAsFixed(2) ?? '0.00'}'; // Recipient's currency
 
-      print('Update Recipient Request: userId=${AuthManager.getUserId()}, fee=$mFees, toCurrency=$mFromCurrency, recipientId=${widget.mRecipientId}, amount=${mAmountController.text}');
+      print(
+          'Update Recipient Request: userId=${AuthManager.getUserId()}, fee=$mFees, toCurrency=$mFromCurrency, recipientId=${widget.mRecipientId}, amount=${mAmountController.text}');
       final request = RecipientUpdateRequest(
           userId: AuthManager.getUserId(),
           fee: mFees.toString(),
@@ -235,7 +243,7 @@ class _UpdateRecipientScreenState extends State<UpdateRecipientScreen> {
           CustomSnackBar.showSnackBar(
               context: context,
               message: response.message ?? "We are facing some issue!",
-              color: kRedColor);
+              color: Colors.red);
         });
       }
     } catch (error) {
@@ -245,7 +253,7 @@ class _UpdateRecipientScreenState extends State<UpdateRecipientScreen> {
         CustomSnackBar.showSnackBar(
             context: context,
             message: "Something went wrong: $error",
-            color: kRedColor);
+            color: Colors.red);
       });
     }
   }
@@ -256,107 +264,117 @@ class _UpdateRecipientScreenState extends State<UpdateRecipientScreen> {
     return format.currencySymbol;
   }
 
-void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, double estimatedTotal) {
-  showDialog(
-    context: context,
-    barrierColor: Colors.black.withOpacity(0.3),
-    builder: (BuildContext context) {
-      return LayoutBuilder(
-        builder: (context, constraints) {
-          final screenWidth = MediaQuery.of(context).size.width;
-          final dialogWidth = screenWidth > 600 ? 500.0 : screenWidth * 0.9;
+  void _showInsufficientBalanceDialog(
+      double enteredAmount, double estimatedFee, double estimatedTotal) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.3),
+      builder: (BuildContext context) {
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final dialogWidth = screenWidth > 600 ? 500.0 : screenWidth * 0.9;
 
-          return BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-            child: Dialog(
-              backgroundColor: Colors.white,
-              elevation: 8,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: dialogWidth),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Stack(
-                        children: [
-                          Center(
-                            child: Lottie.asset(
-                              'assets/lottie/BalanceError.json',
-                              width: screenWidth > 600 ? 200 : 140,
-                              height: screenWidth > 600 ? 200 : 140,
-                              fit: BoxFit.contain,
+            return BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: Dialog(
+                backgroundColor: Colors.white,
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: dialogWidth),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Stack(
+                          children: [
+                            Center(
+                              child: Lottie.asset(
+                                'assets/lottie/BalanceError.json',
+                                width: screenWidth > 600 ? 200 : 140,
+                                height: screenWidth > 600 ? 200 : 140,
+                                fit: BoxFit.contain,
+                              ),
                             ),
-                          ),
-                          Positioned(
-                            right: 0,
-                            child: IconButton(
-                              icon: const Icon(Icons.close, color: Colors.black54),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
+                            Positioned(
+                              right: 0,
+                              child: IconButton(
+                                icon: const Icon(Icons.close,
+                                    color: Colors.black54),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Insufficient Balance',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: kRedColor,
+                          ],
                         ),
-                      ),
-                      const Divider(),
-                      const SizedBox(height: 20),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Your Entered Amount:- $mToCurrencySymbol ${enteredAmount.toStringAsFixed(2)}',
-                            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Insufficient Balance',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
                           ),
-                          const Divider(),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Estimated Fee:- $mToCurrencySymbol ${estimatedFee.toStringAsFixed(2)}',
-                            style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                          const Divider(),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Estimated Total Amount:- $mToCurrencySymbol ${estimatedTotal.toStringAsFixed(2)}',
-                            style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                          const Divider(),
-                          const SizedBox(height: 16),
-                          Text(
-                            'According to your account balance ($mToCurrencySymbol ${mToAmount!.toStringAsFixed(2)}), you will not be able to pay the estimated total amount.',
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500,
+                        ),
+                        const Divider(),
+                        const SizedBox(height: 20),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Your Entered Amount:- $mToCurrencySymbol ${enteredAmount.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16),
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                    ],
+                            const Divider(),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Estimated Fee:- $mToCurrencySymbol ${estimatedFee.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                  color: Colors.black54,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15),
+                            ),
+                            const Divider(),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Estimated Total Amount:- $mToCurrencySymbol ${estimatedTotal.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                  color: Colors.black54,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15),
+                            ),
+                            const Divider(),
+                            const SizedBox(height: 16),
+                            Text(
+                              'According to your account balance ($mToCurrencySymbol ${mToAmount!.toStringAsFixed(2)}), you will not be able to pay the estimated total amount.',
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
-      );
-    },
-  );
-}
-
+            );
+          },
+        );
+      },
+    );
+  }
 
   // Debounced function to handle amount changes
   void _onAmountChanged(String value) {
@@ -370,7 +388,8 @@ void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, d
             // Assume fees are 1% of the amount (adjust based on API behavior)
             double estimatedFee = enteredAmount * 0.01;
             double estimatedTotal = enteredAmount + estimatedFee;
-            print('Entered Amount: $enteredAmount, Estimated Fee: $estimatedFee, Estimated Total: $estimatedTotal, Available Balance: $mToAmount');
+            print(
+                'Entered Amount: $enteredAmount, Estimated Fee: $estimatedFee, Estimated Total: $estimatedTotal, Available Balance: $mToAmount');
             if (estimatedTotal > mToAmount!) {
               setState(() {
                 isExchangeLoading = false;
@@ -380,7 +399,8 @@ void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, d
                 mGetTotalAmount = 0.0;
                 isSubmit = false;
               });
-              _showInsufficientBalanceDialog(enteredAmount, estimatedFee, estimatedTotal);
+              _showInsufficientBalanceDialog(
+                  enteredAmount, estimatedFee, estimatedTotal);
             } else {
               mExchangeMoneyApi();
             }
@@ -396,7 +416,7 @@ void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, d
             CustomSnackBar.showSnackBar(
               context: context,
               message: "Please enter a valid amount",
-              color: kPrimaryColor,
+              color: Theme.of(context).extension<AppColors>()!.primary,
             );
           }
         } else {
@@ -411,7 +431,7 @@ void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, d
           CustomSnackBar.showSnackBar(
             context: context,
             message: "Please enter an amount",
-            color: kPrimaryColor,
+            color: Theme.of(context).extension<AppColors>()!.primary,
           );
         }
       } else {
@@ -426,7 +446,7 @@ void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, d
         CustomSnackBar.showSnackBar(
           context: context,
           message: "Please select an account",
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
         );
       }
     });
@@ -436,16 +456,52 @@ void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, d
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Beneficiary Account Details",
           style: TextStyle(color: Colors.white),
         ),
+         flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color.fromARGB(255, 6, 6, 6), // Dark neo-banking color
+                      Color(0xFF8A2BE2), // Gradient transition
+                      Color(0x00000000), // Transparent fade
+                    ],
+                    stops: [0.0, 0.7, 1.0],
+                  ),
+                ),
+              ),
+        actions: [
+          IconButton(
+            icon: const Icon(CupertinoIcons.bell_fill),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => NotificationScreen(),
+                  ));
+            },
+            tooltip: 'Notifications',
+          ),
+          IconButton(
+            icon: const Icon(CupertinoIcons.headphones),
+            onPressed: () {
+             Navigator.push(context, CupertinoPageRoute(builder: (context) => DashboardTicketScreen(),));
+            },
+            tooltip: 'Support',
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: kPrimaryColor),
+          ? Center(
+              child: CircularProgressIndicator(
+                  color: Theme.of(context).extension<AppColors>()!.primary),
             )
           : SingleChildScrollView(
               child: Padding(
@@ -458,12 +514,19 @@ void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, d
                       controller: mIbanController,
                       keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.next,
-                      cursorColor: kPrimaryColor,
+                      cursorColor:
+                          Theme.of(context).extension<AppColors>()!.primary,
                       readOnly: true,
-                      style: const TextStyle(color: kPrimaryColor),
+                      style: TextStyle(
+                          color: Theme.of(context)
+                              .extension<AppColors>()!
+                              .primary),
                       decoration: InputDecoration(
                         labelText: "IBAN / Account Number",
-                        labelStyle: const TextStyle(color: kPrimaryColor),
+                        labelStyle: TextStyle(
+                            color: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(),
@@ -477,12 +540,19 @@ void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, d
                       controller: mBicCodeController,
                       keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.next,
-                      cursorColor: kPrimaryColor,
+                      cursorColor:
+                          Theme.of(context).extension<AppColors>()!.primary,
                       readOnly: true,
-                      style: const TextStyle(color: kPrimaryColor),
+                      style: TextStyle(
+                          color: Theme.of(context)
+                              .extension<AppColors>()!
+                              .primary),
                       decoration: InputDecoration(
                         labelText: "Routing/IFSC/BIC/SwiftCode",
-                        labelStyle: const TextStyle(color: kPrimaryColor),
+                        labelStyle: TextStyle(
+                            color: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(),
@@ -496,12 +566,19 @@ void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, d
                       controller: mCurrencyController,
                       keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.next,
-                      cursorColor: kPrimaryColor,
-                      style: const TextStyle(color: kPrimaryColor),
+                      cursorColor:
+                          Theme.of(context).extension<AppColors>()!.primary,
+                      style: TextStyle(
+                          color: Theme.of(context)
+                              .extension<AppColors>()!
+                              .primary),
                       readOnly: true,
                       decoration: InputDecoration(
                         labelText: "Currency",
-                        labelStyle: const TextStyle(color: kPrimaryColor),
+                        labelStyle: TextStyle(
+                            color: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(),
@@ -517,7 +594,7 @@ void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, d
                       },
                       child: Card(
                         elevation: 1.0,
-                        color: kPrimaryLightColor,
+                        color: AppColors.light.primaryLight,
                         margin: const EdgeInsets.symmetric(
                             vertical: 0, horizontal: 0),
                         child: Padding(
@@ -540,33 +617,41 @@ void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, d
                                   children: [
                                     Text(
                                       '$mToCurrency Account',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 13,
-                                        color: kPrimaryColor,
+                                        color: Theme.of(context)
+                                            .extension<AppColors>()!
+                                            .primary,
                                       ),
                                     ),
                                     Text(
                                       '$mToIban',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontWeight: FontWeight.w500,
                                         fontSize: 13,
-                                        color: kPrimaryColor,
+                                        color: Theme.of(context)
+                                            .extension<AppColors>()!
+                                            .primary,
                                       ),
                                     ),
                                     Text(
                                       '${getCurrencySymbol(mToCurrency!)}${mToAmount!.toStringAsFixed(2)}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontWeight: FontWeight.w500,
                                         fontSize: 12,
-                                        color: kPrimaryColor,
+                                        color: Theme.of(context)
+                                            .extension<AppColors>()!
+                                            .primary,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                              const Icon(Icons.navigate_next_rounded,
-                                  color: kPrimaryColor),
+                              Icon(Icons.navigate_next_rounded,
+                                  color: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary),
                             ],
                           ),
                         ),
@@ -577,11 +662,18 @@ void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, d
                       controller: mAmountController,
                       keyboardType: TextInputType.number,
                       textInputAction: TextInputAction.done,
-                      cursorColor: kPrimaryColor,
-                      style: const TextStyle(color: kPrimaryColor),
+                      cursorColor:
+                          Theme.of(context).extension<AppColors>()!.primary,
+                      style: TextStyle(
+                          color: Theme.of(context)
+                              .extension<AppColors>()!
+                              .primary),
                       decoration: InputDecoration(
                         labelText: "Enter Amount",
-                        labelStyle: const TextStyle(color: kPrimaryColor),
+                        labelStyle: TextStyle(
+                            color: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(),
@@ -608,16 +700,20 @@ void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, d
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
+                              Text(
                                 "Fee:",
                                 style: TextStyle(
-                                    color: kPrimaryColor,
+                                    color: Theme.of(context)
+                                        .extension<AppColors>()!
+                                        .primary,
                                     fontWeight: FontWeight.bold),
                               ),
                               Text(
                                 "$mToCurrencySymbol ${mFees!.toStringAsFixed(2)}",
-                                style: const TextStyle(
-                                    color: kPrimaryColor,
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .extension<AppColors>()!
+                                        .primary,
                                     fontWeight: FontWeight.bold),
                               ),
                             ],
@@ -626,25 +722,31 @@ void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, d
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
+                              Text(
                                 "Total Amount:",
                                 style: TextStyle(
-                                    color: kPrimaryColor,
+                                    color: Theme.of(context)
+                                        .extension<AppColors>()!
+                                        .primary,
                                     fontWeight: FontWeight.bold),
                               ),
                               isExchangeLoading
-                                  ? const SizedBox(
+                                  ? SizedBox(
                                       height: 20,
                                       width: 20,
                                       child: CircularProgressIndicator(
-                                        color: kPrimaryColor,
+                                        color: Theme.of(context)
+                                            .extension<AppColors>()!
+                                            .primary,
                                         strokeWidth: 2,
                                       ),
                                     )
                                   : Text(
                                       "$mToCurrencySymbol $mTotalAmount",
-                                      style: const TextStyle(
-                                          color: kPrimaryColor,
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .extension<AppColors>()!
+                                              .primary,
                                           fontWeight: FontWeight.bold),
                                     ),
                             ],
@@ -654,25 +756,31 @@ void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, d
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
+                              Text(
                                 "Get Total Amount:",
                                 style: TextStyle(
-                                    color: kPrimaryColor,
+                                    color: Theme.of(context)
+                                        .extension<AppColors>()!
+                                        .primary,
                                     fontWeight: FontWeight.bold),
                               ),
                               isExchangeLoading
-                                  ? const SizedBox(
+                                  ? SizedBox(
                                       height: 20,
                                       width: 20,
                                       child: CircularProgressIndicator(
-                                        color: kPrimaryColor,
+                                        color: Theme.of(context)
+                                            .extension<AppColors>()!
+                                            .primary,
                                         strokeWidth: 2,
                                       ),
                                     )
                                   : Text(
                                       "$mFromCurrencySymbol ${mGetTotalAmount?.toStringAsFixed(2) ?? '0.00'}",
-                                      style: const TextStyle(
-                                          color: kPrimaryColor,
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .extension<AppColors>()!
+                                              .primary,
                                           fontWeight: FontWeight.bold),
                                     ),
                             ],
@@ -682,8 +790,11 @@ void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, d
                     ),
                     const SizedBox(height: largePadding),
                     if (isSubmitLoading)
-                      const Center(
-                        child: CircularProgressIndicator(color: kPrimaryColor),
+                      Center(
+                        child: CircularProgressIndicator(
+                            color: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary),
                       ),
                     const SizedBox(height: 30),
                     Padding(
@@ -691,7 +802,9 @@ void _showInsufficientBalanceDialog(double enteredAmount, double estimatedFee, d
                       child: isSubmit
                           ? ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: kPrimaryColor,
+                                backgroundColor: Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .primary,
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 32, vertical: 16),
                                 shape: RoundedRectangleBorder(
@@ -827,21 +940,23 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Select Account',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: kPrimaryColor,
+                  color: Theme.of(context).extension<AppColors>()!.primary,
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.close, color: kPrimaryColor),
+                icon: Icon(Icons.close,
+                    color: Theme.of(context).extension<AppColors>()!.primary),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -851,8 +966,10 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
           const SizedBox(height: defaultPadding),
           Expanded(
             child: isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(color: kPrimaryColor),
+                ? Center(
+                    child: CircularProgressIndicator(
+                        color:
+                            Theme.of(context).extension<AppColors>()!.primary),
                   )
                 : errorMessage != null
                     ? Center(
@@ -862,13 +979,15 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
                             Text(
                               errorMessage!,
                               style: const TextStyle(
-                                  color: kRedColor, fontSize: 16),
+                                  color: Colors.red, fontSize: 16),
                             ),
                             const SizedBox(height: defaultPadding),
                             ElevatedButton(
                               onPressed: mAccounts,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: kPrimaryColor,
+                                backgroundColor: Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .primary,
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 32, vertical: 16),
                                 shape: RoundedRectangleBorder(
@@ -885,11 +1004,14 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
                         ),
                       )
                     : accountsListData.isEmpty
-                        ? const Center(
+                        ? Center(
                             child: Text(
                               'No Accounts Available',
-                              style:
-                                  TextStyle(color: kPrimaryColor, fontSize: 16),
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary,
+                                  fontSize: 16),
                             ),
                           )
                         : ListView.builder(
@@ -919,7 +1041,9 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
                                   child: Card(
                                     elevation: 5,
                                     color: isSelected
-                                        ? kPrimaryColor
+                                        ? Theme.of(context)
+                                            .extension<AppColors>()!
+                                            .primary
                                         : Colors.white,
                                     shape: RoundedRectangleBorder(
                                       borderRadius:
@@ -954,7 +1078,10 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
                                                   fontWeight: FontWeight.bold,
                                                   color: isSelected
                                                       ? Colors.white
-                                                      : kPrimaryColor,
+                                                      : Theme.of(context)
+                                                          .extension<
+                                                              AppColors>()!
+                                                          .primary,
                                                 ),
                                               ),
                                             ],
@@ -972,7 +1099,10 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
                                                   fontWeight: FontWeight.bold,
                                                   color: isSelected
                                                       ? Colors.white
-                                                      : kPrimaryColor,
+                                                      : Theme.of(context)
+                                                          .extension<
+                                                              AppColors>()!
+                                                          .primary,
                                                 ),
                                               ),
                                               Text(
@@ -982,7 +1112,10 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
                                                   fontWeight: FontWeight.bold,
                                                   color: isSelected
                                                       ? Colors.white
-                                                      : kPrimaryColor,
+                                                      : Theme.of(context)
+                                                          .extension<
+                                                              AppColors>()!
+                                                          .primary,
                                                 ),
                                               ),
                                             ],
@@ -1000,7 +1133,10 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
                                                   fontWeight: FontWeight.bold,
                                                   color: isSelected
                                                       ? Colors.white
-                                                      : kPrimaryColor,
+                                                      : Theme.of(context)
+                                                          .extension<
+                                                              AppColors>()!
+                                                          .primary,
                                                 ),
                                               ),
                                               Text(
@@ -1010,7 +1146,10 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
                                                   fontWeight: FontWeight.bold,
                                                   color: isSelected
                                                       ? Colors.white
-                                                      : kPrimaryColor,
+                                                      : Theme.of(context)
+                                                          .extension<
+                                                              AppColors>()!
+                                                          .primary,
                                                 ),
                                               ),
                                             ],

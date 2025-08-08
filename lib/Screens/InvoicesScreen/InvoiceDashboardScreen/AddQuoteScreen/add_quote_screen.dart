@@ -1,8 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quickcash/Screens/InvoicesScreen/ProductsScreen/ProductScreen/model/productApi.dart';
 import 'package:quickcash/Screens/InvoicesScreen/ProductsScreen/ProductScreen/model/productModel.dart';
 import 'package:quickcash/Screens/InvoicesScreen/QuotesScreen/quoteScreen/AddQuoteModel/addQuoteApi.dart';
 import 'package:quickcash/Screens/InvoicesScreen/QuotesScreen/quoteScreen/AddQuoteModel/addQuoteModel.dart';
+import 'package:quickcash/Screens/NotificationsScreen.dart/NotificationScreen.dart';
+import 'package:quickcash/Screens/TicketsScreen/TicketScreen/DashboardTicketScreen.dart';
 import 'package:quickcash/constants.dart';
 import 'package:intl/intl.dart'; //
 import 'package:quickcash/model/currencyApiModel/Model/currencyModel.dart';
@@ -241,7 +244,7 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
         if(response.message == "Quote Data is added Successfully!!!"){
           setState(() {
             isSubmitLoading = false;
-            CustomSnackBar.showSnackBar(context: context, message: "Quote Data is added Successfully!", color: kPrimaryColor);
+            CustomSnackBar.showSnackBar(context: context, message: "Quote Data is added Successfully!", color: Theme.of(context).extension<AppColors>()!.primary);
             Navigator.of(context).pop();
             Navigator.push(
               context,
@@ -254,7 +257,7 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
         }else{
           setState(() {
             isSubmitLoading = false;
-            CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue", color: kPrimaryColor);
+            CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue", color: Theme.of(context).extension<AppColors>()!.primary);
           });
         }
 
@@ -292,7 +295,7 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
         if(response.message == "Quote Data is added Successfully!!!"){
           setState(() {
             isSubmitLoading = false;
-            CustomSnackBar.showSnackBar(context: context, message: "Quote Data is added Successfully!", color: kPrimaryColor);
+            CustomSnackBar.showSnackBar(context: context, message: "Quote Data is added Successfully!", color: Theme.of(context).extension<AppColors>()!.primary);
             Navigator.of(context).pop();
             Navigator.push(
               context,
@@ -305,7 +308,7 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
         }else{
           setState(() {
             isSubmitLoading = false;
-            CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue", color: kPrimaryColor);
+            CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue", color: Theme.of(context).extension<AppColors>()!.primary);
           });
         }
       }
@@ -314,7 +317,7 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
         isSubmitLoading = false;
         CustomSnackBar.showSnackBar(context: context,
             message: "Something went wrong!",
-            color: kPrimaryColor);
+            color: Theme.of(context).extension<AppColors>()!.primary);
       });
     }
   }
@@ -355,12 +358,47 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Add Quote",
           style: TextStyle(color: Colors.white),
         ),
+          flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color.fromARGB(255, 6, 6, 6), // Dark neo-banking color
+                      Color(0xFF8A2BE2), // Gradient transition
+                      Color(0x00000000), // Transparent fade
+                    ],
+                    stops: [0.0, 0.7, 1.0],
+                  ),
+                ),
+              ),
+          actions: [
+          IconButton(
+            icon: const Icon(CupertinoIcons.bell_fill),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => NotificationScreen(),
+                  ));
+            },
+            tooltip: 'Notifications',
+          ),
+          IconButton(
+            icon: const Icon(CupertinoIcons.headphones),
+            onPressed: () {
+             Navigator.push(context, CupertinoPageRoute(builder: (context) => DashboardTicketScreen(),));
+            },
+            tooltip: 'Support',
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -376,14 +414,14 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                     controller: quoteNumber,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
+                    cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                     onSaved: (value) {},
                     readOnly: true,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     decoration: InputDecoration(
                       labelText: "Quote #",
                       labelStyle:
-                      const TextStyle(color: kPrimaryColor, fontSize: 16),
+                      TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(),
@@ -396,10 +434,10 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                     },
                   ),
                   const SizedBox(height: largePadding),
-                  const Text(
+                   Text(
                     "Select Type",
                     style: TextStyle(
-                        color: kPrimaryColor,
+                        color: Theme.of(context).extension<AppColors>()!.primary,
                         fontSize: 16,
                         fontWeight: FontWeight.w500),
                   ),
@@ -415,8 +453,8 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                           });
                         },
                       ),
-                      const Text(
-                          'Member', style: TextStyle(color: kPrimaryColor)),
+                       Text(
+                          'Member', style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary)),
                       Radio<String>(
                         value: 'other',
                         groupValue: selectedType,
@@ -426,8 +464,8 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                           });
                         },
                       ),
-                      const Text(
-                          'Other', style: TextStyle(color: kPrimaryColor)),
+                       Text(
+                          'Other', style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary)),
                     ],
                   ),
 
@@ -436,10 +474,10 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                     const SizedBox(height: largePadding),
                     DropdownButtonFormField<ClientsData>(
                       value: selectedMember,
-                      style: const TextStyle(color: kPrimaryColor),
+                      style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       decoration: InputDecoration(
                         labelText: 'Select Member',
-                        labelStyle: const TextStyle(color: kPrimaryColor),
+                        labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(),
@@ -452,8 +490,8 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                           value: role,
                           child: Text(
                             '${role.firstName} ${role.lastName}',
-                            style: const TextStyle(
-                                color: kPrimaryColor, fontSize: 16),
+                            style:  TextStyle(
+                                color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                           ),
                         );
                       }).toList(),
@@ -475,7 +513,7 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                       controller: receiverName,
                       keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.next,
-                      cursorColor: kPrimaryColor,
+                      cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                       onSaved: (value) {},
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -484,11 +522,11 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                         return null;
                       },
                       readOnly: false,
-                      style: const TextStyle(color: kPrimaryColor),
+                      style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       decoration: InputDecoration(
                         labelText: "Receiver Name",
                         labelStyle:
-                        const TextStyle(color: kPrimaryColor, fontSize: 16),
+                        TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(),
@@ -502,7 +540,7 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                       controller: receiverEmail,
                       keyboardType: TextInputType.emailAddress,
                       textInputAction: TextInputAction.next,
-                      cursorColor: kPrimaryColor,
+                      cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                       onSaved: (value) {},
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -511,11 +549,11 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                         return null;
                       },
                       readOnly: false,
-                      style: const TextStyle(color: kPrimaryColor),
+                      style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       decoration: InputDecoration(
                         labelText: "Receiver Email",
                         labelStyle:
-                        const TextStyle(color: kPrimaryColor, fontSize: 16),
+                        TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(),
@@ -529,7 +567,7 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                       controller: receiverAddress,
                       keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.next,
-                      cursorColor: kPrimaryColor,
+                      cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                       onSaved: (value) {},
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -538,11 +576,11 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                         return null;
                       },
                       readOnly: false,
-                      style: const TextStyle(color: kPrimaryColor),
+                      style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       decoration: InputDecoration(
                         labelText: "Receiver Address",
                         labelStyle:
-                        const TextStyle(color: kPrimaryColor, fontSize: 16),
+                        TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(),
@@ -564,20 +602,20 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                               ? ''
                               : DateFormat('yyyy-MM-dd').format(quoteDate!),
                         ),
-                        style: const TextStyle(color: kPrimaryColor),
+                        style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                         decoration: InputDecoration(
                           labelText: "Quote Date*",
                           labelStyle:
-                          const TextStyle(color: kPrimaryColor, fontSize: 16),
+                          TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(),
                           ),
                           filled: true,
                           fillColor: Colors.transparent,
-                          suffixIcon: const Icon(
+                          suffixIcon:  Icon(
                             Icons.calendar_today,
-                            color: kPrimaryColor,
+                            color: Theme.of(context).extension<AppColors>()!.primary,
                           ), // Add calendar icon here
                         ),
                       ),
@@ -596,20 +634,20 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                               ? ''
                               : DateFormat('yyyy-MM-dd').format(dueDate!),
                         ),
-                        style: const TextStyle(color: kPrimaryColor),
+                        style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                         decoration: InputDecoration(
                           labelText: "Due Date*",
                           labelStyle:
-                          const TextStyle(color: kPrimaryColor, fontSize: 16),
+                          TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(),
                           ),
                           filled: true,
                           fillColor: Colors.transparent,
-                          suffixIcon: const Icon(
+                          suffixIcon:  Icon(
                             Icons.calendar_today,
-                            color: kPrimaryColor,
+                            color: Theme.of(context).extension<AppColors>()!.primary,
                           ), // Add calendar icon here
                         ),
                       ),
@@ -620,11 +658,11 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                   const SizedBox(height: largePadding),
                   DropdownButtonFormField<String>(
                     value: selectedInvoiceTemplate,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
                     decoration: InputDecoration(
                       labelText: 'Invoice Template',
-                      labelStyle: const TextStyle(color: kPrimaryColor),
+                      labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(),
@@ -647,8 +685,8 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                     ].map((String role) {
                       return DropdownMenuItem(
                         value: role,
-                        child: Text(role, style: const TextStyle(
-                            color: kPrimaryColor, fontSize: 16),),
+                        child: Text(role, style:  TextStyle(
+                            color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),),
                       );
                     }).toList(),
                     onChanged: (newValue) {
@@ -680,8 +718,8 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                             return PopupMenuItem<String>(
                               value: currencyItem.currencyCode,
                               child: Text(currencyItem.currencyCode!,
-                                style: const TextStyle(
-                                    color: kPrimaryColor),), // Display the name or code of the currency
+                                style:  TextStyle(
+                                    color: Theme.of(context).extension<AppColors>()!.primary),), // Display the name or code of the currency
                             );
                           }).toList(),
                         ).then((String? newValue) {
@@ -702,16 +740,16 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                             horizontal: 12.0, vertical: 15.0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: kPrimaryColor),
+                          border: Border.all(color: Theme.of(context).extension<AppColors>()!.primary),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(selectedCurrency ?? "Select Currency",
-                                style: const TextStyle(
-                                    color: kPrimaryColor, fontSize: 16)),
-                            const Icon(Icons.arrow_drop_down,
-                                color: kPrimaryColor),
+                                style:  TextStyle(
+                                    color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16)),
+                             Icon(Icons.arrow_drop_down,
+                                color: Theme.of(context).extension<AppColors>()!.primary),
                           ],
                         ),
                       ),
@@ -775,12 +813,12 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                                       product.id ==
                                           productList[index].productId)
                                           : null,
-                                      style: const TextStyle(
-                                          color: kPrimaryColor),
+                                      style:  TextStyle(
+                                          color: Theme.of(context).extension<AppColors>()!.primary),
                                       decoration: InputDecoration(
                                         labelText: 'Product',
-                                        labelStyle: const TextStyle(
-                                            color: kPrimaryColor),
+                                        labelStyle:  TextStyle(
+                                            color: Theme.of(context).extension<AppColors>()!.primary),
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(
                                               12),
@@ -794,8 +832,8 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                                           child: Text(
                                             product.productName ??
                                                 'Unnamed Product',
-                                            style: const TextStyle(
-                                                color: kPrimaryColor,
+                                            style:  TextStyle(
+                                                color: Theme.of(context).extension<AppColors>()!.primary,
                                                 fontSize: 16),
                                           ),
                                         );
@@ -841,12 +879,12 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                                         text: productList[index].quantity,
                                       ),
                                       keyboardType: TextInputType.number,
-                                      style: const TextStyle(
-                                          color: kPrimaryColor),
+                                      style:  TextStyle(
+                                          color: Theme.of(context).extension<AppColors>()!.primary),
                                       decoration: InputDecoration(
                                         labelText: "Quantity",
-                                        labelStyle: const TextStyle(
-                                            color: kPrimaryColor),
+                                        labelStyle:  TextStyle(
+                                            color: Theme.of(context).extension<AppColors>()!.primary),
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(
                                               12),
@@ -877,12 +915,12 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                                         text: productList[index].price,
                                       ),
                                       keyboardType: TextInputType.number,
-                                      style: const TextStyle(
-                                          color: kPrimaryColor),
+                                      style:  TextStyle(
+                                          color: Theme.of(context).extension<AppColors>()!.primary),
                                       decoration: InputDecoration(
                                         labelText: "Price",
-                                        labelStyle: const TextStyle(
-                                            color: kPrimaryColor),
+                                        labelStyle:  TextStyle(
+                                            color: Theme.of(context).extension<AppColors>()!.primary),
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(
                                               12),
@@ -913,8 +951,8 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                                               horizontal: 14),
                                           child: Text(
                                             productList[index].amount,
-                                            style: const TextStyle(
-                                                color: kPrimaryColor,
+                                            style:  TextStyle(
+                                                color: Theme.of(context).extension<AppColors>()!.primary,
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 16),
                                           ),
@@ -955,8 +993,8 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                               onPressed: () {
                                 addProduct();
                               },
-                              child: const Icon(
-                                Icons.add, color: kPrimaryColor,),
+                              child:  Icon(
+                                Icons.add, color: Theme.of(context).extension<AppColors>()!.primary,),
                             ),
                           ],
                         ),
@@ -973,8 +1011,8 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                                 controller: discount,
                                 keyboardType: TextInputType.number,
                                 textInputAction: TextInputAction.next,
-                                cursorColor: kPrimaryColor,
-                                style: const TextStyle(color: kPrimaryColor),
+                                cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                 onChanged: (value) {
                                   setState(() {
                                     mDiscount();
@@ -990,8 +1028,8 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                                     borderSide: const BorderSide(),
                                   ),
                                   hintText: "0",
-                                  hintStyle: const TextStyle(
-                                      color: kPrimaryColor),
+                                  hintStyle:  TextStyle(
+                                      color: Theme.of(context).extension<AppColors>()!.primary),
                                 ),
                               ),
                             ),
@@ -999,12 +1037,12 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                             const SizedBox(width: defaultPadding,),
                             Expanded(child: DropdownButtonFormField<String>(
                               value: selectedDiscount,
-                              style: const TextStyle(color: kPrimaryColor),
+                              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
                               decoration: InputDecoration(
                                 labelText: 'Discount',
-                                labelStyle: const TextStyle(
-                                    color: kPrimaryColor),
+                                labelStyle:  TextStyle(
+                                    color: Theme.of(context).extension<AppColors>()!.primary),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(),
@@ -1015,8 +1053,8 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                                   .map((String role) {
                                 return DropdownMenuItem(
                                   value: role,
-                                  child: Text(role, style: const TextStyle(
-                                      color: kPrimaryColor, fontSize: 16),),
+                                  child: Text(role, style:  TextStyle(
+                                      color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),),
                                 );
                               }).toList(),
                               onChanged: (newValue) {
@@ -1037,19 +1075,19 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                           child: InputDecorator(
                             decoration: InputDecoration(
                               labelText: 'Select Taxes',
-                              labelStyle: const TextStyle(color: kPrimaryColor),
+                              labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(),
                               ),
-                              suffixIcon: const Icon(
-                                  Icons.arrow_drop_down, color: kPrimaryColor),
+                              suffixIcon:  Icon(
+                                  Icons.arrow_drop_down, color: Theme.of(context).extension<AppColors>()!.primary),
                             ),
                             child: Text(
                               selectedTaxes.isEmpty
                                   ? 'Select Taxes'
                                   : selectedTaxes.join(', '),
-                              style: const TextStyle(color: kPrimaryColor),
+                              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                             ),
                           ),
                         ),
@@ -1058,14 +1096,14 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text("Sub Total:", style: TextStyle(
-                                color: kPrimaryColor,
+                       Text("Sub Total:", style: TextStyle(
+                                color: Theme.of(context).extension<AppColors>()!.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold),),
                             Padding(padding: const EdgeInsets.symmetric(
                                 horizontal: defaultPadding),
-                              child: Text(subTotal, style: const TextStyle(
-                                  color: kPrimaryColor,
+                              child: Text(subTotal, style:  TextStyle(
+                                  color: Theme.of(context).extension<AppColors>()!.primary,
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold),),),
                           ],
@@ -1075,14 +1113,14 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text("Discount:", style: TextStyle(
-                                color: kPrimaryColor,
+                             Text("Discount:", style: TextStyle(
+                                color: Theme.of(context).extension<AppColors>()!.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold),),
                             Padding(padding: const EdgeInsets.symmetric(
                                 horizontal: defaultPadding),
-                              child: Text(showDiscount, style: const TextStyle(
-                                  color: kPrimaryColor,
+                              child: Text(showDiscount, style:  TextStyle(
+                                  color: Theme.of(context).extension<AppColors>()!.primary,
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold),),),
                           ],
@@ -1092,14 +1130,14 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text("Tax:", style: TextStyle(
-                                color: kPrimaryColor,
+                             Text("Tax:", style: TextStyle(
+                                color: Theme.of(context).extension<AppColors>()!.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold),),
                             Padding(padding: const EdgeInsets.symmetric(
                                 horizontal: defaultPadding),
-                              child: Text(showTaxes, style: const TextStyle(
-                                  color: kPrimaryColor,
+                              child: Text(showTaxes, style:  TextStyle(
+                                  color: Theme.of(context).extension<AppColors>()!.primary,
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold),),),
                           ],
@@ -1109,15 +1147,15 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text("Total:", style: TextStyle(
-                                color: kPrimaryColor,
+                             Text("Total:", style: TextStyle(
+                                color: Theme.of(context).extension<AppColors>()!.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold),),
                             Padding(padding: const EdgeInsets.symmetric(
                                 horizontal: defaultPadding),
                               child: Text(
-                                showTotalAmount, style: const TextStyle(
-                                  color: kPrimaryColor,
+                                showTotalAmount, style:  TextStyle(
+                                  color: Theme.of(context).extension<AppColors>()!.primary,
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold),),),
                           ],
@@ -1143,7 +1181,7 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                               ),
                               backgroundColor: _isAdded
                                   ? Colors.red
-                                  : kPrimaryColor,
+                                  : Theme.of(context).extension<AppColors>()!.primary,
                             ),
                           ),
                         ),
@@ -1159,17 +1197,17 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                                 controller: noteController,
                                 keyboardType: TextInputType.text,
                                 textInputAction: TextInputAction.next,
-                                cursorColor: kPrimaryColor,
+                                cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                                 onSaved: (value) {},
                                 readOnly: false,
-                                style: const TextStyle(color: kPrimaryColor),
+                                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                 maxLines: 5,
                                 minLines: 1,
                                 decoration: InputDecoration(
                                   labelText: "Note",
                                   labelStyle:
-                                  const TextStyle(
-                                      color: kPrimaryColor, fontSize: 16),
+                                   TextStyle(
+                                      color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide: const BorderSide(),
@@ -1187,17 +1225,17 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                                 controller: termsController,
                                 keyboardType: TextInputType.text,
                                 textInputAction: TextInputAction.next,
-                                cursorColor: kPrimaryColor,
+                                cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                                 onSaved: (value) {},
                                 readOnly: false,
                                 maxLines: 5,
                                 minLines: 1,
-                                style: const TextStyle(color: kPrimaryColor),
+                                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                 decoration: InputDecoration(
                                   labelText: "Terms",
                                   labelStyle:
-                                  const TextStyle(
-                                      color: kPrimaryColor, fontSize: 16),
+                                   TextStyle(
+                                      color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide: const BorderSide(),
@@ -1244,9 +1282,9 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                           height: largePadding,
                         ),
                         if (isSubmitLoading)
-                          const Center(
+                           Center(
                             child: CircularProgressIndicator(
-                              color: kPrimaryColor,
+                              color: Theme.of(context).extension<AppColors>()!.primary,
                             ),
                           ), // Show loading indicator
 
@@ -1270,7 +1308,7 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 14),
                                 ),
-                                backgroundColor: kPrimaryColor,
+                                backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                               ),
                             ),*/
 
@@ -1289,33 +1327,33 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                                     CustomSnackBar.showSnackBar(
                                         context: context,
                                         message: "Please select type",
-                                        color: kRedColor);
+                                        color: Colors.red);
                                   } else if (quoteDate == null) {
                                     CustomSnackBar.showSnackBar(
                                         context: context,
                                         message: "Please select invoice date",
-                                        color: kRedColor);
+                                        color: Colors.red);
                                   } else if (dueDate == null) {
                                     CustomSnackBar.showSnackBar(
                                         context: context,
                                         message: "Please select due date",
-                                        color: kRedColor);
+                                        color: Colors.red);
                                   } else if (selectedInvoiceTemplate.isEmpty) {
                                     CustomSnackBar.showSnackBar(
                                         context: context,
                                         message: "Please select invoice template",
-                                        color: kRedColor);
+                                        color: Colors.red);
                                   } else if (selectedCurrency!.isEmpty) {
                                     CustomSnackBar.showSnackBar(
                                         context: context,
                                         message: "Please select currency",
-                                        color: kRedColor);
+                                        color: Colors.red);
                                   } else {
 
                                     CustomSnackBar.showSnackBar(
                                         context: context,
                                         message: "Save",
-                                        color: kRedColor);
+                                        color: Colors.red);
                                   }
                                 },
                                 label: const Text(
@@ -1323,7 +1361,7 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 14),
                                 ),
-                                backgroundColor: kPrimaryColor,
+                                backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                               ),
                             ),
 
@@ -1383,14 +1421,14 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
         CustomSnackBar.showSnackBar(
           context: context,
           message: 'Selected product is incomplete.',
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
         );
       }
     } else {
       CustomSnackBar.showSnackBar(
         context: context,
         message: 'You cannot add more products.',
-        color: kPrimaryColor,
+        color: Theme.of(context).extension<AppColors>()!.primary,
       );
     }
   }
@@ -1432,7 +1470,7 @@ class _AddQuoteScreenState extends State<AddQuoteScreen> {
                     return CheckboxListTile(
                       title: Text(
                         '${tax.name ?? ''} - ${tax.taxValue ?? ''}',
-                        style: const TextStyle(color: kPrimaryColor),
+                        style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       ),
                       value: selectedTaxes.contains(
                           '${tax.name ?? ''} - ${tax.taxValue ?? ''}'),

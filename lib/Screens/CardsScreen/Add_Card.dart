@@ -4,8 +4,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:quickcash/Screens/CardsScreen/card_screen.dart';
 import 'package:quickcash/constants.dart';
 import 'package:quickcash/Screens/CardsScreen/addCardModel/addCardApi.dart';
-import 'package:quickcash/model/currencyApiModel/Model/currencyModel.dart';
-import 'package:quickcash/model/currencyApiModel/Services/currencyApi.dart';
+import 'package:quickcash/Screens/DashboardScreen/Dashboard/AccountsList/accountsListApi.dart';
 import 'package:quickcash/util/auth_manager.dart';
 
 class AddCardScreen extends StatefulWidget {
@@ -19,10 +18,10 @@ class AddCardScreen extends StatefulWidget {
 
 class _AddCardScreenState extends State<AddCardScreen> {
   final AddCardApi _addCardApi = AddCardApi();
-  final CurrencyApi _currencyApi = CurrencyApi();
+  final AccountsListApi _accountsListApi = AccountsListApi();
 
   String? selectedCurrency;
-  List<CurrencyListsData> currency = [];
+  List<String> currencies = [];
   TextEditingController name = TextEditingController();
 
   bool isLoading = false;
@@ -31,32 +30,36 @@ class _AddCardScreenState extends State<AddCardScreen> {
   @override
   void initState() {
     super.initState();
-    _getCurrency();
+    _getCurrenciesFromAccounts();
   }
 
-  Future<void> _getCurrency() async {
+  Future<void> _getCurrenciesFromAccounts() async {
     setState(() {
       isLoading = true;
       errorMessage = null;
     });
 
     try {
-      final response = await _currencyApi.currencyApi();
-      if (response.currencyList != null && response.currencyList!.isNotEmpty) {
+      final response = await _accountsListApi.accountsListApi();
+      if (response.accountsList != null && response.accountsList!.isNotEmpty) {
+        final uniqueCurrencies = response.accountsList!
+            .map((account) => account.currency!)
+            .toSet()
+            .toList();
         setState(() {
-          currency = response.currencyList!;
+          currencies = uniqueCurrencies;
           isLoading = false;
         });
       } else {
         setState(() {
           isLoading = false;
-          errorMessage = 'No currencies found';
+          errorMessage = 'No accounts found. Please add an account first.';
         });
       }
     } catch (e) {
       setState(() {
         isLoading = false;
-        errorMessage = 'Failed to load currencies';
+        errorMessage = 'Failed to load account currencies: $e';
       });
     }
   }
@@ -91,12 +94,11 @@ class _AddCardScreenState extends State<AddCardScreen> {
         setState(() {
           isLoading = false;
           name.clear();
-          widget.onCardAdded(); // Call the callback
+          widget.onCardAdded();
         });
-        // Navigate to CardsScreen and remove current screen from stack
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => CardsScreen()),
+          MaterialPageRoute(builder: (context) => const CardsScreen()),
         );
       } else if (response.message ==
           "Same Currency Account is already added in our record") {
@@ -107,7 +109,7 @@ class _AddCardScreenState extends State<AddCardScreen> {
         await _showRedirectDialog();
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => CardsScreen()),
+          MaterialPageRoute(builder: (context) => const CardsScreen()),
         );
       } else {
         setState(() {
@@ -124,7 +126,7 @@ class _AddCardScreenState extends State<AddCardScreen> {
         await _showRedirectDialog();
         Navigator.pushReplacement(
           context,
-          CupertinoPageRoute(builder: (context) => CardsScreen()),
+          CupertinoPageRoute(builder: (context) => const CardsScreen()),
         );
       }
     }
@@ -136,18 +138,19 @@ class _AddCardScreenState extends State<AddCardScreen> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+               CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).extension<AppColors>()!.primary),
               ),
               const SizedBox(height: 16),
               Text(
                 'You already added this card.\nWe are navigating you to Card Screen.',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: kPrimaryColor,
+                style:  TextStyle(
+                  color: Theme.of(context).extension<AppColors>()!.primary,
                   fontSize: 16,
                 ),
               ),
@@ -158,47 +161,96 @@ class _AddCardScreenState extends State<AddCardScreen> {
     );
 
     await Future.delayed(const Duration(seconds: 4));
-    Navigator.of(context).pop();
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 600;
+    final padding = isSmallScreen ? defaultPadding : defaultPadding * 1.5;
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color.fromARGB(255, 6, 6, 6),
+                Color(0xFF8A2BE2),
+                Color(0x00000000),
+              ],
+              stops: [0.0, 0.7, 1.0],
+            ),
+          ),
+        ),
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Add Virtual Card",
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+          ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(CupertinoIcons.bell),
+            onPressed: () => print('Notifications tapped'),
+            tooltip: 'Notifications',
+          ),
+          IconButton(
+            icon: const Icon(CupertinoIcons.headphones),
+            onPressed: () => print('Support tapped'),
+            tooltip: 'Support',
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(defaultPadding),
+        padding: EdgeInsets.all(padding),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              const Text(
+               Text(
                 "Add virtual card details here",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: kPrimaryColor,
+                  color: Theme.of(context).extension<AppColors>()!.primary,
                 ),
               ),
               const SizedBox(height: 20),
               Card(
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: Container(
                   width: double.infinity,
                   height: 200.0,
                   padding: const EdgeInsets.all(smallPadding),
                   decoration: BoxDecoration(
-                    color: Colors.grey,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.grey[700]!,
+                        Colors.grey[900]!,
+                      ],
+                    ),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.white.withOpacity(0.1),
+                        color: Colors.black.withOpacity(0.2),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -209,7 +261,11 @@ class _AddCardScreenState extends State<AddCardScreen> {
                       Positioned(
                         top: 25,
                         left: defaultPadding,
-                        child: Image.asset('assets/icons/chip.png'),
+                        child: Image.asset(
+                          'assets/icons/chip.png',
+                          width: 40,
+                          height: 40,
+                        ),
                       ),
                       const Positioned(
                         top: 80,
@@ -269,11 +325,11 @@ class _AddCardScreenState extends State<AddCardScreen> {
                 controller: name,
                 keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.next,
-                cursorColor: kPrimaryColor,
-                style: const TextStyle(color: kPrimaryColor),
+                cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 decoration: InputDecoration(
                   labelText: "Your Name",
-                  labelStyle: const TextStyle(color: kPrimaryColor, fontSize: 16),
+                  labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -285,79 +341,106 @@ class _AddCardScreenState extends State<AddCardScreen> {
                 },
               ),
               const SizedBox(height: defaultPadding),
-              GestureDetector(
-                onTap: () {
-                  if (currency.isNotEmpty) {
-                    RenderBox renderBox = context.findRenderObject() as RenderBox;
-                    Offset offset = renderBox.localToGlobal(Offset.zero);
-                    showMenu<String>(
-                      context: context,
-                      position: RelativeRect.fromLTRB(
-                        offset.dx,
-                        offset.dy + renderBox.size.height,
-                        offset.dx + renderBox.size.width,
-                        0.0,
-                      ),
-                      items: currency.map((CurrencyListsData currencyItem) {
-                        return PopupMenuItem<String>(
-                          value: currencyItem.currencyCode,
-                          child: Text(currencyItem.currencyCode!),
+              DropdownButtonFormField<String>(
+                value: selectedCurrency,
+                hint:  Text(
+                  "Select Currency",
+                  style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
+                ),
+                icon:  Icon(Icons.arrow_drop_down, color: Theme.of(context).extension<AppColors>()!.primary),
+                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
+                decoration: InputDecoration(
+                  labelText: "Currency",
+                  labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:  BorderSide(color: Theme.of(context).extension<AppColors>()!.primary),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:  BorderSide(color: Theme.of(context).extension<AppColors>()!.primary, width: 1.5),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:  BorderSide(color: Theme.of(context).extension<AppColors>()!.primary, width: 2),
+                  ),
+                  filled: true,
+                  fillColor: Colors.transparent,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 15,
+                  ),
+                ),
+                items: currencies.isNotEmpty
+                    ? currencies.map((String currency) {
+                        return DropdownMenuItem<String>(
+                          value: currency,
+                          child: Text(
+                            currency,
+                            style:  TextStyle(
+                              color: Theme.of(context).extension<AppColors>()!.primary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         );
-                      }).toList(),
-                    ).then((String? newValue) {
-                      if (newValue != null) {
+                      }).toList()
+                    : [
+                        const DropdownMenuItem<String>(
+                          value: null,
+                          child: Text(
+                            "No currencies available",
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                onChanged: currencies.isNotEmpty
+                    ? (String? newValue) {
                         setState(() {
                           selectedCurrency = newValue;
                         });
                       }
-                    });
-                  }
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12.0,
-                    vertical: 15.0,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: kPrimaryColor),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        selectedCurrency ?? "Select Currency",
-                        style: const TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const Icon(Icons.arrow_drop_down, color: kPrimaryColor),
-                    ],
-                  ),
-                ),
+                    : null,
+                isExpanded: true,
+                dropdownColor: const Color.fromARGB(255, 255, 255, 255),
+                menuMaxHeight: 300,
+                elevation: 8,
+                borderRadius: BorderRadius.circular(12),
               ),
-              if (errorMessage != null) ...[
-                const SizedBox(height: 20),
-                Text(
-                  errorMessage!,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ],
+              // if (currencies.isEmpty && errorMessage == null)
+              //   const Padding(
+              //     padding: EdgeInsets.only(top: 8.0),
+              //     child: Text(
+              //       "No account currencies available",
+              //       style: TextStyle(color: Colors.red, fontSize: 14),
+              //     ),
+              //   ),
+              // if (errorMessage != null) ...[
+              //   const SizedBox(height: 20),
+              //   Text(
+              //     errorMessage!,
+              //     style: const TextStyle(color: Colors.red),
+              //   ),
+              // ],
               const SizedBox(height: 45),
               Center(
                 child: isLoading
-                    ? const SpinKitWaveSpinner(color: kPrimaryColor, size: 75)
+                    ?  SpinKitWaveSpinner(color: Theme.of(context).extension<AppColors>()!.primary, size: 75)
                     : SizedBox(
                         width: 200,
                         child: ElevatedButton(
                           onPressed: _addCard,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: kPrimaryColor,
+                            backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                             padding: const EdgeInsets.symmetric(vertical: 16.0),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.0),
                             ),
+                            elevation: 5,
                           ),
                           child: const Text(
                             'Submit',

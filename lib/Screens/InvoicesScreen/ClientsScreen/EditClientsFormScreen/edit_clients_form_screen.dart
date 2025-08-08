@@ -131,7 +131,7 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
 
           final response = await _clientUpdateApi.clientUpdate(request, widget.clientsID);
 
-          CustomSnackBar.showSnackBar(context: context, message: response.message!, color: kGreenColor);
+          CustomSnackBar.showSnackBar(context: context, message: response.message!, color: Colors.green);
 
           setState(() {
             isLoading = false;
@@ -156,7 +156,7 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
 
           final response = await _clientUpdateApi.clientUpdate(request, widget.clientsID);
 
-          CustomSnackBar.showSnackBar(context: context, message: response.message!, color: kGreenColor);
+          CustomSnackBar.showSnackBar(context: context, message: response.message!, color: Colors.green);
 
           setState(() {
             isLoading = false;
@@ -178,7 +178,7 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Edit Client Form",
@@ -186,9 +186,9 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
         ),
       ),
       body: isLoading
-          ? const Center(
+          ?  Center(
         child: CircularProgressIndicator(
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
         ),
       )
           : SingleChildScrollView(
@@ -210,7 +210,7 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
                   controller: firstName,
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.next,
-                  cursorColor: kPrimaryColor,
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                   onSaved: (value) {},
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -220,7 +220,7 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
                   },
                   decoration: InputDecoration(
                     labelText: "First Name",
-                    labelStyle: const TextStyle(color: kPrimaryColor),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -234,7 +234,7 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
                   controller: lastName,
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.next,
-                  cursorColor: kPrimaryColor,
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                   onSaved: (value) {},
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -244,7 +244,7 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
                   },
                   decoration: InputDecoration(
                     labelText: "Last Name",
-                    labelStyle: const TextStyle(color: kPrimaryColor),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -258,7 +258,7 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
                   controller: email,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
-                  cursorColor: kPrimaryColor,
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                   onSaved: (value) {},
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -271,7 +271,7 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
                   },
                   decoration: InputDecoration(
                     labelText: "Email",
-                    labelStyle: const TextStyle(color: kPrimaryColor),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -285,7 +285,7 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
                   controller: mobile,
                   keyboardType: TextInputType.phone,
                   textInputAction: TextInputAction.next,
-                  cursorColor: kPrimaryColor,
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                   onSaved: (value) {},
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -295,7 +295,7 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
                   },
                   decoration: InputDecoration(
                     labelText: "Mobile Number",
-                    labelStyle: const TextStyle(color: kPrimaryColor),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -309,7 +309,7 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
                   controller: postalCode,
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.done,
-                  cursorColor: kPrimaryColor,
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                   onSaved: (value) {},
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -319,7 +319,7 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
                   },
                   decoration: InputDecoration(
                     labelText: "Postal Code",
-                    labelStyle: const TextStyle(color: kPrimaryColor),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -336,11 +336,11 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
                   dialogColor: Colors.white,
                   textFieldDecoration: InputDecoration(
                     filled: true,
-                    counterStyle: const TextStyle(color: kPrimaryColor),
-                    labelStyle: const TextStyle(color: kPrimaryColor),
-                    hintStyle: const TextStyle(color: kPrimaryColor),
-                    suffixIcon: const Icon(Icons.arrow_drop_down,
-                        color: kPrimaryColor),
+                    counterStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                    hintStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                    suffixIcon:  Icon(Icons.arrow_drop_down,
+                        color: Theme.of(context).extension<AppColors>()!.primary),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -353,11 +353,11 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
                 TextFormField(
                   controller: address,
                   keyboardType: TextInputType.text,
-                  cursorColor: kPrimaryColor,
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                   textInputAction: TextInputAction.none,
                   decoration: InputDecoration(
                     labelText: 'Address',
-                    labelStyle: const TextStyle(color: kPrimaryColor),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -378,11 +378,11 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
                 TextFormField(
                   controller: note,
                   keyboardType: TextInputType.text,
-                  cursorColor: kPrimaryColor,
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                   textInputAction: TextInputAction.none,
                   decoration: InputDecoration(
                     labelText: 'Notes',
-                    labelStyle: const TextStyle(color: kPrimaryColor),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -436,11 +436,11 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
                               );
                             }
                           },
-                          child: const CircleAvatar(
+                          child:  CircleAvatar(
                             backgroundColor: Colors.white,
                             child: Icon(
                               Icons.edit,
-                              color: kPrimaryColor,
+                              color: Theme.of(context).extension<AppColors>()!.primary,
                             ),
                           ),
                         ),
@@ -455,7 +455,7 @@ class _EditClientsFormScreenState extends State<EditClientsFormScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 50),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: kPrimaryColor,
+                      backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),

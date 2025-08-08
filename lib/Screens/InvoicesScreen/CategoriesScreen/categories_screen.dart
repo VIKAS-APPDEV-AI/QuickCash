@@ -83,12 +83,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         setState(() {
           mCategories();
           Navigator.of(context).pop();
-          CustomSnackBar.showSnackBar(context: context, message: "Category updated successfully!", color: kGreenColor);
+          CustomSnackBar.showSnackBar(context: context, message: "Category updated successfully!", color: Colors.green);
         });
       }else{
         setState(() {
           Navigator.of(context).pop();
-          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: kRedColor);
+          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: Colors.red);
         });
       }
 
@@ -108,12 +108,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         setState(() {
           mCategories();
           Navigator.of(context).pop();
-          CustomSnackBar.showSnackBar(context: context, message: "Category has been added Successfully!", color: kGreenColor);
+          CustomSnackBar.showSnackBar(context: context, message: "Category has been added Successfully!", color: Colors.green);
         });
       }else{
         setState(() {
           Navigator.of(context).pop();
-          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: kRedColor);
+          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: Colors.red);
         });
       }
     }catch (error) {
@@ -132,12 +132,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         setState(() {
           mCategories();
           Navigator.of(context).pop();
-          CustomSnackBar.showSnackBar(context: context, message: "Category Data has been deleted successfully!", color: kGreenColor);
+          CustomSnackBar.showSnackBar(context: context, message: "Category Data has been deleted successfully!", color: Colors.green);
         });
       }else{
         setState(() {
           Navigator.of(context).pop();
-          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: kRedColor);
+          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: Colors.red);
         });
       }
 
@@ -177,7 +177,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     child: TextFormField(
                       keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.next,
-                      cursorColor: kPrimaryColor,
+                      cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(defaultPadding),
@@ -200,14 +200,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       // Add your onPressed code here
                       _addCategoryDialog();
                     },
-                    child: const Icon(Icons.add, color: kPrimaryColor),
+                    child:  Icon(Icons.add, color: Theme.of(context).extension<AppColors>()!.primary),
                   ),
                 ],
               ),
               const SizedBox(height: largePadding),
-              isLoading ? const Center(
+              isLoading ?  Center(
                 child: CircularProgressIndicator(
-                  color: kPrimaryColor,
+                  color: Theme.of(context).extension<AppColors>()!.primary,
                 ),
               ) :ListView.builder(
                 shrinkWrap: true,
@@ -221,7 +221,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(defaultPadding),
                       decoration: BoxDecoration(
-                        color: kPrimaryColor,
+                        color: Theme.of(context).extension<AppColors>()!.primary,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
@@ -243,7 +243,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             ],
                           ),
                           const SizedBox(height: smallPadding),
-                          const Divider(color: kPrimaryLightColor),
+                          const Divider(color: Color(0xA66F35A5)),
                           const SizedBox(height: smallPadding),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -253,7 +253,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             ],
                           ),
                           const SizedBox(height: smallPadding),
-                          const Divider(color: kPrimaryLightColor),
+                          const Divider(color: Color(0xA66F35A5)),
                           const SizedBox(height: smallPadding),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -263,7 +263,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             ],
                           ),
                           const SizedBox(height: smallPadding),
-                          const Divider(color: kPrimaryLightColor),
+                          const Divider(color: Color(0xA66F35A5)),
                           const SizedBox(height: smallPadding),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -316,13 +316,13 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 TextFormField(
                   controller: categoryController, // Set controller to TextFormField
                   keyboardType: TextInputType.text,
-                  cursorColor: kPrimaryColor,
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                   textInputAction: TextInputAction.none,
                   maxLines: 4,
                   minLines: 1,
                   decoration: InputDecoration(
                     labelText: 'Category',
-                    labelStyle: const TextStyle(color: kPrimaryColor),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -386,13 +386,13 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 TextFormField(
                   controller: categoryName,
                   keyboardType: TextInputType.text,
-                  cursorColor: kPrimaryColor,
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                   textInputAction: TextInputAction.none,
                   maxLines: 4,
                   minLines: 1,
                   decoration: InputDecoration(
                     labelText: 'Category',
-                    labelStyle: const TextStyle(color: kPrimaryColor),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),

@@ -59,13 +59,13 @@ class _UpdateTaxScreenState extends State<UpdateTaxScreen> {
          setState(() {
            isLoading = false;
            errorMessage = null;
-           CustomSnackBar.showSnackBar(context: context, message: "Tax Data has been Updated!", color: kPrimaryColor);
+           CustomSnackBar.showSnackBar(context: context, message: "Tax Data has been Updated!", color: Theme.of(context).extension<AppColors>()!.primary);
          });
         }else{
           setState(() {
             isLoading = false;
             errorMessage = null;
-            CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: kPrimaryColor);
+            CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: Theme.of(context).extension<AppColors>()!.primary);
           });
         }
 
@@ -74,7 +74,7 @@ class _UpdateTaxScreenState extends State<UpdateTaxScreen> {
           isLoading = false;
           errorMessage = error.toString();
           CustomSnackBar.showSnackBar(
-              context: context, message: errorMessage!, color: kRedColor);
+              context: context, message: errorMessage!, color: Colors.red);
         });
       }
     }
@@ -85,7 +85,7 @@ class _UpdateTaxScreenState extends State<UpdateTaxScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Update Tax",
@@ -108,7 +108,7 @@ class _UpdateTaxScreenState extends State<UpdateTaxScreen> {
                     controller: name,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
+                    cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                     onSaved: (value) {},
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -117,11 +117,11 @@ class _UpdateTaxScreenState extends State<UpdateTaxScreen> {
                       return null;
                     },
                     readOnly: false,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     decoration: InputDecoration(
                       labelText: "Name",
                       labelStyle:
-                      const TextStyle(color: kPrimaryColor, fontSize: 16),
+                      TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(),
@@ -137,7 +137,7 @@ class _UpdateTaxScreenState extends State<UpdateTaxScreen> {
                     controller: taxRate,
                     keyboardType: TextInputType.number,
                     textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
+                    cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                     onSaved: (value) {},
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -146,11 +146,11 @@ class _UpdateTaxScreenState extends State<UpdateTaxScreen> {
                       return null;
                     },
                     readOnly: false,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     decoration: InputDecoration(
                       labelText: "Tax Rate",
                       labelStyle:
-                      const TextStyle(color: kPrimaryColor, fontSize: 16),
+                      TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(),
@@ -160,10 +160,10 @@ class _UpdateTaxScreenState extends State<UpdateTaxScreen> {
                     ),
                   ),
                   const SizedBox(height: 35),
-                  const Text(
+                  Text(
                     "Default",
                     style: TextStyle(
-                        color: kPrimaryColor,
+                        color: Theme.of(context).extension<AppColors>()!.primary,
                         fontSize: 16,
                         fontWeight: FontWeight.w500),
                   ),
@@ -179,7 +179,7 @@ class _UpdateTaxScreenState extends State<UpdateTaxScreen> {
                           });
                         },
                       ),
-                      const Text('Yes', style: TextStyle(color: kPrimaryColor)),
+                      Text('Yes', style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary)),
                       Radio<String>(
                         value: 'no',
                         groupValue: selectedType,
@@ -189,14 +189,14 @@ class _UpdateTaxScreenState extends State<UpdateTaxScreen> {
                           });
                         },
                       ),
-                      const Text('No', style: TextStyle(color: kPrimaryColor)),
+                      Text('No', style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary)),
                     ],
                   ),
 
                   const SizedBox(height: defaultPadding,),
-                  if (isLoading) const Center(
+                  if (isLoading)  Center(
                     child: CircularProgressIndicator(
-                      color: kPrimaryColor,
+                      color: Theme.of(context).extension<AppColors>()!.primary,
                     ),
                   ), // Show loading indicator
                   if (errorMessage != null) // Show error message if there's an error
@@ -216,7 +216,7 @@ class _UpdateTaxScreenState extends State<UpdateTaxScreen> {
                           'Submit',
                           style: TextStyle(color: Colors.white, fontSize: 15),
                         ),
-                        backgroundColor: kPrimaryColor,
+                        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                       ),
                     ),
                   )

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Import the services package
+import 'package:flutter/services.dart';
 import 'package:quickcash/Screens/UserProfileScreen/AdditionalInformationScreen/model/additionalInformationApi.dart';
 import 'package:quickcash/util/apiConstants.dart';
+import 'package:quickcash/util/error_handler.dart';
+import 'package:quickcash/util/customSnackBar.dart';
 import '../../../../constants.dart';
 
 class AdditionalInfoScreen extends StatefulWidget {
@@ -12,25 +14,75 @@ class AdditionalInfoScreen extends StatefulWidget {
 }
 
 class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
-  final AdditionalInformationApi _additionalInformationApi =
-      AdditionalInformationApi();
+  final AdditionalInformationApi _additionalInformationApi = AdditionalInformationApi();
 
-  // Add text controllers to bind to the text fields
   final TextEditingController _stateController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _zipCodeController = TextEditingController();
-  final TextEditingController _documentSubmittedController =
-      TextEditingController();
+  final TextEditingController _documentSubmittedController = TextEditingController();
   final TextEditingController _documentNoController = TextEditingController();
   final TextEditingController _referralLinkController = TextEditingController();
 
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    mAdditionalInformation();
+  }
+
   void _copyReferralLink() {
-    Clipboard.setData(ClipboardData(text: _referralLinkController.text))
-        .then((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Referral link copied to clipboard!')),
+    Clipboard.setData(ClipboardData(text: _referralLinkController.text)).then((_) {
+      CustomSnackBar.showSnackBar(
+        context: context,
+        message: 'Referral link copied to clipboard!',
+        color: Colors.green,
       );
     });
+  }
+
+  Future<void> mAdditionalInformation() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await _additionalInformationApi.additionalInformation();
+
+      _stateController.text = response.state ?? '';
+      _cityController.text = response.city ?? '';
+      _zipCodeController.text = response.postalCode ?? '';
+      _documentSubmittedController.text =
+          response.documentSubmitted != null ? mCapitalizeFirstLetter(response.documentSubmitted!) : '';
+      _documentNoController.text = response.documentNo ?? '';
+
+      if (response.referralDetails != null && response.referralDetails!.isNotEmpty) {
+        final referralCode = response.referralDetails!.first.referralCode?.toString() ?? '';
+        _referralLinkController.text = '${ApiConstants.baseReferralCodeUrl}$referralCode';
+      } else {
+        _referralLinkController.text = '';
+      }
+
+      setState(() {
+        isLoading = false;
+      });
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+      });
+
+      final message = getFriendlyErrorMessage(error);
+      CustomSnackBar.showSnackBar(
+        context: context,
+        message: message,
+        color: Colors.red,
+      );
+    }
+  }
+
+  String mCapitalizeFirstLetter(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1);
   }
 
   @override
@@ -44,236 +96,71 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
     super.dispose();
   }
 
-  // Api Integration -------
-  bool isLoading = false;
-  String? errorMessage;
-
-  @override
-  void initState() {
-    super.initState();
-    mAdditionalInformation();
-  }
-
-  Future<void> mAdditionalInformation() async {
-    setState(() {
-      isLoading = true;
-      errorMessage = null;
-    });
-
-    try {
-      final response = await _additionalInformationApi.additionalInformation();
-
-      if (response.state != null) {
-        _stateController.text = response.state!;
-      }
-      if (response.city != null) {
-        _cityController.text = response.city!;
-      }
-      if (response.postalCode != null) {
-        _zipCodeController.text = response.postalCode!;
-      }
-
-      if (response.documentSubmitted != null) {
-        // Capitalize the first letter of 'documentSubmitted' to 'Document Submitted'
-        _documentSubmittedController.text =
-            mCapitalizeFirstLetter(response.documentSubmitted!);
-      }
-
-      if (response.documentNo != null) {
-        _documentNoController.text = response.documentNo!;
-      }
-
-      // Check if referralDetails is not null and not empty
-      if (response.referralDetails != null &&
-          response.referralDetails!.isNotEmpty) {
-        final referralCode =
-            response.referralDetails!.first.referralCode?.toString() ?? '';
-        final referralLink = '${ApiConstants.baseReferralCodeUrl}$referralCode';
-        _referralLinkController.text = referralLink;
-      } else {
-        // Handle the case where referralDetails is empty or null
-        _referralLinkController.text = ''; // Or set a default value
-      }
-
-      setState(() {
-        isLoading = false;
-      });
-    } catch (error) {
-      setState(() {
-        isLoading = false;
-        errorMessage = error.toString();
-      });
-    }
-  }
-
-  // Helper method to capitalize the first letter of a string
-  String mCapitalizeFirstLetter(String text) {
-    if (text.isEmpty) {
-      return text;
-    }
-    return text[0].toUpperCase() + text.substring(1);
-  }
-
   @override
   Widget build(BuildContext context) {
+      final colors = Theme.of(context).extension<AppColors>()!;
     return Scaffold(
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(defaultPadding),
-              child: Column(
+        child: Padding(
+          padding: const EdgeInsets.all(defaultPadding),
+          child: Column(
+            children: [
+              const SizedBox(height: defaultPadding),
+              if (isLoading)
+                 CircularProgressIndicator(color: Theme.of(context).extension<AppColors>()!.primary),
+
+              const SizedBox(height: defaultPadding),
+
+              _buildReadOnlyField("State", _stateController),
+              _buildReadOnlyField("City", _cityController),
+              _buildReadOnlyField("Zip Code", _zipCodeController),
+              _buildReadOnlyField("Document Submitted", _documentSubmittedController),
+              _buildReadOnlyField("Document Number", _documentNoController),
+
+              const SizedBox(height: defaultPadding),
+              TextFormField(
+                controller: _referralLinkController,
+                readOnly: true,
+                maxLines: 4,
+                minLines: 1,
+                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                decoration: InputDecoration(
+                  labelText: "Referral Link",
+                  labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const SizedBox(height: defaultPadding),
-
-                  if (isLoading)
-                    const CircularProgressIndicator(
-                      color: kPrimaryColor,
-                    ),
-                  // Show loading indicator
-                  if (errorMessage !=
-                      null) // Show error message if there's an error
-                    Text(errorMessage!,
-                        style: const TextStyle(color: Colors.red)),
-                  const SizedBox(
-                    height: defaultPadding,
-                  ),
-
-                  // State
-                  const SizedBox(height: defaultPadding),
-                  TextFormField(
-                    controller: _stateController,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
-                    onSaved: (value) {},
-                    readOnly: true,
-                    style: const TextStyle(color: kPrimaryColor),
-                    decoration: InputDecoration(
-                      labelText: "State",
-                      labelStyle: const TextStyle(color: kPrimaryColor),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(),
-                      ),
-                    ),
-                  ),
-
-                  // City
-                  const SizedBox(height: defaultPadding),
-                  TextFormField(
-                    controller: _cityController,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
-                    onSaved: (value) {},
-                    readOnly: true,
-                    style: const TextStyle(color: kPrimaryColor),
-                    decoration: InputDecoration(
-                      labelText: "City",
-                      labelStyle: const TextStyle(color: kPrimaryColor),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(),
-                      ),
-                    ),
-                  ),
-
-                  // Zip Code
-                  const SizedBox(height: defaultPadding),
-                  TextFormField(
-                    controller: _zipCodeController,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
-                    onSaved: (value) {},
-                    readOnly: true,
-                    style: const TextStyle(color: kPrimaryColor),
-                    decoration: InputDecoration(
-                      labelText: "Zip Code",
-                      labelStyle: const TextStyle(color: kPrimaryColor),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(),
-                      ),
-                    ),
-                  ),
-
-                  // Document Submitted
-                  const SizedBox(height: defaultPadding),
-                  TextFormField(
-                    controller: _documentSubmittedController,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
-                    onSaved: (value) {},
-                    readOnly: true,
-                    style: const TextStyle(color: kPrimaryColor),
-                    decoration: InputDecoration(
-                      labelText: "Document Submitted",
-                      labelStyle: const TextStyle(color: kPrimaryColor),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(),
-                      ),
-                    ),
-                  ),
-
-                  // Document Number
-                  const SizedBox(height: defaultPadding),
-                  TextFormField(
-                    controller: _documentNoController,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
-                    onSaved: (value) {},
-                    readOnly: true,
-                    style: const TextStyle(color: kPrimaryColor),
-                    decoration: InputDecoration(
-                      labelText: "Document Number",
-                      labelStyle: const TextStyle(color: kPrimaryColor),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(),
-                      ),
-                    ),
-                  ),
-
-                  // Referral Link
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    controller: _referralLinkController,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
-                    onSaved: (value) {},
-                    readOnly: true,
-                    maxLines: 4,
-                    minLines: 1,
-                    style: const TextStyle(color: kPrimaryColor),
-                    decoration: InputDecoration(
-                      labelText: "Referral Link",
-                      labelStyle: const TextStyle(color: kPrimaryColor),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(),
-                      ),
-                    ),
-                  ),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      IconButton(
-                        icon: const Icon(Icons.copy, color: kPrimaryColor),
-                        onPressed: _copyReferralLink, // Call the copy function
-                      ),
-                    ],
+                  IconButton(
+                    icon:  Icon(Icons.copy, color: Theme.of(context).extension<AppColors>()!.primary),
+                    onPressed: _copyReferralLink,
                   ),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReadOnlyField(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: defaultPadding),
+      child: TextFormField(
+        controller: controller,
+        readOnly: true,
+        style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
     );

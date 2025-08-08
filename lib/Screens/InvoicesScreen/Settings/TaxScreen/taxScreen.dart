@@ -51,14 +51,14 @@ class _TaxScreen extends State<TaxScreen> {
         setState(() {
           isLoading = false;
           errorMessage = 'No Tax List';
-          CustomSnackBar.showSnackBar(context: context, message: "No Tax List", color: kPrimaryColor);
+          CustomSnackBar.showSnackBar(context: context, message: "No Tax List", color: Theme.of(context).extension<AppColors>()!.primary);
         });
       }
     } catch (error) {
       setState(() {
         isLoading = false;
         errorMessage = error.toString();
-        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: kRedColor);
+        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: Colors.red);
       });
     }
   }
@@ -77,14 +77,14 @@ class _TaxScreen extends State<TaxScreen> {
           errorMessage = null;
           Navigator.of(context).pop(false);
           mTaxDetails("No");
-          CustomSnackBar.showSnackBar(context: context, message: "Tax data has been deleted successfully", color: kPrimaryColor);
+          CustomSnackBar.showSnackBar(context: context, message: "Tax data has been deleted successfully", color: Theme.of(context).extension<AppColors>()!.primary);
         });
       }else{
         setState(() {
           isLoading = false;
           errorMessage = null;
           Navigator.of(context).pop(false);
-          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: kPrimaryColor);
+          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: Theme.of(context).extension<AppColors>()!.primary);
         });
       }
 
@@ -92,7 +92,7 @@ class _TaxScreen extends State<TaxScreen> {
       setState(() {
         isLoading = false;
         errorMessage = error.toString();
-        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: kRedColor);
+        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: Colors.red);
       });
     }
   }
@@ -127,21 +127,21 @@ class _TaxScreen extends State<TaxScreen> {
                           MaterialPageRoute(builder: (context) => const AddTaxScreen()),
                         );
                       },
-                      backgroundColor: kPrimaryColor,
+                      backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                       label: const Text(
                         'Add Tax',
-                        style: TextStyle(color: kWhiteColor, fontSize: 15),
+                        style: TextStyle(color: Colors.white, fontSize: 15),
                       ),
-                      icon: const Icon(Icons.add, color: kWhiteColor),
+                      icon: const Icon(Icons.add, color: Colors.white),
                     ),
                   ),
                 ],
               ),
               SizedBox(height: 30,),
               isLoading
-                  ? const Center(
+                  ?  Center(
                 child: CircularProgressIndicator(
-                  color: kPrimaryColor,
+                  color: Theme.of(context).extension<AppColors>()!.primary,
                 ),
               )
                   : ListView.builder(
@@ -157,7 +157,7 @@ class _TaxScreen extends State<TaxScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(defaultPadding),
                         decoration: BoxDecoration(
-                          color: kPrimaryColor,
+                          color: Theme.of(context).extension<AppColors>()!.primary,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
@@ -184,7 +184,7 @@ class _TaxScreen extends State<TaxScreen> {
                               ],
                             ),
                             const SizedBox(height: smallPadding),
-                            const Divider(color: kPrimaryLightColor),
+                            const Divider(color: Color(0xFF6F35A5)),
                             const SizedBox(height: smallPadding),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -199,7 +199,7 @@ class _TaxScreen extends State<TaxScreen> {
                               ],
                             ),
                             const SizedBox(height: smallPadding),
-                            const Divider(color: kPrimaryLightColor),
+                            const Divider(color: Color(0xFF6F35A5)),
                             const SizedBox(height: smallPadding),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -215,7 +215,7 @@ class _TaxScreen extends State<TaxScreen> {
                               ],
                             ),
                             const SizedBox(height: smallPadding),
-                            const Divider(color: kPrimaryLightColor),
+                            const Divider(color: Color(0xFF6F35A5)),
 
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -231,12 +231,12 @@ class _TaxScreen extends State<TaxScreen> {
                                       taxDetails.isDefaultSwitch = newValue; // Update the switch state for this specific item
                                     });
                                   },
-                                  activeColor: kPurpleColor,
+                                  activeColor: Color(0xFF9568ff),
                                 ),
                               ],
                             ),
 
-                            const Divider(color: kPrimaryLightColor),
+                            const Divider(color: Color(0xFF6F35A5)),
 
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,

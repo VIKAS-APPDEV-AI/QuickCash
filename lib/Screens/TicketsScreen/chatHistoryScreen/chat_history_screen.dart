@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:quickcash/Screens/NotificationsScreen.dart/NotificationScreen.dart';
+import 'package:quickcash/Screens/TicketsScreen/TicketScreen/DashboardTicketScreen.dart';
 import 'package:quickcash/Screens/TicketsScreen/chatHistoryScreen/replyModel/chatReplyApi.dart';
 import 'package:quickcash/constants.dart';
 import 'package:quickcash/util/auth_manager.dart';
@@ -36,13 +39,15 @@ class ChatMessage {
 class ChatHistoryScreen extends StatefulWidget {
   final String? mID;
   final String? mChatStatus;
-  const ChatHistoryScreen({super.key, required this.mID, required this.mChatStatus});
+  const ChatHistoryScreen(
+      {super.key, required this.mID, required this.mChatStatus});
 
   @override
   State<ChatHistoryScreen> createState() => _ChatHistoryScreenState();
 }
 
-class _ChatHistoryScreenState extends State<ChatHistoryScreen> with SingleTickerProviderStateMixin {
+class _ChatHistoryScreenState extends State<ChatHistoryScreen>
+    with SingleTickerProviderStateMixin {
   final ChatReplyApi _chatReplyApi = ChatReplyApi();
   final ChatHistoryApi _chatHistoryApi = ChatHistoryApi();
   List<ChatMessage> messages = [];
@@ -150,7 +155,8 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with SingleTicker
           isFetchingNewMessage = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response.message ?? 'We are facing some issue!')),
+          SnackBar(
+              content: Text(response.message ?? 'We are facing some issue!')),
         );
       }
     } catch (error) {
@@ -231,14 +237,46 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppColors>()!;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text('Chat History', style: TextStyle(color: Colors.white)),
+        title:
+            const Text('Chat History', style: TextStyle(color: Colors.white)),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color.fromARGB(255, 6, 6, 6), // Dark neo-banking color
+                Color(0xFF8A2BE2), // Gradient transition
+                Color(0x00000000), // Transparent fade
+              ],
+              stops: [0.0, 0.7, 1.0],
+            ),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(CupertinoIcons.bell_fill),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => NotificationScreen(),
+                  ));
+            },
+            tooltip: 'Notifications',
+          ),
+           
+          const SizedBox(width: 8),
+        ],
       ),
       body: Column(
         children: [
+          SizedBox(height: 10,),
           Expanded(
             child: RefreshIndicator(
               onRefresh: _refreshChatHistory,
@@ -248,12 +286,17 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with SingleTicker
                       ? Center(child: Text(errorMessage!))
                       : ListView.builder(
                           controller: _scrollController,
-                          itemCount: messages.length + (isFetchingNewMessage ? 1 : 0), // Add extra item for dots
+                          itemCount: messages.length +
+                              (isFetchingNewMessage
+                                  ? 1
+                                  : 0), // Add extra item for dots
                           itemBuilder: (context, index) {
-                            if (isFetchingNewMessage && index == messages.length) {
+                            if (isFetchingNewMessage &&
+                                index == messages.length) {
                               return Align(
                                 alignment: Alignment.centerLeft,
-                                child: _buildTypingIndicator(), // Show animated dots
+                                child:
+                                    _buildTypingIndicator(), // Show animated dots
                               );
                             }
                             final message = messages[index];
@@ -263,7 +306,8 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with SingleTicker
                                   ? Alignment.centerLeft
                                   : Alignment.centerRight,
                               child: Container(
-                                margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 5, horizontal: 10),
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   color: isAdminMessage
@@ -278,7 +322,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with SingleTicker
                                     if (isAdminMessage) ...[
                                       CircleAvatar(
                                         radius: 20,
-                                        backgroundColor: kPurpleColor,
+                                        backgroundColor: colors.purple,
                                         child: Text(
                                           (message.from?.isNotEmpty ?? false)
                                               ? message.from![0]
@@ -300,11 +344,14 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with SingleTicker
                                         children: [
                                           Text(
                                             message.message ?? "",
-                                            style: const TextStyle(fontSize: 16),
+                                            style:
+                                                const TextStyle(fontSize: 16),
                                           ),
                                           Text(
                                             formatDate(message.createdAt ?? ""),
-                                            style: const TextStyle(fontSize: 10, color: Colors.grey),
+                                            style: const TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.grey),
                                           ),
                                         ],
                                       ),
@@ -313,7 +360,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with SingleTicker
                                       const SizedBox(width: 10),
                                       CircleAvatar(
                                         radius: 20,
-                                        backgroundColor: kGreenColor,
+                                        backgroundColor: colors.green,
                                         child: Text(
                                           (message.from?.isNotEmpty ?? false)
                                               ? message.from![0]
@@ -344,17 +391,25 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with SingleTicker
                           controller: _controller,
                           keyboardType: TextInputType.text,
                           textInputAction: TextInputAction.none,
-                          cursorColor: kPrimaryColor,
+                          cursorColor:
+                              Theme.of(context).extension<AppColors>()!.primary,
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(defaultPadding),
+                              borderRadius:
+                                  BorderRadius.circular(defaultPadding),
                               borderSide: const BorderSide(),
                             ),
                             filled: true,
                             fillColor: Colors.transparent,
                             hintText: "Type a message...",
-                            labelStyle: const TextStyle(color: kPrimaryColor),
-                            hintStyle: const TextStyle(color: kPrimaryColor),
+                            labelStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .primary),
+                            hintStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .primary),
                           ),
                           maxLines: 4,
                           minLines: 1,
@@ -363,8 +418,9 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with SingleTicker
                       const SizedBox(width: 10),
                       FloatingActionButton(
                         onPressed: _sendMessage,
-                        backgroundColor: kPrimaryColor,
-                        child: const Icon(Icons.send, color: kWhiteColor),
+                        backgroundColor:
+                            Theme.of(context).extension<AppColors>()!.primary,
+                        child: const Icon(Icons.send, color: Colors.white),
                       ),
                     ],
                   )

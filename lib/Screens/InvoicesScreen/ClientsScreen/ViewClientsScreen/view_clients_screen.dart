@@ -90,7 +90,7 @@ class _ViewClientsScreenState extends State<ViewClientsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "View Client",
@@ -98,9 +98,9 @@ class _ViewClientsScreenState extends State<ViewClientsScreen> {
         ),
       ),
       body: isLoading
-          ? const Center(
+          ?  Center(
         child: CircularProgressIndicator(
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
         ),
       )
           : SingleChildScrollView(
@@ -146,14 +146,14 @@ class _ViewClientsScreenState extends State<ViewClientsScreen> {
                     controller: name,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
+                    cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                     onSaved: (value){},
                     readOnly: true,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
                     decoration: InputDecoration(
                       labelText: "Full Name",
-                      labelStyle: const TextStyle(color: kPrimaryColor),
+                      labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide()
@@ -166,14 +166,14 @@ class _ViewClientsScreenState extends State<ViewClientsScreen> {
                     controller: email,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
+                    cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                     onSaved: (value) {},
                     readOnly: true,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
                     decoration: InputDecoration(
                       labelText: "Email",
-                      labelStyle: const TextStyle(color: kPrimaryColor),
+                      labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide()
@@ -186,14 +186,14 @@ class _ViewClientsScreenState extends State<ViewClientsScreen> {
                     controller: mobile,
                     keyboardType: TextInputType.phone,
                     textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
+                    cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                     onSaved: (value) {},
                     readOnly: true,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
                     decoration: InputDecoration(
                       labelText: "Mobile Number",
-                      labelStyle: const TextStyle(color: kPrimaryColor),
+                      labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide()
@@ -206,14 +206,14 @@ class _ViewClientsScreenState extends State<ViewClientsScreen> {
                     controller: country,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
+                    cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                     onSaved: (value) {},
                     readOnly: true,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
                     decoration: InputDecoration(
                       labelText: "Country",
-                      labelStyle: const TextStyle(color: kPrimaryColor),
+                      labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide()
@@ -226,14 +226,14 @@ class _ViewClientsScreenState extends State<ViewClientsScreen> {
                     controller: postalCode,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
+                    cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                     onSaved: (value) {},
                     readOnly: true,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
                     decoration: InputDecoration(
                       labelText: "Postal Code",
-                      labelStyle: const TextStyle(color: kPrimaryColor),
+                      labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide()
@@ -246,14 +246,14 @@ class _ViewClientsScreenState extends State<ViewClientsScreen> {
                     controller: address,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
+                    cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                     onSaved: (value) {},
                     readOnly: true,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
                     decoration: InputDecoration(
                       labelText: "Address",
-                      labelStyle: const TextStyle(color: kPrimaryColor),
+                      labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide()
@@ -266,14 +266,14 @@ class _ViewClientsScreenState extends State<ViewClientsScreen> {
                     controller: note,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
+                    cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                     onSaved: (value) {},
                     readOnly: true,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
                     decoration: InputDecoration(
                       labelText: "Note",
-                      labelStyle: const TextStyle(color: kPrimaryColor),
+                      labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide()
@@ -288,14 +288,14 @@ class _ViewClientsScreenState extends State<ViewClientsScreen> {
                     controller: lastUpdate,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
+                    cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                     onSaved: (value) {},
                     readOnly: true,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
                     decoration: InputDecoration(
                       labelText: "Last Update",
-                      labelStyle: const TextStyle(color: kPrimaryColor),
+                      labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide()

@@ -4,12 +4,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:quickcash/Screens/CardsScreen/WelcomCardScreen.dart';
 import 'package:quickcash/Screens/DashboardScreen/DashboardProvider/DashboardProvider.dart';
 import 'package:quickcash/Screens/WelcomeScreen/welcome_screen.dart';
 import 'package:quickcash/constants.dart';
 import 'package:quickcash/util/LoadingWidget.dart';
 import 'package:quickcash/util/auth_manager.dart';
 import 'package:quickcash/Screens/TransactionScreen/TransactionDetailsScreen/transaction_details_screen.dart';
+import 'package:quickcash/utils/themeProvider.dart';
 
 // Define a simple state management class for authentication and loading
 class AuthenticationState extends ChangeNotifier {
@@ -37,7 +39,7 @@ class AuthenticationState extends ChangeNotifier {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  
   /// 👇 Load environment variables first
   await dotenv.load(fileName: ".env");
 
@@ -57,6 +59,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (context) => AuthenticationState()),
         ChangeNotifierProvider(create: (context) => DashboardProvider()),
         ChangeNotifierProvider(create: (context) => TransactionProvider()),
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
       ],
       child: const QuickCashApp(),
     ),
@@ -68,49 +71,19 @@ class QuickCashApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Consumer<AuthenticationState>(
       builder: (context, authState, child) {
-          return MaterialApp(
+        return MaterialApp(
           title: 'Quickcash',
           debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            primaryColor: kPrimaryColor,
-            scaffoldBackgroundColor: Colors.white,
-            elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                foregroundColor: Colors.white,
-                backgroundColor: kPrimaryColor,
-                maximumSize: const Size(double.infinity, 56),
-                minimumSize: const Size(double.infinity, 56),
-              ),
-            ),
-            inputDecorationTheme: const InputDecorationTheme(
-              filled: true,
-              fillColor: kPrimaryLightColor,
-              iconColor: kPrimaryColor,
-              prefixIconColor: kPrimaryColor,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: defaultPadding,
-                vertical: defaultPadding,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(30)),
-                borderSide: BorderSide.none,
-              ),
-            ),
-            textTheme: GoogleFonts.poppinsTextTheme(
-              // Yaha apni desired font lagale
-              Theme.of(context).textTheme,
-            ),
-          ),
+          theme: lightTheme,
+          darkTheme: darkTheme,
+          themeMode: themeProvider.themeMode,
           home: Stack(
             children: [
-              // Main content
-              const WelcomeScreen(), // Example home screen; replace with your actual home screen or navigation logic
-              // Show loading indicator when isLoading is true
-              if (authState.isLoading)
-              const LoadingWidget(), // Use the Lottie animation as the global loading indicator
+              const WelcomeScreen(),
+              if (authState.isLoading) const LoadingWidget(),
             ],
           ),
         );

@@ -108,7 +108,7 @@ class _StatementDetailsScreenState extends State<StatementDetailsScreen>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         // Change back button color here
         title: const Text(
@@ -117,9 +117,9 @@ class _StatementDetailsScreenState extends State<StatementDetailsScreen>{
         ),
       ),
       body: isLoading
-          ? const Center(
+          ?  Center(
         child: CircularProgressIndicator(
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
         ),
       )
           : SingleChildScrollView(
@@ -137,7 +137,7 @@ class _StatementDetailsScreenState extends State<StatementDetailsScreen>{
 
               // Transaction Details Card
               Card(
-                color: kPrimaryColor,
+                color: Theme.of(context).extension<AppColors>()!.primary,
                 margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
                 child: Padding(
                   padding: const EdgeInsets.all(defaultPadding),
@@ -208,7 +208,7 @@ class _StatementDetailsScreenState extends State<StatementDetailsScreen>{
 
               // Sender Information Card
               Card(
-                color: kPrimaryColor,
+                color: Theme.of(context).extension<AppColors>()!.primary,
                 margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
                 child: Padding(
                   padding: const EdgeInsets.all(defaultPadding),
@@ -258,7 +258,7 @@ class _StatementDetailsScreenState extends State<StatementDetailsScreen>{
 
               // Receiver Information Card
               Card(
-                color: kPrimaryColor,
+                color: Theme.of(context).extension<AppColors>()!.primary,
                 margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
                 child: Padding(
                   padding: const EdgeInsets.all(defaultPadding),
@@ -331,7 +331,7 @@ class _StatementDetailsScreenState extends State<StatementDetailsScreen>{
 
               // Bank Status Card
               Card(
-                color: kPrimaryColor,
+                color: Theme.of(context).extension<AppColors>()!.primary,
                 margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
                 child: Padding(
                   padding: const EdgeInsets.all(defaultPadding),

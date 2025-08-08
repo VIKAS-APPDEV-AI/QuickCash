@@ -1,7 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:quickcash/Screens/DashboardScreen/AllAccountsScreen/AccountDetailsScreen/model/accountDetailsApi.dart';  // Import your API cardModel
+import 'package:quickcash/Screens/DashboardScreen/AllAccountsScreen/AccountDetailsScreen/model/accountDetailsApi.dart'; // Import your API cardModel
+import 'package:quickcash/Screens/NotificationsScreen.dart/NotificationScreen.dart';
+import 'package:quickcash/Screens/TicketsScreen/TicketScreen/DashboardTicketScreen.dart';
 
 import '../../../../constants.dart';
 import '../../../../util/customSnackBar.dart';
@@ -25,7 +28,7 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
   bool isLoading = false;
   String? errorMessage;
   String? name;
-  double? amount;  // Use double? for amount
+  double? amount; // Use double? for amount
 
   @override
   void initState() {
@@ -41,14 +44,16 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
     });
 
     try {
-      final response = await _accountDetailsApi.accountDetailsApi(widget.accountId!);
+      final response =
+          await _accountDetailsApi.accountDetailsApi(widget.accountId!);
 
       // Set the controller values directly after fetching the response
       accountNo?.text = response.accountNo?.toString() ?? '0';
       ifscCode?.text = response.ifscCode?.toString() ?? '0';
       currency.text = response.currency ?? "";
       name = response.name ?? "";
-      amount = response.amount ?? 0.0;  // Assign amount directly (no need to cast)
+      amount =
+          response.amount ?? 0.0; // Assign amount directly (no need to cast)
 
       setState(() {
         isLoading = false;
@@ -62,13 +67,13 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
   }
 
   void _copyIFSCCode() {
-      Clipboard.setData(ClipboardData(text: ifscCode!.text)).then((_) {
-        CustomSnackBar.showSnackBar(
-          context: context,
-          message: 'IFSC Code copied to clipboard!',
-          color: kPrimaryColor,
-        );
-      });
+    Clipboard.setData(ClipboardData(text: ifscCode!.text)).then((_) {
+      CustomSnackBar.showSnackBar(
+        context: context,
+        message: 'IFSC Code copied to clipboard!',
+        color: Theme.of(context).extension<AppColors>()!.primary,
+      );
+    });
   }
 
   void _copyAccountNo() {
@@ -76,7 +81,7 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
       CustomSnackBar.showSnackBar(
         context: context,
         message: 'Account No copied to clipboard!',
-        color: kPrimaryColor,
+        color: Theme.of(context).extension<AppColors>()!.primary,
       );
     });
   }
@@ -88,148 +93,199 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Account Details",
           style: TextStyle(color: Colors.white),
         ),
-      ),
-      body: isLoading
-          ? const Center(
-        child: CircularProgressIndicator(
-          color: kPrimaryColor,
-        ),
-      )
-          : SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(defaultPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(
-                height: defaultPadding,
-              ),
-              // Displaying the USD amount (Currency + amount)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Amount:",
-                    style: TextStyle(
-                        color: kPrimaryColor, fontWeight: FontWeight.w500),
-                  ),
-                  Text(
-                    amount != null
-                        ? "${getCurrencySymbol(currency.text)} ${amount!.toStringAsFixed(2)}"
-                        : "${currency.text} 0.00", // Safely display the formatted amount
-                    style: const TextStyle(
-                        color: kPrimaryColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18),
-                  ),
-                ],
-              ),
-              const SizedBox(height: smallPadding),
-              const Divider(color: kPrimaryLightColor),
-              const SizedBox(height: smallPadding),
-
-              // Account Number TextField
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: accountNo,
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                      cursorColor: kPrimaryColor,
-                      readOnly: true,  // Set readOnly to true as it’s just for display
-                      style: const TextStyle(color: kPrimaryColor),
-                      decoration: InputDecoration(
-                        labelText: "Account No.",
-                        labelStyle: const TextStyle(
-                            color: kPrimaryColor, fontSize: 16),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(),
-                        ),
-                        filled: true,
-                        fillColor: Colors.transparent,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.copy, color: kPrimaryColor),
-                    onPressed: _copyAccountNo,
-                  ),
-                ],
-              ),
-              const SizedBox(height: smallPadding),
-              const Divider(color: kPrimaryLightColor),
-              const SizedBox(height: smallPadding),
-
-              // IFSC Code TextField
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: ifscCode,
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                      cursorColor: kPrimaryColor,
-                      readOnly: true,  // Set readOnly to true
-                      style: const TextStyle(color: kPrimaryColor),
-                      decoration: InputDecoration(
-                        labelText: "IFSC Code",
-                        labelStyle: const TextStyle(
-                            color: kPrimaryColor, fontSize: 16),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(),
-                        ),
-                        filled: true,
-                        fillColor: Colors.transparent,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.copy, color: kPrimaryColor),
-                    onPressed: _copyIFSCCode,
-                  ),
-                ],
-              ),
-              const SizedBox(height: smallPadding),
-              const Divider(color: kPrimaryLightColor),
-              const SizedBox(height: smallPadding),
-
-              // Currency TextField
-              TextFormField(
-                controller: currency,
-                keyboardType: TextInputType.text,
-                textInputAction: TextInputAction.next,
-                cursorColor: kPrimaryColor,
-                readOnly: true,  // Set readOnly to true
-                style: const TextStyle(color: kPrimaryColor),
-                decoration: InputDecoration(
-                  labelText: "Currency",
-                  labelStyle: const TextStyle(
-                      color: kPrimaryColor, fontSize: 16),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(),
-                  ),
-                  filled: true,
-                  fillColor: Colors.transparent,
-                ),
-              ),
-            ],
+        actions: [
+          IconButton(
+            icon: const Icon(CupertinoIcons.bell_fill),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => NotificationScreen(),
+                  ));
+            },
+            tooltip: 'Notifications',
+          ),
+          IconButton(
+            icon: const Icon(CupertinoIcons.headphones),
+            onPressed: () {
+             Navigator.push(context, CupertinoPageRoute(builder: (context) => DashboardTicketScreen(),));
+            },
+            tooltip: 'Support',
+          ),
+          const SizedBox(width: 8),
+        ],
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color.fromARGB(255, 20, 20, 20), // Primary color
+                Color(0xFF8A2BE2), // Slightly lighter for gradient effect
+                Color(0x00000000), // Transparent at the bottom
+              ],
+              stops: [0.0, 0.7, 1.0],
+            ),
           ),
         ),
       ),
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).extension<AppColors>()!.primary,
+              ),
+            )
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(defaultPadding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: defaultPadding,
+                    ),
+                    // Displaying the USD amount (Currency + amount)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Amount:",
+                          style: TextStyle(
+                               color: isDarkMode ? Colors.white : Color(0xA66F35A5),
+                              fontWeight: FontWeight.w500),
+                        ),
+                        Text(
+                          amount != null
+                              ? "${getCurrencySymbol(currency.text)} ${amount!.toStringAsFixed(2)}"
+                              : "${currency.text} 0.00", // Safely display the formatted amount
+                          style: TextStyle(
+                             color: isDarkMode ? Colors.white : Color(0xA66F35A5),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: smallPadding),
+                    const Divider(color: Color(0xA66F35A5)),
+                    const SizedBox(height: smallPadding),
+
+                    // Account Number TextField
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: accountNo,
+                            keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.next,
+                            cursorColor: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary,
+                            readOnly:
+                                true, // Set readOnly to true as it’s just for display
+                            style: TextStyle(
+                                 color: isDarkMode ? Colors.white : Color(0xA66F35A5),),
+                            decoration: InputDecoration(
+                              labelText: "Account No.",
+                              labelStyle: TextStyle(
+                                   color: isDarkMode ? Colors.white : Color(0xA66F35A5),
+                                  fontSize: 16),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(),
+                              ),
+                              filled: true,
+                              fillColor: Colors.transparent,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.copy,
+                               color: isDarkMode ? Colors.white : Color(0xA66F35A5),),
+                          onPressed: _copyAccountNo,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: smallPadding),
+                    const Divider(color: Color(0xA66F35A5)),
+                    const SizedBox(height: smallPadding),
+
+                    // IFSC Code TextField
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: ifscCode,
+                            keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.next,
+                            cursorColor: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary,
+                            readOnly: true, // Set readOnly to true
+                            style: TextStyle(
+                                color: isDarkMode ? Colors.white : Color(0xA66F35A5),),
+                            decoration: InputDecoration(
+                              labelText: "IFSC Code",
+                              labelStyle: TextStyle(
+                                   color: isDarkMode ? Colors.white : Color(0xA66F35A5),
+                                  fontSize: 16),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(),
+                              ),
+                              filled: true,
+                              fillColor: Colors.transparent,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.copy,
+                               color: isDarkMode ? Colors.white : Color(0xA66F35A5),),
+                          onPressed: _copyIFSCCode,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: smallPadding),
+                    const Divider(color: Color(0xA66F35A5)),
+                    const SizedBox(height: smallPadding),
+
+                    // Currency TextField
+                    TextFormField(
+                      controller: currency,
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      cursorColor:
+                          Theme.of(context).extension<AppColors>()!.primary,
+                      readOnly: true, // Set readOnly to true
+                      style: TextStyle(
+                           color: isDarkMode ? Colors.white : Color(0xA66F35A5),),
+                      decoration: InputDecoration(
+                        labelText: "Currency",
+                        labelStyle: TextStyle(
+                              color: isDarkMode ? Colors.white : Color(0xA66F35A5),
+                            fontSize: 16),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(),
+                        ),
+                        filled: true,
+                        fillColor: Colors.transparent,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 }

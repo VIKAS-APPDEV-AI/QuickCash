@@ -1,6 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:quickcash/Screens/NotificationsScreen.dart/NotificationScreen.dart';
 import 'package:quickcash/Screens/ReferAndEarnScreen/model/referAndEarnApi.dart';
+import 'package:quickcash/Screens/TicketsScreen/TicketScreen/DashboardTicketScreen.dart';
 import 'package:quickcash/constants.dart';
 import 'package:quickcash/util/customSnackBar.dart';
 import 'package:share_plus/share_plus.dart';
@@ -25,7 +28,7 @@ class _ReferAndEarnScreenState extends State<ReferAndEarnScreen> {
         CustomSnackBar.showSnackBar(
           context: context,
           message: 'Referral link copied to clipboard!',
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
         );
       });
     } else {
@@ -91,19 +94,56 @@ class _ReferAndEarnScreenState extends State<ReferAndEarnScreen> {
 
   @override
   Widget build(BuildContext context) {
+     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
-        iconTheme: const IconThemeData(color: kWhiteColor),
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Refer & Earn",
-          style: TextStyle(color: kWhiteColor),
+          style: TextStyle(color: Colors.white),
         ),
+        flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color.fromARGB(255, 6, 6, 6), // Dark neo-banking color
+                      Color(0xFF8A2BE2), // Gradient transition
+                      Color(0x00000000), // Transparent fade
+                    ],
+                    stops: [0.0, 0.7, 1.0],
+                  ),
+                ),
+              ),
+                  actions: [
+          IconButton(
+            icon: const Icon(CupertinoIcons.bell_fill),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => NotificationScreen(),
+                  ));
+            },
+            tooltip: 'Notifications',
+          ),
+          IconButton(
+            icon: const Icon(CupertinoIcons.headphones),
+            onPressed: () {
+             Navigator.push(context, CupertinoPageRoute(builder: (context) => DashboardTicketScreen(),));
+            },
+            tooltip: 'Support',
+          ),
+          const SizedBox(width: 8),
+        ],
+      
       ),
       body: isLoading
-          ? const Center(
+          ?  Center(
               child: CircularProgressIndicator(
-                color: kPrimaryColor,
+                color: Theme.of(context).extension<AppColors>()!.primary,
               ),
             )
           : Column(
@@ -158,10 +198,14 @@ class _ReferAndEarnScreenState extends State<ReferAndEarnScreen> {
                                           child: Padding(
                                             padding: const EdgeInsets.all(8),
                                             child: Text(
+                                              style: TextStyle(color: isDarkMode
+                                  ? const Color.fromARGB(255, 15, 15, 15)
+                                  : const Color.fromARGB(255, 15, 15, 15),),
                                               referralLink ?? (errorMessage ?? 'Loading referral link...'),
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 2,
                                               softWrap: false,
+                                              
                                             ),
                                           ),
                                         ),
@@ -289,15 +333,15 @@ class _ReferAndEarnScreenState extends State<ReferAndEarnScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.red,
-                          side: const BorderSide(color: kPrimaryColor),
+                          side:  BorderSide(color: Theme.of(context).extension<AppColors>()!.primary),
                           minimumSize: const Size(double.infinity, 50),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           'INVITE NOW',
-                          style: TextStyle(color: kPrimaryColor, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontWeight: FontWeight.bold),
                         ),
                       ),
                       SizedBox(height: 30,)

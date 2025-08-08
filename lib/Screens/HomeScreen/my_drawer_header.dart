@@ -20,7 +20,7 @@ class _MyHeaderDrawerState extends State<MyHeaderDrawer>{
   @override
   Widget build(BuildContext context){
     return Container(
-      color: kPrimaryColor,
+      color: Theme.of(context).extension<AppColors>()!.primary,
       width: double.infinity,
       height: 200,
       padding: const EdgeInsets.only(top: 20.0),

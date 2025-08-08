@@ -1,4 +1,5 @@
 import 'package:country_flags/country_flags.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:quickcash/Screens/DashboardScreen/Dashboard/AccountsList/accountsListApi.dart';
@@ -6,6 +7,8 @@ import 'package:quickcash/Screens/DashboardScreen/Dashboard/AccountsList/account
 import 'package:quickcash/Screens/DashboardScreen/SendMoneyScreen/PayRecipientsScree/exchangeCurrencyModel/exchangeCurrencyApi.dart';
 import 'package:quickcash/Screens/DashboardScreen/SendMoneyScreen/PayRecipientsScree/makePaymentModel/makePaymentApi.dart';
 import 'package:quickcash/Screens/DashboardScreen/SendMoneyScreen/PayRecipientsScree/makePaymentModel/makePaymentModel.dart';
+import 'package:quickcash/Screens/NotificationsScreen.dart/NotificationScreen.dart';
+import 'package:quickcash/Screens/TicketsScreen/TicketScreen/DashboardTicketScreen.dart';
 import 'package:quickcash/constants.dart';
 import 'package:quickcash/util/currency_utils.dart';
 import 'package:lottie/lottie.dart';
@@ -121,7 +124,7 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
           CustomSnackBar.showSnackBar(
               context: context,
               message: "We are facing some issue!",
-              color: kPrimaryColor);
+              color: Theme.of(context).extension<AppColors>()!.primary);
         });
       }
     } catch (error) {
@@ -226,7 +229,7 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: kRedColor,
+                            color: Colors.red,
                           ),
                         ),
                         const Divider(),
@@ -324,7 +327,7 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
             CustomSnackBar.showSnackBar(
                 context: context,
                 message: "Recipient is added Successfully ",
-                color: kPrimaryColor);
+                color: Theme.of(context).extension<AppColors>()!.primary);
             Navigator.of(context).pop();
             Navigator.push(
               context,
@@ -339,7 +342,7 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
             CustomSnackBar.showSnackBar(
                 context: context,
                 message: "We are facing some issue",
-                color: kPrimaryColor);
+                color: Theme.of(context).extension<AppColors>()!.primary);
           });
         }
       } catch (error) {
@@ -348,7 +351,7 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
           CustomSnackBar.showSnackBar(
               context: context,
               message: "Something went wrong!",
-              color: kPrimaryColor);
+              color: Theme.of(context).extension<AppColors>()!.primary);
         });
       }
     }
@@ -358,11 +361,46 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
-          "Recipients",
+          "Add Recipient",
           style: TextStyle(color: Colors.white),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(CupertinoIcons.bell_fill),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => NotificationScreen(),
+                  ));
+            },
+            tooltip: 'Notifications',
+          ),
+          IconButton(
+            icon: const Icon(CupertinoIcons.headphones),
+            onPressed: () {
+             Navigator.push(context, CupertinoPageRoute(builder: (context) => DashboardTicketScreen(),));
+            },
+            tooltip: 'Support',
+          ),
+          const SizedBox(width: 8),
+        ],
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color.fromARGB(255, 20, 20, 20), // Primary color
+                Color(0xFF8A2BE2), // Slightly lighter for gradient effect
+                Color(0x00000000), // Transparent at the bottom
+              ],
+              stops: [0.0, 0.7, 1.0],
+            ),
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -383,11 +421,13 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                     padding: const EdgeInsets.all(defaultPadding),
                     child: Column(
                       children: [
-                        const Center(
+                        Center(
                           child: Text(
                             "Payment Information",
                             style: TextStyle(
-                                color: kPrimaryColor,
+                                color: Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .primary,
                                 fontSize: 20,
                                 fontWeight: FontWeight.w500),
                             textAlign: TextAlign.center,
@@ -410,7 +450,7 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                                   },
                                   child: Card(
                                     elevation: 1.0,
-                                    color: kPrimaryLightColor,
+                                    color: AppColors.light.primaryLight,
                                     margin: const EdgeInsets.symmetric(
                                         vertical: 0, horizontal: 0),
                                     child: Padding(
@@ -436,17 +476,21 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                                               children: [
                                                 Text(
                                                   '$mSendCurrency',
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 14,
-                                                    color: kPrimaryColor,
+                                                    color: Theme.of(context)
+                                                        .extension<AppColors>()!
+                                                        .primary,
                                                   ),
                                                 ),
                                               ],
                                             ),
                                           ),
-                                          const Icon(Icons.arrow_drop_down,
-                                              color: kPrimaryColor),
+                                          Icon(Icons.arrow_drop_down,
+                                              color: Theme.of(context)
+                                                  .extension<AppColors>()!
+                                                  .primary),
                                         ],
                                       ),
                                     ),
@@ -455,16 +499,21 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                                 const SizedBox(height: smallPadding),
                                 Row(
                                   children: [
-                                    const Text(
+                                    Text(
                                       'Send Avg Balance = ',
-                                      style: TextStyle(color: kPrimaryColor),
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .extension<AppColors>()!
+                                              .primary),
                                     ),
                                     Text(
                                       '${getCurrencySymbol(mSendCurrency!)}${mSendCurrencyAmount?.toStringAsFixed(2) ?? '0.00'}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14,
-                                        color: kPrimaryColor,
+                                        color: Theme.of(context)
+                                            .extension<AppColors>()!
+                                            .primary,
                                       ),
                                     ),
                                   ],
@@ -475,12 +524,16 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                                   decoration: InputDecoration(
                                     prefix: Text(
                                       '${getCurrencySymbol(mSendCurrency!)} ',
-                                      style:
-                                          const TextStyle(color: kPrimaryColor),
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .extension<AppColors>()!
+                                              .primary),
                                     ),
                                     labelText: 'Send',
-                                    labelStyle:
-                                        const TextStyle(color: kPrimaryColor),
+                                    labelStyle: TextStyle(
+                                        color: Theme.of(context)
+                                            .extension<AppColors>()!
+                                            .primary),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
                                       borderSide: const BorderSide(),
@@ -490,8 +543,13 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                                   ),
                                   keyboardType: TextInputType.number,
                                   textInputAction: TextInputAction.next,
-                                  cursorColor: kPrimaryColor,
-                                  style: const TextStyle(color: kPrimaryColor),
+                                  cursorColor: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary,
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .extension<AppColors>()!
+                                          .primary),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Please enter sender amount';
@@ -514,7 +572,9 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                                                 context: context,
                                                 message:
                                                     "Please enter a valid amount",
-                                                color: kPrimaryColor);
+                                                color: Theme.of(context)
+                                                    .extension<AppColors>()!
+                                                    .primary);
                                             return;
                                           }
 
@@ -523,7 +583,9 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                                                 context: context,
                                                 message:
                                                     "You don't have sufficient amount",
-                                                color: kPrimaryColor);
+                                                color: Theme.of(context)
+                                                    .extension<AppColors>()!
+                                                    .primary);
                                             return;
                                           }
 
@@ -553,7 +615,9 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                                                   context: context,
                                                   message:
                                                       "Please enter a valid amount",
-                                                  color: kPrimaryColor);
+                                                  color: Theme.of(context)
+                                                      .extension<AppColors>()!
+                                                      .primary);
                                             });
                                           }
                                         } else {
@@ -562,21 +626,27 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                                               context: context,
                                               message:
                                                   "Please enter sender amount",
-                                              color: kPrimaryColor);
+                                              color: Theme.of(context)
+                                                  .extension<AppColors>()!
+                                                  .primary);
                                         }
                                       } else {
                                         CustomSnackBar.showSnackBar(
                                             context: context,
                                             message:
                                                 "Please select Recipient will receive currency",
-                                            color: kPrimaryColor);
+                                            color: Theme.of(context)
+                                                .extension<AppColors>()!
+                                                .primary);
                                       }
                                     } else {
                                       CustomSnackBar.showSnackBar(
                                           context: context,
                                           message:
                                               "Please select send currency",
-                                          color: kPrimaryColor);
+                                          color: Theme.of(context)
+                                              .extension<AppColors>()!
+                                              .primary);
                                     }
                                   },
                                 ),
@@ -592,7 +662,7 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                               Container(
                                 height: 1,
                                 width: double.maxFinite,
-                                color: kPrimaryLightColor,
+                                color: Color(0xA66F35A5),
                               ),
                               Material(
                                 elevation: 6.0,
@@ -605,16 +675,20 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                                     color: Colors.white,
                                   ),
                                   child: isLoading
-                                      ? const Center(
+                                      ? Center(
                                           child: CircularProgressIndicator(
-                                            color: kPrimaryColor,
+                                            color: Theme.of(context)
+                                                .extension<AppColors>()!
+                                                .primary,
                                           ),
                                         )
-                                      : const Center(
+                                      : Center(
                                           child: Icon(
                                             Icons.arrow_downward,
                                             size: 30,
-                                            color: kPrimaryColor,
+                                            color: Theme.of(context)
+                                                .extension<AppColors>()!
+                                                .primary,
                                           ),
                                         ),
                                 ),
@@ -638,7 +712,7 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                                   },
                                   child: Card(
                                     elevation: 1.0,
-                                    color: kPrimaryLightColor,
+                                    color: AppColors.light.primaryLight,
                                     margin: const EdgeInsets.symmetric(
                                         vertical: 0, horizontal: 0),
                                     child: Padding(
@@ -664,17 +738,21 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                                               children: [
                                                 Text(
                                                   '$mReceiveCurrency',
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 14,
-                                                    color: kPrimaryColor,
+                                                    color: Theme.of(context)
+                                                        .extension<AppColors>()!
+                                                        .primary,
                                                   ),
                                                 ),
                                               ],
                                             ),
                                           ),
-                                          const Icon(Icons.arrow_drop_down,
-                                              color: kPrimaryColor),
+                                          Icon(Icons.arrow_drop_down,
+                                              color: Theme.of(context)
+                                                  .extension<AppColors>()!
+                                                  .primary),
                                         ],
                                       ),
                                     ),
@@ -687,12 +765,16 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                                   decoration: InputDecoration(
                                     prefix: Text(
                                       '${getCurrencySymbol(mReceiveCurrency!)} ',
-                                      style:
-                                          const TextStyle(color: kPrimaryColor),
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .extension<AppColors>()!
+                                              .primary),
                                     ),
                                     labelText: 'Recipient will receive',
-                                    labelStyle:
-                                        const TextStyle(color: kPrimaryColor),
+                                    labelStyle: TextStyle(
+                                        color: Theme.of(context)
+                                            .extension<AppColors>()!
+                                            .primary),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
                                       borderSide: const BorderSide(),
@@ -708,8 +790,13 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                                   },
                                   keyboardType: TextInputType.number,
                                   textInputAction: TextInputAction.next,
-                                  cursorColor: kPrimaryColor,
-                                  style: const TextStyle(color: kPrimaryColor),
+                                  cursorColor: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary,
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .extension<AppColors>()!
+                                          .primary),
                                   maxLines: 2,
                                   minLines: 1,
                                 ),
@@ -723,31 +810,39 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text('Charge',
+                            Text('Charge',
                                 style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: kPrimaryColor)),
+                                    color: Theme.of(context)
+                                        .extension<AppColors>()!
+                                        .primary)),
                             Text('$mSendCurrencySymbol $mTotalCharge',
-                                style: const TextStyle(
+                                style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: kPrimaryColor)),
+                                    color: Theme.of(context)
+                                        .extension<AppColors>()!
+                                        .primary)),
                           ],
                         ),
                         const Divider(),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text('Payable',
+                            Text('Payable',
                                 style: TextStyle(
                                     fontSize: 16,
-                                    color: kPrimaryColor,
+                                    color: Theme.of(context)
+                                        .extension<AppColors>()!
+                                        .primary,
                                     fontWeight: FontWeight.bold)),
                             Text('$mSendCurrencySymbol $mTotalPayable',
-                                style: const TextStyle(
+                                style: TextStyle(
                                     fontSize: 16,
-                                    color: kPrimaryColor,
+                                    color: Theme.of(context)
+                                        .extension<AppColors>()!
+                                        .primary,
                                     fontWeight: FontWeight.bold)),
                           ],
                         ),
@@ -771,11 +866,18 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                           controller: mFullName,
                           keyboardType: TextInputType.text,
                           textInputAction: TextInputAction.next,
-                          cursorColor: kPrimaryColor,
-                          style: const TextStyle(color: kPrimaryColor),
+                          cursorColor:
+                              Theme.of(context).extension<AppColors>()!.primary,
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary),
                           decoration: InputDecoration(
                             labelText: "Full Name",
-                            labelStyle: const TextStyle(color: kPrimaryColor),
+                            labelStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .primary),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: const BorderSide(),
@@ -798,11 +900,18 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                           controller: mEmail,
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
-                          cursorColor: kPrimaryColor,
-                          style: const TextStyle(color: kPrimaryColor),
+                          cursorColor:
+                              Theme.of(context).extension<AppColors>()!.primary,
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary),
                           decoration: InputDecoration(
                             labelText: "Your Email",
-                            labelStyle: const TextStyle(color: kPrimaryColor),
+                            labelStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .primary),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: const BorderSide(),
@@ -826,11 +935,18 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                           controller: mMobileNo,
                           keyboardType: TextInputType.phone,
                           textInputAction: TextInputAction.next,
-                          cursorColor: kPrimaryColor,
-                          style: const TextStyle(color: kPrimaryColor),
+                          cursorColor:
+                              Theme.of(context).extension<AppColors>()!.primary,
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary),
                           decoration: InputDecoration(
                             labelText: "Mobile Number",
-                            labelStyle: const TextStyle(color: kPrimaryColor),
+                            labelStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .primary),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: const BorderSide(),
@@ -850,11 +966,18 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                           controller: mBankName,
                           keyboardType: TextInputType.text,
                           textInputAction: TextInputAction.next,
-                          cursorColor: kPrimaryColor,
-                          style: const TextStyle(color: kPrimaryColor),
+                          cursorColor:
+                              Theme.of(context).extension<AppColors>()!.primary,
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary),
                           decoration: InputDecoration(
                             labelText: "Bank Name",
-                            labelStyle: const TextStyle(color: kPrimaryColor),
+                            labelStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .primary),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: const BorderSide(),
@@ -874,11 +997,18 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                           controller: mIban,
                           keyboardType: TextInputType.text,
                           textInputAction: TextInputAction.next,
-                          cursorColor: kPrimaryColor,
-                          style: const TextStyle(color: kPrimaryColor),
+                          cursorColor:
+                              Theme.of(context).extension<AppColors>()!.primary,
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary),
                           decoration: InputDecoration(
                             labelText: "IBAN / AC",
-                            labelStyle: const TextStyle(color: kPrimaryColor),
+                            labelStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .primary),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: const BorderSide(),
@@ -898,11 +1028,18 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                           controller: mBicCode,
                           keyboardType: TextInputType.text,
                           textInputAction: TextInputAction.next,
-                          cursorColor: kPrimaryColor,
-                          style: const TextStyle(color: kPrimaryColor),
+                          cursorColor:
+                              Theme.of(context).extension<AppColors>()!.primary,
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary),
                           decoration: InputDecoration(
                             labelText: "Routing/IFSC/BIC/SwiftCode",
-                            labelStyle: const TextStyle(color: kPrimaryColor),
+                            labelStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .primary),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: const BorderSide(),
@@ -922,11 +1059,18 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                           controller: mAddress,
                           keyboardType: TextInputType.text,
                           textInputAction: TextInputAction.next,
-                          cursorColor: kPrimaryColor,
-                          style: const TextStyle(color: kPrimaryColor),
+                          cursorColor:
+                              Theme.of(context).extension<AppColors>()!.primary,
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary),
                           decoration: InputDecoration(
                             labelText: "Recipient Address",
-                            labelStyle: const TextStyle(color: kPrimaryColor),
+                            labelStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .primary),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: const BorderSide(),
@@ -943,9 +1087,11 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                         ),
                         const SizedBox(height: largePadding),
                         if (isAddLoading)
-                          const Center(
+                          Center(
                             child: CircularProgressIndicator(
-                              color: kPrimaryColor,
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary,
                             ),
                           ),
                         const SizedBox(height: 35),
@@ -953,7 +1099,9 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 50),
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: kPrimaryColor,
+                              backgroundColor: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary,
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 32, vertical: 16),
                               shape: RoundedRectangleBorder(
@@ -1023,6 +1171,7 @@ class _PayRecipientsScreen extends State<PayRecipientsScreen> {
 
   void mReceiveCurrencyBottomSheet(BuildContext context) {
     showModalBottomSheet<void>(
+      
       context: context,
       isScrollControlled: true,
       builder: (BuildContext context) {
@@ -1119,21 +1268,23 @@ class _SendCurrencyBottomSheetState extends State<SendCurrencyBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
         body: Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Select Currency',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: kPrimaryColor,
+                color: Theme.of(context).extension<AppColors>()!.primary,
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.close, color: kPrimaryColor),
+              icon: Icon(Icons.close,
+                  color: Theme.of(context).extension<AppColors>()!.primary),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -1143,9 +1294,9 @@ class _SendCurrencyBottomSheetState extends State<SendCurrencyBottomSheet> {
         const SizedBox(height: defaultPadding),
         Expanded(
             child: isLoading
-                ? const Center(
+                ? Center(
                     child: CircularProgressIndicator(
-                      color: kPrimaryColor,
+                      color: Theme.of(context).extension<AppColors>()!.primary,
                     ),
                   )
                 : SingleChildScrollView(
@@ -1184,7 +1335,9 @@ class _SendCurrencyBottomSheetState extends State<SendCurrencyBottomSheet> {
                                         child: Card(
                                           elevation: 5,
                                           color: isSelected
-                                              ? kPrimaryColor
+                                              ? Theme.of(context)
+                                                  .extension<AppColors>()!
+                                                  .primary
                                               : Colors.white,
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
@@ -1222,7 +1375,10 @@ class _SendCurrencyBottomSheetState extends State<SendCurrencyBottomSheet> {
                                                             FontWeight.bold,
                                                         color: isSelected
                                                             ? Colors.white
-                                                            : kPrimaryColor,
+                                                            : Theme.of(context)
+                                                                .extension<
+                                                                    AppColors>()!
+                                                                .primary,
                                                       ),
                                                     ),
                                                   ],
@@ -1308,21 +1464,23 @@ class _ReceiveCurrencyBottomSheetState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
         body: Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Select Currency',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: kPrimaryColor,
+                color: Theme.of(context).extension<AppColors>()!.primary,
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.close, color: kPrimaryColor),
+              icon: Icon(Icons.close,
+                  color: Theme.of(context).extension<AppColors>()!.primary),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -1332,9 +1490,9 @@ class _ReceiveCurrencyBottomSheetState
         const SizedBox(height: defaultPadding),
         Expanded(
             child: isLoading
-                ? const Center(
+                ? Center(
                     child: CircularProgressIndicator(
-                      color: kPrimaryColor,
+                      color: Theme.of(context).extension<AppColors>()!.primary,
                     ),
                   )
                 : SingleChildScrollView(
@@ -1373,7 +1531,9 @@ class _ReceiveCurrencyBottomSheetState
                                         child: Card(
                                           elevation: 5,
                                           color: isSelected
-                                              ? kPrimaryColor
+                                              ? Theme.of(context)
+                                                  .extension<AppColors>()!
+                                                  .primary
                                               : Colors.white,
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
@@ -1411,7 +1571,10 @@ class _ReceiveCurrencyBottomSheetState
                                                             FontWeight.bold,
                                                         color: isSelected
                                                             ? Colors.white
-                                                            : kPrimaryColor,
+                                                            : Theme.of(context)
+                                                                .extension<
+                                                                    AppColors>()!
+                                                                .primary,
                                                       ),
                                                     ),
                                                   ],

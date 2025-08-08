@@ -54,7 +54,7 @@ class _PaymentQRCodeScreen extends State<PaymentQRCodeScreen> {
           isLoading = false;
           errorMessage = 'No QR-Code List';
           CustomSnackBar.showSnackBar(
-              context: context, message: "No Tax List", color: kPrimaryColor);
+              context: context, message: "No Tax List", color: Theme.of(context).extension<AppColors>()!.primary);
         });
       }
     } catch (error) {
@@ -62,7 +62,7 @@ class _PaymentQRCodeScreen extends State<PaymentQRCodeScreen> {
         isLoading = false;
         errorMessage = error.toString();
         CustomSnackBar.showSnackBar(
-            context: context, message: errorMessage!, color: kRedColor);
+            context: context, message: errorMessage!, color: Colors.red);
       });
     }
   }
@@ -81,14 +81,14 @@ class _PaymentQRCodeScreen extends State<PaymentQRCodeScreen> {
           errorMessage = null;
           Navigator.of(context).pop(false);
           mQRCodeDetails("No");
-          CustomSnackBar.showSnackBar(context: context, message: "QR Code data has been deleted successfully", color: kPrimaryColor);
+          CustomSnackBar.showSnackBar(context: context, message: "QR Code data has been deleted successfully", color: Theme.of(context).extension<AppColors>()!.primary);
         });
       }else{
         setState(() {
           isLoading = false;
           errorMessage = null;
           Navigator.of(context).pop(false);
-          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: kPrimaryColor);
+          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: Theme.of(context).extension<AppColors>()!.primary);
         });
       }
 
@@ -96,7 +96,7 @@ class _PaymentQRCodeScreen extends State<PaymentQRCodeScreen> {
       setState(() {
         isLoading = false;
         errorMessage = error.toString();
-        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: kRedColor);
+        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: Colors.red);
       });
     }
   }
@@ -133,21 +133,21 @@ class _PaymentQRCodeScreen extends State<PaymentQRCodeScreen> {
                                 const AddPaymentQRCodeScreen()),
                       );
                     },
-                    backgroundColor: kPrimaryColor,
+                    backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                     label: const Text(
                       'Add QR Code',
-                      style: TextStyle(color: kWhiteColor, fontSize: 15),
+                      style: TextStyle(color: Colors.white, fontSize: 15),
                     ),
-                    icon: const Icon(Icons.add, color: kWhiteColor),
+                    icon: const Icon(Icons.add, color: Colors.white),
                   ),
                 ),
               ],
             ),
            SizedBox(height: 30,),
             isLoading
-                ? const Center(
+                ?  Center(
                     child: CircularProgressIndicator(
-                      color: kPrimaryColor,
+                      color: Theme.of(context).extension<AppColors>()!.primary,
                     ),
                   )
                 : ListView.builder(
@@ -162,7 +162,7 @@ class _PaymentQRCodeScreen extends State<PaymentQRCodeScreen> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(defaultPadding),
                           decoration: BoxDecoration(
-                            color: kPrimaryColor,
+                            color: Theme.of(context).extension<AppColors>()!.primary,
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
@@ -189,7 +189,7 @@ class _PaymentQRCodeScreen extends State<PaymentQRCodeScreen> {
                                 ],
                               ),
                               const SizedBox(height: smallPadding),
-                              const Divider(color: kPrimaryLightColor),
+                              const Divider(color: Color(0xFF9568ff)),
                               const SizedBox(height: smallPadding),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -204,7 +204,7 @@ class _PaymentQRCodeScreen extends State<PaymentQRCodeScreen> {
                                 ],
                               ),
                               const SizedBox(height: smallPadding),
-                              const Divider(color: kPrimaryLightColor),
+                              const Divider(color: Color(0xFF9568ff)),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
@@ -224,13 +224,13 @@ class _PaymentQRCodeScreen extends State<PaymentQRCodeScreen> {
                                           return Container(
                                             height: 50,
                                             width: 50,
-                                            decoration: const BoxDecoration(
+                                            decoration:  BoxDecoration(
                                               shape: BoxShape.circle, // Circular container
-                                              color: kPrimaryColor, // Background color of the circle
+                                              color: Theme.of(context).extension<AppColors>()!.primary, // Background color of the circle
                                             ),
                                             child: const Icon(
                                               Icons.image_outlined,
-                                              color: kWhiteColor,
+                                              color: Colors.white,
                                               size: 40, // Adjust the icon size as needed
                                             ),
                                           );
@@ -241,7 +241,7 @@ class _PaymentQRCodeScreen extends State<PaymentQRCodeScreen> {
 
                                 ],
                               ),
-                              const Divider(color: kPrimaryLightColor),
+                              const Divider(color: Color(0xFF9568ff)),
 
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -257,12 +257,12 @@ class _PaymentQRCodeScreen extends State<PaymentQRCodeScreen> {
                                         qrCodeDetails.isDefaultSwitch = newValue; // Update the switch state for this specific item
                                       });
                                     },
-                                    activeColor: kPurpleColor,
+                                    activeColor: Color(0xFF6F35A5),
                                   ),
                                 ],
                               ),
 
-                              const Divider(color: kPrimaryLightColor),
+                              const Divider(color: Color(0xFF9568ff)),
 
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,

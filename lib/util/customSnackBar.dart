@@ -12,7 +12,7 @@ class CustomSnackBar {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message,style: const TextStyle(color: kWhiteColor),),
+        content: Text(message,style: const TextStyle(color: Colors.white),),
         backgroundColor: color,
         duration: duration,
       ),

@@ -1,14 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quickcash/Screens/CardsScreen/Add_Card.dart';
 import 'package:quickcash/Screens/CardsScreen/PhysicalCardConfirmation.dart';
-import 'package:quickcash/Screens/CardsScreen/PhysicalCardScreen.dart';
 import 'package:quickcash/Screens/CardsScreen/RequestPhysicalCard.dart';
 import 'package:quickcash/Screens/CardsScreen/card_screen.dart';
 import 'package:quickcash/Screens/DashboardScreen/Dashboard/KycStatusWidgets/KycStatusWidgets.dart';
+import 'package:quickcash/Screens/NotificationsScreen.dart/NotificationScreen.dart';
+import 'package:quickcash/Screens/TicketsScreen/TicketScreen/DashboardTicketScreen.dart';
 import 'package:quickcash/constants.dart';
 import 'package:quickcash/util/AnimatedContainerWidget.dart';
-import 'package:quickcash/util/auth_manager.dart'; // Import AuthManager for KYC status
-import 'package:quickcash/Screens/KYCScreen/kycHomeScreen.dart'; // Import for navigation
+import 'package:quickcash/util/auth_manager.dart';
+import 'package:quickcash/Screens/KYCScreen/kycHomeScreen.dart';
 
 class CardSelectionScreen extends StatefulWidget {
   const CardSelectionScreen({super.key});
@@ -17,15 +19,55 @@ class CardSelectionScreen extends StatefulWidget {
   State<CardSelectionScreen> createState() => _CardSelectionScreenState();
 }
 
-class _CardSelectionScreenState extends State<CardSelectionScreen> {
+class _CardSelectionScreenState extends State<CardSelectionScreen>
+    with TickerProviderStateMixin {
   String? kycStatus;
   bool isLoading = true;
   String? errorMessage;
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
-    _fetchKycStatus();
+
+    // Initialize animation controller
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+
+    // Initialize fade animation
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
+      ),
+    );
+
+    // Initialize slide animation
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0.0, 0.3),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.2, 0.8, curve: Curves.easeOutCubic),
+      ),
+    );
+
+    // Start animations and fetch KYC status after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _controller.forward();
+      _fetchKycStatus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchKycStatus() async {
@@ -34,8 +76,7 @@ class _CardSelectionScreenState extends State<CardSelectionScreen> {
       errorMessage = null;
     });
     try {
-      // Simulate fetching KYC status (replace with actual async call if needed)
-      String status = AuthManager.getKycStatus();
+      final status = AuthManager.getKycStatus();
       setState(() {
         kycStatus = status;
         isLoading = false;
@@ -53,56 +94,138 @@ class _CardSelectionScreenState extends State<CardSelectionScreen> {
     final size = MediaQuery.of(context).size;
     final isSmallScreen = size.width < 600;
     final isTablet = size.width >= 600 && size.width < 1200;
-
-    // Responsive padding
-    final padding = isSmallScreen ? 12.0 : isTablet ? 16.0 : 20.0;
+    final padding = isSmallScreen
+        ? 12.0
+        : isTablet
+            ? 16.0
+            : 20.0;
 
     return Scaffold(
-      backgroundColor: kWhiteColor,
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(padding),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color.fromARGB(255, 6, 6, 6),
+                Color(0xFF8A2BE2),
+                Color(0x00000000),
+              ],
+              stops: [0.0, 0.7, 1.0],
+            ),
+          ),
+        ),
+          actions: [
+          IconButton(
+            icon: const Icon(CupertinoIcons.bell_fill),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => NotificationScreen(),
+                  ));
+            },
+            tooltip: 'Notifications',
+          ),
+          IconButton(
+            icon: const Icon(CupertinoIcons.headphones),
+            onPressed: () {
+             Navigator.push(context, CupertinoPageRoute(builder: (context) => DashboardTicketScreen(),));
+            },
+            tooltip: 'Support',
+          ),
+          const SizedBox(width: 8),
+        ],
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
+          'Card Selection',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+          ),
+        ),
+       
+      ),
+      body: Container(
+        height: double.infinity, // Ensure full height
+        width: double.infinity, // Ensure full width
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Theme.of(context)
+                  .extension<AppColors>()!
+                  .primary
+                  .withOpacity(0.5),
+              Colors.white,
+            ],
+            stops: const [0.0, 1.0],
+          ),
+        ),
+        child: SafeArea(
           child: isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(color: kPrimaryColor),
+              ? Center(
+                  child: CircularProgressIndicator(
+                    color: Theme.of(context).extension<AppColors>()!.primary,
+                  ),
                 )
-              : errorMessage != null
-                  ? _buildErrorWidget()
-                  : _buildContentBasedOnKycStatus(kycStatus ?? 'Pending', context),
+              : FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Padding(
+                      padding: EdgeInsets.all(padding),
+                      child: errorMessage != null
+                          ? _buildErrorWidget()
+                          : _buildContentBasedOnKycStatus(
+                              kycStatus ?? 'Pending'),
+                    ),
+                  ),
+                ),
         ),
       ),
     );
   }
 
-  // Method to determine content based on KYC status
-  Widget _buildContentBasedOnKycStatus(String kycStatus, BuildContext context) {
+  Widget _buildContentBasedOnKycStatus(String kycStatus) {
     switch (kycStatus.toLowerCase()) {
-      case "pending":
-        return  CheckKycStatus(); // Show KYC pending widget
-      case "processed":
-        return _buildProcessedWidget(context); // Show processed widget
-      case "declined":
-        return _buildDeclinedWidget(context); // Show declined widget
-      case "completed":
-        return _buildCardSelectionContent(context); // Show full card selection UI
+      case 'pending':
+        return  CheckKycStatus();
+      case 'processed':
+        return _buildProcessedWidget();
+      case 'declined':
+        return _buildDeclinedWidget();
+      case 'completed':
+        return _buildCardSelectionContent();
       default:
-        return CheckKycStatus(); // Default to KYC pending widget
+        return  CheckKycStatus();
     }
   }
 
-  // Error widget when KYC status fetch fails
   Widget _buildErrorWidget() {
     final size = MediaQuery.of(context).size;
     final isSmallScreen = size.width < 600;
-    final fontSize = isSmallScreen ? 14.0 : 16.0;
+    final fontSize = isSmallScreen ? 16.0 : 18.0;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(
-          Icons.error_outline,
-          color: Colors.red,
-          size: 60,
+        Container(
+          padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.red.withOpacity(0.1),
+          ),
+          child: const Icon(
+            Icons.error_outline,
+            color: Colors.red,
+            size: 60,
+          ),
         ),
         const SizedBox(height: 20),
         Text(
@@ -111,12 +234,13 @@ class _CardSelectionScreenState extends State<CardSelectionScreen> {
           style: TextStyle(
             color: Colors.grey[800],
             fontSize: fontSize,
+            fontWeight: FontWeight.w500,
           ),
         ),
         const SizedBox(height: 20),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: kPrimaryColor,
+            backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
             padding: EdgeInsets.symmetric(
               horizontal: isSmallScreen ? 24 : 32,
               vertical: isSmallScreen ? 12 : 16,
@@ -124,6 +248,11 @@ class _CardSelectionScreenState extends State<CardSelectionScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(isSmallScreen ? 12 : 16),
             ),
+            elevation: 5,
+            shadowColor: Theme.of(context)
+                .extension<AppColors>()!
+                .primary
+                .withOpacity(0.3),
           ),
           onPressed: _fetchKycStatus,
           child: Text(
@@ -131,6 +260,7 @@ class _CardSelectionScreenState extends State<CardSelectionScreen> {
             style: TextStyle(
               color: Colors.white,
               fontSize: isSmallScreen ? 14 : 16,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
@@ -138,124 +268,30 @@ class _CardSelectionScreenState extends State<CardSelectionScreen> {
     );
   }
 
-  // Full Card Selection UI for "completed" status
-  Widget _buildCardSelectionContent(BuildContext context) {
+  Widget _buildProcessedWidget() {
     final size = MediaQuery.of(context).size;
     final isSmallScreen = size.width < 600;
     final isTablet = size.width >= 600 && size.width < 1200;
-
-    final titleFontSize = isSmallScreen ? 20.0 : isTablet ? 22.0 : 24.0;
-    final spacing = isSmallScreen ? 8.0 : isTablet ? 12.0 : 16.0;
-
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(height: spacing * 1.25),
-          AnimatedContainerWidget(
-            child: Center(
-              child: Text(
-                "Pick your Cards",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: titleFontSize,
-                  fontWeight: FontWeight.bold,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black.withOpacity(0.1),
-                      offset: const Offset(0, 2),
-                      blurRadius: 4,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: spacing * 0.625),
-          AnimatedContainerWidget(
-            slideBegin: const Offset(2.0, 1.0),
-            child: Divider(
-              color: Colors.black26,
-              thickness: isSmallScreen ? 1 : 1.5,
-            ),
-          ),
-          SizedBox(height: spacing),
-          AnimatedContainerWidget(
-            slideBegin: const Offset(1.0, 1.0),
-            child: _buildCardSection(
-              context: context,
-              imagePath: "assets/images/card.png",
-              icon: Icons.credit_card,
-              title: "Physical Card",
-              description:
-                  "Choose your card design or personalize it, and get it delivered to your doorstep.",
-              buttonText: "Customizable",
-              isButton: true,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => RequestPhysicalCard(
-                      onCardAdded: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const DeliveryProcessingScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          SizedBox(height: spacing),
-          AnimatedContainerWidget(
-            slideCurve: Curves.linear,
-            child: _buildCardSection(
-              context: context,
-              imagePath: "assets/images/VirtualCard.png",
-              icon: Icons.credit_card_outlined,
-              title: "Virtual Card",
-              description:
-                  "Get free virtual cards instantly, with disposable options for extra online security.",
-              buttonText: "Extra Secure",
-              isButton: true,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddCardScreen(
-                      onCardAdded: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const CardsScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Widget for "Processed" status
-  Widget _buildProcessedWidget(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final isSmallScreen = size.width < 600;
-    final isTablet = size.width >= 600 && size.width < 1200;
-
-    final imageWidth = isSmallScreen ? 200.0 : isTablet ? 230.0 : 260.0;
-    final imageHeight = isSmallScreen ? 120.0 : isTablet ? 135.0 : 150.0;
-    final fontSize = isSmallScreen ? 14.0 : isTablet ? 15.0 : 16.0;
-    final spacing = isSmallScreen ? 15.0 : isTablet ? 18.0 : 20.0;
+    final imageWidth = isSmallScreen
+        ? 200.0
+        : isTablet
+            ? 230.0
+            : 260.0;
+    final imageHeight = isSmallScreen
+        ? 120.0
+        : isTablet
+            ? 135.0
+            : 150.0;
+    final fontSize = isSmallScreen
+        ? 16.0
+        : isTablet
+            ? 17.0
+            : 18.0;
+    final spacing = isSmallScreen
+        ? 15.0
+        : isTablet
+            ? 18.0
+            : 20.0;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -264,12 +300,15 @@ class _CardSelectionScreenState extends State<CardSelectionScreen> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
-              // BoxShadow(
-              //   color: Colors.black.withOpacity(0.1),
-              //   spreadRadius: 2,
-              //   blurRadius: 8,
-              //   offset: const Offset(0, 4),
-              // ),
+              BoxShadow(
+                color: Theme.of(context)
+                    .extension<AppColors>()!
+                    .primary
+                    .withOpacity(0.2),
+                spreadRadius: 2,
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
             ],
           ),
           child: ClipRRect(
@@ -284,19 +323,23 @@ class _CardSelectionScreenState extends State<CardSelectionScreen> {
         ),
         SizedBox(height: spacing),
         Text(
-          'Your details have been submitted. An admin will approve your KYC after review.',
+          'Your details are under review. An admin will approve your KYC soon.',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Colors.grey[800],
             fontSize: fontSize,
             height: 1.5,
+            fontWeight: FontWeight.w500,
           ),
         ),
         SizedBox(height: spacing),
         OutlinedButton(
           onPressed: _fetchKycStatus,
           style: OutlinedButton.styleFrom(
-            side: BorderSide(color: kPrimaryColor, width: 2),
+            side: BorderSide(
+              color: Theme.of(context).extension<AppColors>()!.primary,
+              width: 2,
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(isSmallScreen ? 12 : 16),
             ),
@@ -308,7 +351,7 @@ class _CardSelectionScreenState extends State<CardSelectionScreen> {
           child: Text(
             'Refresh Status',
             style: TextStyle(
-              color: kPrimaryColor,
+              color: Theme.of(context).extension<AppColors>()!.primary,
               fontSize: isSmallScreen ? 14 : 16,
               fontWeight: FontWeight.w600,
             ),
@@ -318,17 +361,30 @@ class _CardSelectionScreenState extends State<CardSelectionScreen> {
     );
   }
 
-  // Widget for "Declined" status
-  Widget _buildDeclinedWidget(BuildContext context) {
+  Widget _buildDeclinedWidget() {
     final size = MediaQuery.of(context).size;
     final isSmallScreen = size.width < 600;
     final isTablet = size.width >= 600 && size.width < 1200;
-
-    final imageWidth = isSmallScreen ? 200.0 : isTablet ? 230.0 : 260.0;
-    final imageHeight = isSmallScreen ? 120.0 : isTablet ? 135.0 : 150.0;
-    final fontSize = isSmallScreen ? 14.0 : isTablet ? 15.0 : 16.0;
-    final buttonFontSize = isSmallScreen ? 14.0 : isTablet ? 15.0 : 16.0;
-    final spacing = isSmallScreen ? 15.0 : isTablet ? 18.0 : 20.0;
+    final imageWidth = isSmallScreen
+        ? 200.0
+        : isTablet
+            ? 230.0
+            : 260.0;
+    final imageHeight = isSmallScreen
+        ? 120.0
+        : isTablet
+            ? 135.0
+            : 150.0;
+    final fontSize = isSmallScreen
+        ? 16.0
+        : isTablet
+            ? 17.0
+            : 18.0;
+    final spacing = isSmallScreen
+        ? 15.0
+        : isTablet
+            ? 18.0
+            : 20.0;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -338,7 +394,10 @@ class _CardSelectionScreenState extends State<CardSelectionScreen> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Theme.of(context)
+                    .extension<AppColors>()!
+                    .primary
+                    .withOpacity(0.2),
                 spreadRadius: 2,
                 blurRadius: 8,
                 offset: const Offset(0, 4),
@@ -351,7 +410,7 @@ class _CardSelectionScreenState extends State<CardSelectionScreen> {
               'assets/images/Rejected.jpg',
               width: imageWidth,
               height: imageHeight,
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
             ),
           ),
         ),
@@ -363,12 +422,13 @@ class _CardSelectionScreenState extends State<CardSelectionScreen> {
             color: Colors.grey[800],
             fontSize: fontSize,
             height: 1.5,
+            fontWeight: FontWeight.w500,
           ),
         ),
         SizedBox(height: spacing * 1.75),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: kPrimaryColor,
+            backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
             padding: EdgeInsets.symmetric(
               horizontal: isSmallScreen ? 24 : 32,
               vertical: isSmallScreen ? 12 : 16,
@@ -377,7 +437,10 @@ class _CardSelectionScreenState extends State<CardSelectionScreen> {
               borderRadius: BorderRadius.circular(isSmallScreen ? 12 : 16),
             ),
             elevation: 5,
-            shadowColor: kPrimaryColor.withOpacity(0.3),
+            shadowColor: Theme.of(context)
+                .extension<AppColors>()!
+                .primary
+                .withOpacity(0.3),
           ),
           onPressed: () {
             Navigator.push(
@@ -389,7 +452,7 @@ class _CardSelectionScreenState extends State<CardSelectionScreen> {
             'Apply Again',
             style: TextStyle(
               color: Colors.white,
-              fontSize: buttonFontSize,
+              fontSize: isSmallScreen ? 14 : 16,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -398,9 +461,204 @@ class _CardSelectionScreenState extends State<CardSelectionScreen> {
     );
   }
 
-  // Helper method to build the card sections
+  Widget _buildCardSelectionContent() {
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 600;
+    final isTablet = size.width >= 600 && size.width < 1200;
+    final titleFontSize = isSmallScreen
+        ? 22.0
+        : isTablet
+            ? 24.0
+            : 26.0;
+    final spacing = isSmallScreen
+        ? 12.0
+        : isTablet
+            ? 16.0
+            : 20.0;
+    final dropdownFontSize = isSmallScreen
+        ? 14.0
+        : isTablet
+            ? 15.0
+            : 16.0;
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(height: spacing * 2),
+          AnimatedContainerWidget(
+            child: Text(
+              'Choose Your Card',
+              style: TextStyle(
+                color: Theme.of(context).extension<AppColors>()!.primary,
+                fontSize: titleFontSize,
+                fontWeight: FontWeight.bold,
+                shadows: [
+                  Shadow(
+                    color: Colors.black.withOpacity(0.2),
+                    offset: const Offset(0, 2),
+                    blurRadius: 6,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: spacing),
+          AnimatedContainerWidget(
+            slideBegin: const Offset(0.0, 0.5),
+            child: Divider(
+              color: Theme.of(context)
+                  .extension<AppColors>()!
+                  .primary
+                  .withOpacity(0.3),
+              thickness: 2,
+              indent: spacing * 2,
+              endIndent: spacing * 2,
+            ),
+          ),
+          SizedBox(height: spacing),
+          _buildCardSection(
+            imagePath: 'assets/images/card.png',
+            icon: Icons.credit_card,
+            title: 'Physical Card',
+            description:
+                'Personalize your card design and have it delivered to your doorstep with ease.',
+            buttonText: 'Customizable',
+            isButton: true,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RequestPhysicalCard(
+                    onCardAdded: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const DeliveryProcessingScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+          SizedBox(height: spacing),
+          _buildCardSection(
+            imagePath: 'assets/images/VirtualCard.png',
+            icon: Icons.credit_card_outlined,
+            title: 'Virtual Card',
+            description:
+                'Instantly create secure virtual cards for safe online transactions.',
+            buttonText: 'Extra Secure',
+            isButton: true,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddCardScreen(
+                    onCardAdded: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CardsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+          SizedBox(height: 40),
+          AnimatedContainerWidget(
+            slideBegin: const Offset(0.0, 0.5),
+            child: Container(
+              margin: EdgeInsets.symmetric(horizontal: spacing),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(context)
+                        .extension<AppColors>()!
+                        .primary
+                        .withOpacity(0.1),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: ExpansionTile(
+                leading: Icon(
+                  Icons.info,
+                  color: Theme.of(context).extension<AppColors>()!.primary,
+                  size: isSmallScreen ? 20 : 24,
+                ),
+                title: Text(
+                  'How to Add a Card',
+                  style: TextStyle(
+                    color: Theme.of(context).extension<AppColors>()!.primary,
+                    fontSize: dropdownFontSize,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                iconColor: Theme.of(context).extension<AppColors>()!.primary,
+                backgroundColor: Colors.white,
+                collapsedBackgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                childrenPadding: EdgeInsets.all(spacing),
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                        color: Colors.grey[800],
+                        fontSize: dropdownFontSize * 0.9,
+                        height: 1.6,
+                      ),
+                      children: const [
+                        TextSpan(text: '• '),
+                        TextSpan(
+                          text: 'Virtual Card',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                        TextSpan(
+                          text:
+                              ': A virtual card that exists only online. It provides secure online commerce, transfers, and payments without issuing a physical card\n\n',
+                          style: TextStyle(fontSize: 13),
+                        ),
+                        TextSpan(text: '• '),
+                        TextSpan(
+                          text: 'Physical Card',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                        TextSpan(
+                          text:
+                              ': Access your funds globally without all the costs and time. Your Physical card will arrive anywhere from 3-5 business days.',
+                          style: TextStyle(fontSize: 13),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildCardSection({
-    required BuildContext context,
     required String imagePath,
     required IconData icon,
     required String title,
@@ -412,96 +670,141 @@ class _CardSelectionScreenState extends State<CardSelectionScreen> {
     final size = MediaQuery.of(context).size;
     final isSmallScreen = size.width < 600;
     final isTablet = size.width >= 600 && size.width < 1200;
-
-    final cardHeight = isSmallScreen ? 110.0 : isTablet ? 115.0 : 120.0;
-    final imageSize = isSmallScreen ? 36.0 : isTablet ? 38.0 : 40.0;
-    final titleFontSize = isSmallScreen ? 16.0 : isTablet ? 17.0 : 18.0;
-    final descriptionFontSize = isSmallScreen ? 12.0 : isTablet ? 13.0 : 14.0;
-    final iconSize = isSmallScreen ? 14.0 : isTablet ? 15.0 : 16.0;
-    final padding = isSmallScreen ? 12.0 : isTablet ? 14.0 : 16.0;
+    final cardHeight = isSmallScreen
+        ? 120.0
+        : isTablet
+            ? 130.0
+            : 140.0;
+    final imageSize = isSmallScreen
+        ? 40.0
+        : isTablet
+            ? 44.0
+            : 48.0;
+    final titleFontSize = isSmallScreen
+        ? 18.0
+        : isTablet
+            ? 20.0
+            : 22.0;
+    final descriptionFontSize = isSmallScreen
+        ? 14.0
+        : isTablet
+            ? 15.0
+            : 16.0;
+    final padding = isSmallScreen
+        ? 12.0
+        : isTablet
+            ? 16.0
+            : 20.0;
 
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
         width: double.infinity,
         height: cardHeight,
-        padding: EdgeInsets.all(padding),
+        margin: EdgeInsets.symmetric(horizontal: padding),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              kPrimaryColor,
-              kPrimaryColor.withOpacity(0.8),
+              Theme.of(context)
+                  .extension<AppColors>()!
+                  .primary
+                  .withOpacity(0.9),
+              Theme.of(context)
+                  .extension<AppColors>()!
+                  .primary
+                  .withOpacity(0.6),
             ],
           ),
-          borderRadius: BorderRadius.circular(isSmallScreen ? 10 : 12),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: kPrimaryColor.withOpacity(isSmallScreen ? 0.3 : 0.4),
-              spreadRadius: isSmallScreen ? 1 : 2,
-              blurRadius: isSmallScreen ? 4 : 5,
-              offset: const Offset(0, 6),
+              color: Theme.of(context)
+                  .extension<AppColors>()!
+                  .primary
+                  .withOpacity(isSmallScreen ? 0.3 : 0.4),
+              spreadRadius: 2,
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: Row(
-          children: [
-            Container(
-              padding: EdgeInsets.all(isSmallScreen ? 6 : 8),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Image.asset(
-                imagePath,
-                width: imageSize,
-                height: imageSize,
-                fit: BoxFit.cover,
-              ),
-            ),
-            SizedBox(width: padding),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: onTap,
+            child: Padding(
+              padding: EdgeInsets.all(padding),
+              child: Row(
                 children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: titleFontSize,
-                      fontWeight: FontWeight.bold,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black.withOpacity(0.3),
-                          offset: const Offset(0, 1),
-                          blurRadius: 2,
+                  Container(
+                    padding: EdgeInsets.all(isSmallScreen ? 8 : 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Image.asset(
+                      imagePath,
+                      width: imageSize,
+                      height: imageSize,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  SizedBox(width: padding),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: titleFontSize,
+                            fontWeight: FontWeight.bold,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black.withOpacity(0.3),
+                                offset: const Offset(0, 1),
+                                blurRadius: 2,
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: padding / 2),
+                        Text(
+                          description,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: descriptionFontSize,
+                            height: 1.4,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: padding / 4),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
-                      fontSize: descriptionFontSize,
-                      height: 1.4,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white,
+                    size: isSmallScreen ? 16 : 18,
                   ),
                 ],
               ),
             ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.white.withOpacity(0.9),
-              size: iconSize,
-            ),
-          ],
+          ),
         ),
       ),
     );

@@ -10,19 +10,25 @@ import 'package:quickcash/util/auth_manager.dart';
 import '../../../../../util/apiConstants.dart';
 import '../../../../../util/customSnackBar.dart';
 
-class UpdatePaymentQRCodeScreen extends StatefulWidget{
+class UpdatePaymentQRCodeScreen extends StatefulWidget {
   final String? qrCodeId;
   final String? qrCodeTitle;
   final String? qrCodeImage;
   final String? qrCodeType;
 
-  const UpdatePaymentQRCodeScreen({super.key, required this.qrCodeId, required this.qrCodeTitle, required this.qrCodeImage, required this.qrCodeType});
+  const UpdatePaymentQRCodeScreen(
+      {super.key,
+      required this.qrCodeId,
+      required this.qrCodeTitle,
+      required this.qrCodeImage,
+      required this.qrCodeType});
 
   @override
-  State<UpdatePaymentQRCodeScreen> createState() => _UpdatePaymentQRCodeScreenState();
+  State<UpdatePaymentQRCodeScreen> createState() =>
+      _UpdatePaymentQRCodeScreenState();
 }
 
-class _UpdatePaymentQRCodeScreenState extends State<UpdatePaymentQRCodeScreen>{
+class _UpdatePaymentQRCodeScreenState extends State<UpdatePaymentQRCodeScreen> {
   final _formKey = GlobalKey<FormState>();
   final QrCodeUpdateApi _qrCodeUpdateApi = QrCodeUpdateApi();
 
@@ -40,7 +46,7 @@ class _UpdatePaymentQRCodeScreenState extends State<UpdatePaymentQRCodeScreen>{
     super.initState();
   }
 
-  Future<void> mSetQrCodeDetails() async{
+  Future<void> mSetQrCodeDetails() async {
     title.text = widget.qrCodeTitle!;
     imageUrl = '${ApiConstants.baseQRCodeImageUrl}${widget.qrCodeImage}';
   }
@@ -54,44 +60,50 @@ class _UpdatePaymentQRCodeScreenState extends State<UpdatePaymentQRCodeScreen>{
         errorMessage = null;
       });
 
-      try{
-        final request = QrCodeUpdateRequest(userId: AuthManager.getUserId(), title: title.text, type: selectedType!);
-        final response = await _qrCodeUpdateApi.qrCodeUpdate(request, widget.qrCodeId);
+      try {
+        final request = QrCodeUpdateRequest(
+            userId: AuthManager.getUserId(),
+            title: title.text,
+            type: selectedType!);
+        final response =
+            await _qrCodeUpdateApi.qrCodeUpdate(request, widget.qrCodeId);
 
-
-        if(response.message == "Payment QR Code details has been updated successfully"){
+        if (response.message ==
+            "Payment QR Code details has been updated successfully") {
           setState(() {
             isLoading = false;
             errorMessage = null;
-            CustomSnackBar.showSnackBar(context: context, message: "QrCode Data has been Updated!", color: kPrimaryColor);
+            CustomSnackBar.showSnackBar(
+                context: context,
+                message: "QrCode Data has been Updated!",
+                color: Theme.of(context).extension<AppColors>()!.primary);
           });
-        }else{
+        } else {
           setState(() {
             isLoading = false;
             errorMessage = null;
-            CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: kPrimaryColor);
+            CustomSnackBar.showSnackBar(
+                context: context,
+                message: "We are facing some issue!",
+                color: Theme.of(context).extension<AppColors>()!.primary);
           });
         }
-
-
       } catch (error) {
         setState(() {
           isLoading = false;
           errorMessage = error.toString();
           CustomSnackBar.showSnackBar(
-              context: context, message: errorMessage!, color: kRedColor);
+              context: context, message: errorMessage!, color: Colors.red);
         });
       }
-
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Edit QR Code",
@@ -114,7 +126,8 @@ class _UpdatePaymentQRCodeScreenState extends State<UpdatePaymentQRCodeScreen>{
                     controller: title,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
+                    cursorColor:
+                        Theme.of(context).extension<AppColors>()!.primary,
                     onSaved: (value) {},
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -123,11 +136,15 @@ class _UpdatePaymentQRCodeScreenState extends State<UpdatePaymentQRCodeScreen>{
                       return null;
                     },
                     readOnly: false,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(
+                        color:
+                            Theme.of(context).extension<AppColors>()!.primary),
                     decoration: InputDecoration(
                       labelText: "Title",
-                      labelStyle:
-                      const TextStyle(color: kPrimaryColor, fontSize: 16),
+                      labelStyle: TextStyle(
+                          color:
+                              Theme.of(context).extension<AppColors>()!.primary,
+                          fontSize: 16),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(),
@@ -140,81 +157,22 @@ class _UpdatePaymentQRCodeScreenState extends State<UpdatePaymentQRCodeScreen>{
                     height: largePadding,
                   ),
 
-                  const Padding(padding: EdgeInsets.only(left: smallPadding),
-                    child: Text("Upload Payment QR-code",style: TextStyle(color: kPrimaryColor, fontWeight: FontWeight.bold),),),
-
-                  const SizedBox(height: 2.0,),
-
-                  if(imageUrl !=null)
-                  Card(
-                    child: Stack(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: imagePath != null
-                              ? Image.file(
-                            File(imagePath!),
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: 250,
-                          )
-                              : Image.network(
-                            imageUrl.toString(),
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: 250,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const SizedBox(
-                                height: 250,
-                                width: double.infinity,
-
-                                child: Icon(
-                                  Icons.image_outlined,
-                                  color: kPrimaryColor,
-                                  size: 120, // Adjust the icon size as needed
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 8,
-                          right: 8,
-                          child: GestureDetector(
-                            onTap: () async {
-                              final ImagePicker picker = ImagePicker();
-                              final XFile? image = await picker.pickImage(
-                                  source: ImageSource.gallery);
-
-                              if (image != null) {
-                                setState(() {
-                                  imagePath =
-                                      image.path; // Store the image path
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('Image selected')),
-                                );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('No image selected.')),
-                                );
-                              }
-                            },
-                            child: const CircleAvatar(
-                              backgroundColor: Colors.white,
-                              child: Icon(
-                                Icons.edit,
-                                color: kPrimaryColor,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                  Padding(
+                    padding: EdgeInsets.only(left: smallPadding),
+                    child: Text(
+                      "Upload Payment QR-code",
+                      style: TextStyle(
+                          color:
+                              Theme.of(context).extension<AppColors>()!.primary,
+                          fontWeight: FontWeight.bold),
                     ),
-                  )
-                  else
+                  ),
+
+                  const SizedBox(
+                    height: 2.0,
+                  ),
+
+                  if (imageUrl != null)
                     Card(
                       child: Stack(
                         children: [
@@ -222,17 +180,31 @@ class _UpdatePaymentQRCodeScreenState extends State<UpdatePaymentQRCodeScreen>{
                             borderRadius: BorderRadius.circular(12),
                             child: imagePath != null
                                 ? Image.file(
-                              File(imagePath!),
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: 250,
-                            )
+                                    File(imagePath!),
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: 250,
+                                  )
                                 : Image.network(
-                              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmN0el3AEK0rjTxhTGTBJ05JGJ7rc4_GSW6Q&s',
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: 250,
-                            ),
+                                    imageUrl.toString(),
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: 250,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return SizedBox(
+                                        height: 250,
+                                        width: double.infinity,
+                                        child: Icon(
+                                          Icons.image_outlined,
+                                          color: Theme.of(context)
+                                              .extension<AppColors>()!
+                                              .primary,
+                                          size:
+                                              120, // Adjust the icon size as needed
+                                        ),
+                                      );
+                                    },
+                                  ),
                           ),
                           Positioned(
                             bottom: 8,
@@ -259,11 +231,72 @@ class _UpdatePaymentQRCodeScreenState extends State<UpdatePaymentQRCodeScreen>{
                                   );
                                 }
                               },
-                              child: const CircleAvatar(
+                              child: CircleAvatar(
                                 backgroundColor: Colors.white,
                                 child: Icon(
                                   Icons.edit,
-                                  color: kPrimaryColor,
+                                  color: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    Card(
+                      child: Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: imagePath != null
+                                ? Image.file(
+                                    File(imagePath!),
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: 250,
+                                  )
+                                : Image.network(
+                                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmN0el3AEK0rjTxhTGTBJ05JGJ7rc4_GSW6Q&s',
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: 250,
+                                  ),
+                          ),
+                          Positioned(
+                            bottom: 8,
+                            right: 8,
+                            child: GestureDetector(
+                              onTap: () async {
+                                final ImagePicker picker = ImagePicker();
+                                final XFile? image = await picker.pickImage(
+                                    source: ImageSource.gallery);
+
+                                if (image != null) {
+                                  setState(() {
+                                    imagePath =
+                                        image.path; // Store the image path
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text('Image selected')),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text('No image selected.')),
+                                  );
+                                }
+                              },
+                              child:  CircleAvatar(
+                                backgroundColor: Colors.white,
+                                child: Icon(
+                                  Icons.edit,
+                                  color: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary,
                                 ),
                               ),
                             ),
@@ -272,12 +305,12 @@ class _UpdatePaymentQRCodeScreenState extends State<UpdatePaymentQRCodeScreen>{
                       ),
                     ),
 
-
                   const SizedBox(height: largePadding),
-                  const Text(
+                  Text(
                     "Default",
                     style: TextStyle(
-                        color: kPrimaryColor,
+                        color:
+                            Theme.of(context).extension<AppColors>()!.primary,
                         fontSize: 16,
                         fontWeight: FontWeight.w500),
                   ),
@@ -293,7 +326,11 @@ class _UpdatePaymentQRCodeScreenState extends State<UpdatePaymentQRCodeScreen>{
                           });
                         },
                       ),
-                      const Text('Yes', style: TextStyle(color: kPrimaryColor)),
+                      Text('Yes',
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary)),
                       Radio<String>(
                         value: 'no',
                         groupValue: selectedType,
@@ -303,20 +340,28 @@ class _UpdatePaymentQRCodeScreenState extends State<UpdatePaymentQRCodeScreen>{
                           });
                         },
                       ),
-                      const Text('No', style: TextStyle(color: kPrimaryColor)),
+                      Text('No',
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary)),
                     ],
                   ),
 
-                  const SizedBox(height: defaultPadding,),
-                  if (isLoading) const Center(
-                    child: CircularProgressIndicator(
-                      color: kPrimaryColor,
-                    ),
-                  ), // Show loading indicator
-                  if (errorMessage != null) // Show error message if there's an error
-                    Text(errorMessage!, style: const TextStyle(color: Colors.red)),
-
-
+                  const SizedBox(
+                    height: defaultPadding,
+                  ),
+                  if (isLoading)
+                    Center(
+                      child: CircularProgressIndicator(
+                        color:
+                            Theme.of(context).extension<AppColors>()!.primary,
+                      ),
+                    ), // Show loading indicator
+                  if (errorMessage !=
+                      null) // Show error message if there's an error
+                    Text(errorMessage!,
+                        style: const TextStyle(color: Colors.red)),
 
                   const SizedBox(
                     height: 45.0,
@@ -331,7 +376,8 @@ class _UpdatePaymentQRCodeScreenState extends State<UpdatePaymentQRCodeScreen>{
                           'Submit',
                           style: TextStyle(color: Colors.white, fontSize: 15),
                         ),
-                        backgroundColor: kPrimaryColor,
+                        backgroundColor:
+                            Theme.of(context).extension<AppColors>()!.primary,
                       ),
                     ),
                   )

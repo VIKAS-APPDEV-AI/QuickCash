@@ -9,9 +9,12 @@ import 'package:quickcash/Screens/CryptoScreen/BuyAndSell/BuyAndSellScreen/crypt
 import 'package:quickcash/Screens/CryptoScreen/BuyAndSell/BuyAndSellScreen/cryptoSellFetchCoinDataModel/cryptoSellFetchCoinApi.dart';
 import 'package:quickcash/Screens/CryptoScreen/BuyAndSell/BuyAndSellScreen/cryptoSellFetchCoinPriceModel/cryptoSellFetchCoinPriceApi.dart';
 import 'package:quickcash/Screens/CryptoScreen/BuyAndSell/BuyAndSellScreen/cryptoSellFetchCoinPriceModel/cryptoSellFetchCoinPriceModel.dart';
+import 'package:quickcash/Screens/CryptoScreen/BuyAndSell/CryptoBuyAndSellScreen/Tabs/CryptoSwapTab.dart'
+    hide CryptoSellFetchCoinDataApi;
 import 'package:quickcash/constants.dart';
 import 'package:quickcash/model/currencyApiModel/Model/currencyModel.dart';
 import 'package:quickcash/model/currencyApiModel/Services/currencyApi.dart';
+import 'package:quickcash/util/auth_manager.dart';
 import 'package:quickcash/util/currency_utils.dart';
 import 'package:quickcash/util/customSnackBar.dart';
 import 'confirm_buy_screen.dart';
@@ -138,7 +141,7 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() {
       setState(() {
         _selectedIndex = _tabController.index;
@@ -154,12 +157,13 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: isDarkMode ? Colors.black : Colors.white,
         appBar: AppBar(
-          backgroundColor: kPrimaryColor,
+          backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
           elevation: 0,
           title: const Text(
             "Crypto Exchange",
@@ -188,7 +192,9 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
                             Text(
                               _selectedIndex == 0
                                   ? "How to Buy Crypto"
-                                  : "How to Sell Crypto",
+                                  : _selectedIndex == 1
+                                      ? "How to Sell Crypto"
+                                      : "How to Swap Crypto",
                               style: GoogleFonts.poppins(
                                 fontSize: 17,
                                 fontWeight: FontWeight.bold,
@@ -199,9 +205,13 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(
-                                  Icons.touch_app,
-                                  color: kPrimaryColor,
+                                Icon(
+                                  _selectedIndex == 2
+                                      ? Icons.swap_horiz
+                                      : Icons.touch_app,
+                                  color: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary,
                                   size: 30,
                                 ),
                                 const SizedBox(width: 12),
@@ -213,7 +223,9 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
                                       Text(
                                         _selectedIndex == 0
                                             ? "1. Enter Amount & Select Payment"
-                                            : "1. Enter Amount & Choose Payment Method",
+                                            : _selectedIndex == 1
+                                                ? "1. Enter Amount & Choose Payment Method"
+                                                : "1. Choose Crypto Pair",
                                         style: GoogleFonts.poppins(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w600,
@@ -224,7 +236,9 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
                                       Text(
                                         _selectedIndex == 0
                                             ? "Enter the amount, select the available payment method, and choose the payment account or bind the payment card."
-                                            : "Enter the amount, select a payment method, and choose the account to receive the payment.",
+                                            : _selectedIndex == 1
+                                                ? "Enter the amount, select a payment method, and choose the account to receive the payment."
+                                                : "Select the crypto you want to swap and the one you want to receive.",
                                         style: GoogleFonts.poppins(
                                           fontSize: 12,
                                           color: Colors.black54,
@@ -239,9 +253,13 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(
-                                  Icons.shopping_cart_checkout,
-                                  color: kPrimaryColor,
+                                Icon(
+                                  _selectedIndex == 2
+                                      ? Icons.rate_review
+                                      : Icons.shopping_cart_checkout,
+                                  color: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary,
                                   size: 30,
                                 ),
                                 const SizedBox(width: 12),
@@ -253,7 +271,9 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
                                       Text(
                                         _selectedIndex == 0
                                             ? "2. Confirm Order"
-                                            : "2. Confirm Your Order",
+                                            : _selectedIndex == 1
+                                                ? "2. Confirm Your Order"
+                                                : "2. Review Exchange Rate",
                                         style: GoogleFonts.poppins(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w600,
@@ -264,7 +284,9 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
                                       Text(
                                         _selectedIndex == 0
                                             ? "Confirmation of transaction detail information, including trading pair quotes, fees, and other explanatory tips."
-                                            : "Review your transaction details, including trading pair quotes, fees, and any additional information before confirming.",
+                                            : _selectedIndex == 1
+                                                ? "Review your transaction details, including trading pair quotes, fees, and any additional information before confirming."
+                                                : "Check real-time exchange rates and network fees.",
                                         style: GoogleFonts.poppins(
                                           fontSize: 12,
                                           color: Colors.black54,
@@ -279,9 +301,13 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(
-                                  Icons.currency_bitcoin,
-                                  color: kPrimaryColor,
+                                Icon(
+                                  _selectedIndex == 2
+                                      ? Icons.swap_calls
+                                      : Icons.currency_bitcoin,
+                                  color: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary,
                                   size: 30,
                                 ),
                                 const SizedBox(width: 12),
@@ -293,7 +319,9 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
                                       Text(
                                         _selectedIndex == 0
                                             ? "3. Receive Crypto"
-                                            : "3. Receive Cash",
+                                            : _selectedIndex == 1
+                                                ? "3. Receive Cash"
+                                                : "3. Swap Instantly",
                                         style: GoogleFonts.poppins(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w600,
@@ -304,7 +332,9 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
                                       Text(
                                         _selectedIndex == 0
                                             ? "After successful payment, the purchased crypto will be deposited into your Spot or Funding Wallet."
-                                            : "Once the payment is successful, the purchased digital currency will be deposited into your Spot Wallet.",
+                                            : _selectedIndex == 1
+                                                ? "Once the payment is successful, the purchased digital currency will be deposited into your Spot Wallet."
+                                                : "Receive swapped crypto instantly into your wallet.",
                                         style: GoogleFonts.poppins(
                                           fontSize: 12,
                                           color: Colors.black54,
@@ -322,7 +352,9 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
                                   Navigator.pop(context);
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: kPrimaryColor,
+                                  backgroundColor: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 40,
                                     vertical: 12,
@@ -349,6 +381,20 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
               },
             ),
           ],
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color.fromARGB(255, 20, 20, 20),
+                  Color(0xFF8A2BE2),
+                  Color(0x00000000),
+                ],
+                stops: [0.0, 0.7, 1.0],
+              ),
+            ),
+          ),
         ),
         body: Column(
           children: [
@@ -358,10 +404,10 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20.0),
-                border: Border.all(color: kHintColor, width: 1.0),
+                border: Border.all(color: Color(0xA66F35A5), width: 1.0),
                 boxShadow: [
                   const BoxShadow(
-                    color: kHintColor,
+                    color: Color(0xA66F35A5),
                     spreadRadius: 2,
                     blurRadius: 5,
                     offset: Offset(0, 3),
@@ -371,8 +417,8 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
               child: TabBar(
                 controller: _tabController,
                 indicatorSize: TabBarIndicatorSize.tab,
-                indicator: const BoxDecoration(
-                  color: kPrimaryColor,
+                indicator: BoxDecoration(
+                  color: Theme.of(context).extension<AppColors>()!.primary,
                   borderRadius: BorderRadius.only(
                       topRight: Radius.circular(20),
                       bottomLeft: Radius.circular(20)),
@@ -387,22 +433,28 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
                 tabs: const [
                   Tab(text: 'Buy'),
                   Tab(text: 'Sell'),
+                  Tab(text: 'Swap'),
                 ],
               ),
             ),
             Padding(
-              padding:
-                  const EdgeInsets.only(left: 30.0, right: 30.0, bottom: 30),
+              padding: EdgeInsets.only(left: 30.0, right: 30.0, bottom: 30),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Center(
-                      child: Text(
-                          'Quickcash offers a user-friendly platform to purchase a \nvariety of cryptocurrencies.',
-                          style: TextStyle(
-                              fontSize: 13,
-                              color: kPrimaryColor,
-                              fontWeight: FontWeight.bold)))
+                  // Wrap with Expanded to prevent overflow
+                  Expanded(
+                    child: Text(
+                      'Quickcash offers a user-friendly platform to purchase a \nvariety of cryptocurrencies.',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color:
+                            Theme.of(context).extension<AppColors>()!.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -412,6 +464,7 @@ class _CryptoBuyAnsSellScreenState extends State<CryptoBuyAnsSellScreen>
                 children: const [
                   CryptoBuyTab(),
                   CryptoSellTab(),
+                  CryptoSwapTab(),
                 ],
               ),
             ),
@@ -475,7 +528,7 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
       setState(() => isDataLoaded = true);
       fetchLivePrice();
       fetchAllCryptoPrices();
-      _priceUpdateTimer = Timer.periodic(Duration(seconds: 30), (timer) {
+      _priceUpdateTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
         fetchLivePrice();
         fetchAllCryptoPrices();
       });
@@ -493,13 +546,13 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
   Future<void> mGetCurrency() async {
     final response = await _currencyApi.currencyApi();
     if (response.currencyList != null && response.currencyList!.isNotEmpty) {
-     setState(() {
-      currency = response.currencyList!;
-      // Set default to "USD" if it exists, otherwise fallback to first currency
-      selectedCurrency = currency.any((item) => item.currencyCode == 'USD')
-          ? 'USD'
-          : currency[0].currencyCode;
-    });
+      setState(() {
+        currency = response.currencyList!;
+        // Set default to "USD" if it exists, otherwise fallback to first currency
+        selectedCurrency = currency.any((item) => item.currencyCode == 'USD')
+            ? 'USD'
+            : currency[0].currencyCode;
+      });
     }
   }
 
@@ -523,7 +576,7 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
       CustomSnackBar.showSnackBar(
         context: context,
         message: "Failed to fetch live price",
-        color: kPrimaryColor,
+        color: Theme.of(context).extension<AppColors>()!.primary,
       );
     }
   }
@@ -560,7 +613,7 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
       CustomSnackBar.showSnackBar(
         context: context,
         message: "Failed to fetch all crypto prices",
-        color: kPrimaryColor,
+        color: Theme.of(context).extension<AppColors>()!.primary,
       );
     }
   }
@@ -593,7 +646,7 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
         setState(() {
           isLoading = false;
           mEstimatedRate = response.data.rate;
-          mYouGet.text = response.data.numberofCoins.toString();
+          mYouGet.text = response.data.numberofCoins.toStringAsFixed(7);
           fees = response.data.fees;
           mCryptoFees = response.data.cryptoFees ?? 0.0;
           mExchangeFees = response.data.exchangeFees ?? 0.0;
@@ -617,17 +670,17 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
           CustomSnackBar.showSnackBar(
               context: context,
               message: "We are facing some issue!",
-              color: kPrimaryColor);
+              color: Theme.of(context).extension<AppColors>()!.primary);
         });
       }
     } catch (error) {
       setState(() {
         isLoading = false;
         CustomSnackBar.showSnackBar(
-            duration: Duration(seconds: 1),
+            duration: const Duration(seconds: 1),
             context: context,
             message: 'Please Enter Numeric Value',
-            color: kPrimaryColor);
+            color: Theme.of(context).extension<AppColors>()!.primary);
       });
     }
   }
@@ -647,7 +700,7 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
             const SizedBox(height: 10),
             Card(
               elevation: 4,
-              color: kPrimaryColor,
+              color: Theme.of(context).extension<AppColors>()!.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -660,7 +713,8 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(10),
                             topRight: Radius.circular(10)),
-                        color: kPrimaryColor),
+                        color:
+                            Theme.of(context).extension<AppColors>()!.primary),
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -674,7 +728,7 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
                             padding: EdgeInsets.symmetric(horizontal: 15),
                             child: Text(
                               'Spend',
-                              style: TextStyle( 
+                              style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold),
@@ -690,7 +744,7 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
                                     controller: mAmount,
                                     style: const TextStyle(
                                         color: Colors.white, fontSize: 16),
-                                    cursorColor: kWhiteColor,
+                                    cursorColor: Colors.white,
                                     textAlign: TextAlign.start,
                                     decoration: const InputDecoration(
                                       fillColor: Colors.transparent,
@@ -716,7 +770,7 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
                                   width: 18,
                                   height: 18,
                                   decoration: BoxDecoration(
-                                    color: kWhiteColor,
+                                    color: Colors.white,
                                     shape: BoxShape.circle,
                                     border: Border.all(
                                         color: Colors.white, width: 1),
@@ -799,7 +853,7 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
                     padding:
                         const EdgeInsets.only(bottom: 25, left: 15, right: 15),
                     decoration: BoxDecoration(
-                      color: kPrimaryColor,
+                      color: Theme.of(context).extension<AppColors>()!.primary,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Container(
@@ -816,7 +870,7 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
                             child: Text(
                               'Receive',
                               style: TextStyle(
-                                  color: kWhiteColor,
+                                  color: Colors.white,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold),
                             ),
@@ -829,8 +883,8 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
                                   controller: mYouGet,
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 16),
-                                  decoration: const InputDecoration(
-                                    fillColor: kBlackColor,
+                                  decoration: InputDecoration(
+                                    fillColor: AppColors.light.primary,
                                     border: InputBorder.none,
                                     hintText: '0',
                                     hintStyle: TextStyle(color: Colors.grey),
@@ -838,12 +892,14 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
                                   readOnly: true,
                                 ),
                               ),
-                              SizedBox(width: 15,),
+                              const SizedBox(
+                                width: 15,
+                              ),
                               Container(
                                 width: 18,
                                 height: 18,
                                 decoration: BoxDecoration(
-                                  color: kWhiteColor,
+                                  color: Colors.white,
                                   shape: BoxShape.circle,
                                   border:
                                       Border.all(color: Colors.white, width: 1),
@@ -996,7 +1052,8 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
                   horizontal: 0), // Reduced from 50 to 20
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: kPrimaryColor,
+                  backgroundColor:
+                      Theme.of(context).extension<AppColors>()!.primary,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -1012,17 +1069,23 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
                           CustomSnackBar.showSnackBar(
                               context: context,
                               message: "Please Select Currency",
-                              color: kPrimaryColor);
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary);
                         } else if (mAmount.text.isEmpty) {
                           CustomSnackBar.showSnackBar(
                               context: context,
                               message: "Please Enter Amount",
-                              color: kPrimaryColor);
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary);
                         } else if (selectedCoinType == null) {
                           CustomSnackBar.showSnackBar(
                               context: context,
                               message: "Please Select Coin",
-                              color: kPrimaryColor);
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary);
                         } else if (mAmount.text.isNotEmpty &&
                             selectedCurrency != null &&
                             selectedCoinType != null &&
@@ -1047,11 +1110,13 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
                           CustomSnackBar.showSnackBar(
                               context: context,
                               message: "Please Enter Valid Details.",
-                              color: kPrimaryColor);
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary);
                         }
                       },
                 child: isLoading
-                    ? const SpinKitWaveSpinner(color: kWhiteColor, size: 30)
+                    ? const SpinKitWaveSpinner(color: Colors.white, size: 30)
                     : const Text('Proceed',
                         style: TextStyle(color: Colors.white, fontSize: 16)),
               ),
@@ -1121,7 +1186,7 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
             const SizedBox(height: 20),
             Card(
               elevation: 4,
-              color: Color(0XFFdfad52),
+              color: const Color(0XFFdfad52),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -1130,7 +1195,7 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Cryptocurrency Prices',
                       style: TextStyle(
                         color: Colors.white,
@@ -1139,22 +1204,26 @@ class _CryptoBuyTabState extends State<CryptoBuyTab>
                       ),
                     ),
                     const SizedBox(height: 5),
-                    Divider(color: Colors.white30,),
+                    const Divider(
+                      color: Colors.white30,
+                    ),
                     // Show a loading indicator if prices are being fetched
                     if (allCryptoPrices.isEmpty && isDataLoaded)
                       Center(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          padding: EdgeInsets.symmetric(vertical: 10),
                           child: SpinKitWaveSpinner(
-                            color: kPrimaryColor,
+                            color: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary,
                             size: 30,
                           ),
                         ),
                       )
                     // Show a message if no prices are available
                     else if (allCryptoPrices.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
                         child: Text(
                           'Unable to fetch cryptocurrency prices. Please try again later.',
                           style: TextStyle(
@@ -1335,7 +1404,7 @@ class _CryptoSellTabState extends State<CryptoSellTab>
       mCryptoSellFetchCoinData();
       fetchLivePrice();
       fetchAllCryptoPrices();
-      _priceUpdateTimer = Timer.periodic(Duration(seconds: 30), (timer) {
+      _priceUpdateTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
         fetchLivePrice();
         fetchAllCryptoPrices();
       });
@@ -1354,12 +1423,12 @@ class _CryptoSellTabState extends State<CryptoSellTab>
     final response = await _currencyApi.currencyApi();
     if (response.currencyList != null && response.currencyList!.isNotEmpty) {
       setState(() {
-      currency = response.currencyList!;
-      // Set default to "USD" if it exists, otherwise fallback to first currency
-      selectedCurrency = currency.any((item) => item.currencyCode == 'USD')
-          ? 'USD'
-          : currency[0].currencyCode;
-    });
+        currency = response.currencyList!;
+        // Set default to "USD" if it exists, otherwise fallback to first currency
+        selectedCurrency = currency.any((item) => item.currencyCode == 'USD')
+            ? 'USD'
+            : currency[0].currencyCode;
+      });
     }
   }
 
@@ -1383,7 +1452,7 @@ class _CryptoSellTabState extends State<CryptoSellTab>
       CustomSnackBar.showSnackBar(
         context: context,
         message: "Failed to fetch live price",
-        color: kPrimaryColor,
+        color: Theme.of(context).extension<AppColors>()!.primary,
       );
     }
   }
@@ -1420,7 +1489,7 @@ class _CryptoSellTabState extends State<CryptoSellTab>
       CustomSnackBar.showSnackBar(
         context: context,
         message: "Failed to fetch all crypto prices",
-        color: kPrimaryColor,
+        color: Theme.of(context).extension<AppColors>()!.primary,
       );
     }
   }
@@ -1450,7 +1519,7 @@ class _CryptoSellTabState extends State<CryptoSellTab>
         CustomSnackBar.showSnackBar(
             context: context,
             message: "No of Coins not found",
-            color: kPrimaryColor);
+            color: Theme.of(context).extension<AppColors>()!.primary);
       });
     }
   }
@@ -1510,7 +1579,7 @@ class _CryptoSellTabState extends State<CryptoSellTab>
         CustomSnackBar.showSnackBar(
             context: context,
             message: "Something went wrong!",
-            color: kPrimaryColor);
+            color: Theme.of(context).extension<AppColors>()!.primary);
       });
     }
   }
@@ -1530,7 +1599,7 @@ class _CryptoSellTabState extends State<CryptoSellTab>
             const SizedBox(height: 10),
             Card(
               elevation: 4,
-              color: kPrimaryColor,
+              color: Theme.of(context).extension<AppColors>()!.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -1543,7 +1612,8 @@ class _CryptoSellTabState extends State<CryptoSellTab>
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(10),
                             topRight: Radius.circular(10)),
-                        color: kPrimaryColor),
+                        color:
+                            Theme.of(context).extension<AppColors>()!.primary),
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -1573,7 +1643,7 @@ class _CryptoSellTabState extends State<CryptoSellTab>
                                     controller: mAmount,
                                     style: const TextStyle(
                                         color: Colors.white, fontSize: 16),
-                                    cursorColor: kWhiteColor,
+                                    cursorColor: Colors.white,
                                     textAlign: TextAlign.start,
                                     decoration: const InputDecoration(
                                       fillColor: Colors.transparent,
@@ -1618,7 +1688,7 @@ class _CryptoSellTabState extends State<CryptoSellTab>
                                   width: 18,
                                   height: 18,
                                   decoration: BoxDecoration(
-                                    color: kWhiteColor,
+                                    color: Colors.white,
                                     shape: BoxShape.circle,
                                     border: Border.all(
                                         color: Colors.white, width: 1),
@@ -1709,7 +1779,7 @@ class _CryptoSellTabState extends State<CryptoSellTab>
                     padding:
                         const EdgeInsets.only(bottom: 25, left: 15, right: 15),
                     decoration: BoxDecoration(
-                      color: kPrimaryColor,
+                      color: Theme.of(context).extension<AppColors>()!.primary,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Container(
@@ -1726,7 +1796,7 @@ class _CryptoSellTabState extends State<CryptoSellTab>
                             child: Text(
                               'Receive',
                               style: TextStyle(
-                                  color: kWhiteColor,
+                                  color: Colors.white,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold),
                             ),
@@ -1739,9 +1809,8 @@ class _CryptoSellTabState extends State<CryptoSellTab>
                                   controller: mYouGet,
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 16),
-                                  decoration: const InputDecoration(
-                                    fillColor: kBlackColor,
-                                    border: InputBorder.none,
+                                  decoration: InputDecoration(
+                                    fillColor: AppColors.light.primary,
                                     hintText: '0',
                                     hintStyle: TextStyle(color: Colors.grey),
                                   ),
@@ -1752,7 +1821,7 @@ class _CryptoSellTabState extends State<CryptoSellTab>
                                 width: 18,
                                 height: 18,
                                 decoration: BoxDecoration(
-                                  color: kWhiteColor,
+                                  color: Colors.white,
                                   shape: BoxShape.circle,
                                   border:
                                       Border.all(color: Colors.white, width: 1),
@@ -1911,7 +1980,8 @@ class _CryptoSellTabState extends State<CryptoSellTab>
               padding: const EdgeInsets.symmetric(horizontal: 0),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: kPrimaryColor,
+                  backgroundColor:
+                      Theme.of(context).extension<AppColors>()!.primary,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -1928,21 +1998,21 @@ class _CryptoSellTabState extends State<CryptoSellTab>
                           CustomSnackBar.showSnackBar(
                               context: context,
                               message: "Please Select Coins",
-                              color: kRedColor);
+                              color: Colors.red);
                           return;
                         }
                         if (mAmount.text.isEmpty) {
                           CustomSnackBar.showSnackBar(
                               context: context,
                               message: "Please Enter No of Coins",
-                              color: kRedColor);
+                              color: Colors.red);
                           return;
                         }
                         if (selectedCurrency == null) {
                           CustomSnackBar.showSnackBar(
                               context: context,
                               message: "Please Select Currency",
-                              color: kRedColor);
+                              color: Colors.red);
                           return;
                         }
                         double availableCoins =
@@ -1955,7 +2025,7 @@ class _CryptoSellTabState extends State<CryptoSellTab>
                               context: context,
                               message:
                                   "Insufficient balance to sell this amount of coins",
-                              color: kRedColor);
+                              color: Colors.red);
                           return;
                         }
                         if (enteredAmount <= 0) {
@@ -1963,7 +2033,7 @@ class _CryptoSellTabState extends State<CryptoSellTab>
                               context: context,
                               message:
                                   "Please enter a valid amount greater than 0",
-                              color: kRedColor);
+                              color: Colors.red);
                           return;
                         }
                         if (mAmount.text.isNotEmpty &&
@@ -1990,11 +2060,13 @@ class _CryptoSellTabState extends State<CryptoSellTab>
                           CustomSnackBar.showSnackBar(
                               context: context,
                               message: "Please Enter Valid Details",
-                              color: kPrimaryColor);
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary);
                         }
                       },
                 child: isLoading
-                    ? const SpinKitWaveSpinner(color: kWhiteColor, size: 30)
+                    ? const SpinKitWaveSpinner(color: Colors.white, size: 30)
                     : const Text('Proceed',
                         style: TextStyle(color: Colors.white, fontSize: 16)),
               ),
@@ -2002,7 +2074,7 @@ class _CryptoSellTabState extends State<CryptoSellTab>
             const SizedBox(height: 20),
             // Card(
             //   elevation: 4,
-            //   color: kPrimaryColor,
+            //   color: Theme.of(context).extension<AppColors>()!.primary,
             //   margin: const EdgeInsets.symmetric(horizontal: 0),
             //   shape: RoundedRectangleBorder(
             //     borderRadius: BorderRadius.circular(10),
@@ -2064,7 +2136,7 @@ class _CryptoSellTabState extends State<CryptoSellTab>
             const SizedBox(height: 20),
             Card(
               elevation: 4,
-              color: Color(0XFFdfad52),
+              color: const Color(0XFFdfad52),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -2073,7 +2145,7 @@ class _CryptoSellTabState extends State<CryptoSellTab>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Cryptocurrency Prices',
                       style: TextStyle(
                         color: Colors.white,
@@ -2082,22 +2154,26 @@ class _CryptoSellTabState extends State<CryptoSellTab>
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Divider(color: Colors.white30,),
+                    const Divider(
+                      color: Colors.white30,
+                    ),
                     // Show a loading indicator if prices are being fetched
                     if (allCryptoPrices.isEmpty && isDataLoaded)
                       Center(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          padding: EdgeInsets.symmetric(vertical: 10),
                           child: SpinKitWaveSpinner(
-                            color: kPrimaryColor,
+                            color: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary,
                             size: 30,
                           ),
                         ),
                       )
                     // Show a message if no prices are available
                     else if (allCryptoPrices.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
                         child: Text(
                           'Unable to fetch cryptocurrency prices. Please try again later.',
                           style: TextStyle(

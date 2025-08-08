@@ -1,7 +1,10 @@
+import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:quickcash/Screens/UserProfileScreen/BeneficiaryAccountListScreen/model/beneficiaryAccountApi.dart';
 import 'package:quickcash/Screens/UserProfileScreen/BeneficiaryAccountListScreen/model/beneficiaryAccountModel.dart';
+import 'package:quickcash/util/CurrencyImageList.dart';
+import 'package:quickcash/util/currency_utils.dart' as CurrencyFlagHelper;
 
 import '../../../constants.dart';
 
@@ -58,6 +61,7 @@ class _BeneficiaryAccountListState extends State<BeneficiaryAccountListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppColors>()!;
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(defaultPadding),
@@ -67,24 +71,22 @@ class _BeneficiaryAccountListState extends State<BeneficiaryAccountListScreen> {
             if (isLoading) const Center(child: CircularProgressIndicator()),
             if (errorMessage != null)
               Column(
-              
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Column(
                         children: [
-                           Lottie.asset('assets/lottie/NoTransactions.json',
-                      height: 120),
-                  const SizedBox(height: 0),
-                  const Text("There is no Beneficiary Account Here",
-                      style: TextStyle(color: Colors.black, fontSize: 13)),
+                          Lottie.asset('assets/lottie/NoTransactions.json',
+                              height: 120),
+                          const SizedBox(height: 0),
+                          const Text("There is no Beneficiary Account Here",
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 13)),
                         ],
                       ),
-                        
                     ],
                   ),
-                  
                 ],
               ),
             if (!isLoading &&
@@ -99,7 +101,7 @@ class _BeneficiaryAccountListState extends State<BeneficiaryAccountListScreen> {
                       margin: const EdgeInsets.only(bottom: defaultPadding),
                       // Margin for card spacing
                       decoration: BoxDecoration(
-                        color: kWhiteColor,
+                        color: colors.background,
                         // Background color of the container
                         borderRadius: BorderRadius.circular(smallPadding),
                         // Rounded corners for the container
@@ -112,7 +114,7 @@ class _BeneficiaryAccountListState extends State<BeneficiaryAccountListScreen> {
                           ),
                         ],
                         border: Border.all(
-                          color: kPurpleColor, // Purple border color
+                          color: colors.purple, // Purple border color
                           width: 1, // Border width
                         ),
                       ),
@@ -124,21 +126,20 @@ class _BeneficiaryAccountListState extends State<BeneficiaryAccountListScreen> {
                           children: [
                             // Display currency code inside a circle
                             Center(
-                              child: CircleAvatar(
-                                radius: 50,
-                                // Size of the circle
-                                backgroundColor: kPrimaryColor,
-                                // Background color of the circle
-                                child: Text(
-                                  beneficiaryList.currency ??
-                                      'N/A', // Display the currency code
-                                  style: const TextStyle(
-                                    fontSize: 30,
-                                    // Font size of the currency code
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white, // Text color
-                                  ),
-                                ),
+                              child: SizedBox(
+                                height: 70,
+                                width: 70,
+                                child: (beneficiaryList.currency
+                                            ?.toUpperCase() ==
+                                        'EUR')
+                                    ? CurrencyFlagHelper.getEuFlagWidget()
+                                    : CountryFlag.fromCountryCode(
+                                        CurrencyCountryMapper.getCountryCode(
+                                            beneficiaryList.currency),
+                                        height: 70,
+                                        width: 70,
+                                        shape: const Circle(),
+                                      ),
                               ),
                             ),
 
@@ -146,56 +147,76 @@ class _BeneficiaryAccountListState extends State<BeneficiaryAccountListScreen> {
                               height: largePadding,
                             ),
 
-                            const Text(
+                            Text(
                               "Currency:",
                               style: TextStyle(
-                                  color: kPrimaryColor,
+                                  color: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary,
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
                               beneficiaryList.currency ?? 'N/A',
-                              style: const TextStyle(color: kPrimaryColor),
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary),
                             ),
 
                             const SizedBox(
                                 height: 8), // Small space between rows
-                            const Text(
+                            Text(
                               "IBAN / Routing / Account Number",
                               style: TextStyle(
-                                  color: kPrimaryColor,
+                                  color: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary,
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
                               beneficiaryList.iban ?? 'N/A',
-                              style: const TextStyle(color: kPrimaryColor),
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary),
                             ),
 
                             const SizedBox(
                               height: smallPadding,
                             ),
 
-                            const Text(
+                            Text(
                               "BIC / IFSC:",
                               style: TextStyle(
-                                  color: kPrimaryColor,
+                                  color: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary,
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
                               beneficiaryList.bic ?? 'N/A',
-                              style: const TextStyle(color: kPrimaryColor),
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary),
                             ),
 
                             const SizedBox(
                                 height: 8), // Small space between rows
-                            const Text(
+                            Text(
                               "Balance:",
                               style: TextStyle(
-                                  color: kPrimaryColor,
+                                  color: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary,
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
                               '${beneficiaryList.balance ?? 0.0}',
-                              style: const TextStyle(color: kPrimaryColor),
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary),
                             ),
                           ],
                         ),

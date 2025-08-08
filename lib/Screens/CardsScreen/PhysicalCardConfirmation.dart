@@ -131,7 +131,7 @@ class DeliveryProcessingScreen extends StatelessWidget {
                       ));
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: kPrimaryColor,
+                  backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                   padding: EdgeInsets.symmetric(vertical: 16.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),

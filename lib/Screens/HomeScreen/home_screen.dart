@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // For SystemChrome
-import 'package:quickcash/Screens/CardsScreen/CardSelection.dart';
-import 'package:quickcash/Screens/CardsScreen/card_screen.dart';
+import 'package:flutter/services.dart'; // For SystemChrome// Added import for FinPayWelcomeScreen
+import 'package:provider/provider.dart';
+import 'package:quickcash/Screens/CardsScreen/WelcomCardScreen.dart';
 import 'package:quickcash/Screens/CryptoScreen/BuyAndSell/BuyAndSellScreen/buy_and_sell_home_screen.dart';
 import 'package:quickcash/Screens/CryptoScreen/WalletAddress/walletAddress_screen.dart';
+import 'package:quickcash/Screens/DashboardScreen/Dashboard/ThemeToggle.dart';
 import 'package:quickcash/Screens/DashboardScreen/Dashboard/dashboard_screen.dart';
 import 'package:quickcash/Screens/HomeScreen/my_drawer_header.dart';
 import 'package:quickcash/Screens/InvoicesScreen/CategoriesScreen/categories_screen.dart';
@@ -16,6 +18,7 @@ import 'package:quickcash/Screens/InvoicesScreen/ProductsScreen/ProductScreen/pr
 import 'package:quickcash/Screens/InvoicesScreen/QuotesScreen/quoteScreen/quotes_screen.dart';
 import 'package:quickcash/Screens/InvoicesScreen/Settings/settingsMainScreen.dart';
 import 'package:quickcash/Screens/LoginScreen/login_screen.dart';
+import 'package:quickcash/Screens/NotificationsScreen.dart/NotificationScreen.dart';
 import 'package:quickcash/Screens/ReferAndEarnScreen/refer_and_earn_screen.dart';
 import 'package:quickcash/Screens/SpotTradeScreen/spot_trade_screen.dart';
 import 'package:quickcash/Screens/StatemetScreen/StatementScreen/statement_screen.dart';
@@ -24,6 +27,7 @@ import 'package:quickcash/Screens/TransactionScreen/TransactionScreen/transactio
 import 'package:quickcash/Screens/UserProfileScreen/profile_main_screen.dart';
 import 'package:quickcash/constants.dart';
 import 'package:quickcash/util/customSnackBar.dart';
+import 'package:quickcash/utils/themeProvider.dart';
 import '../../util/auth_manager.dart';
 import '../KYCScreen/kycHomeScreen.dart';
 
@@ -38,7 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
   var currentPage = DrawerSections.dashboard;
   bool isCryptoExpanded = false; // Track submenu state for Crypto
   bool isInvoicesExpanded = false; // Track submenu state for Invoices
-  int _selectedIndex = 0; // Track the selected index for the bottom navigation bar
+  int _selectedIndex =
+      0; // Track the selected index for the bottom navigation bar
 
   @override
   void initState() {
@@ -46,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Set status bar style to avoid overlap
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
     ));
   }
 
@@ -73,6 +78,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
     Widget container;
 
     switch (currentPage) {
@@ -80,7 +87,8 @@ class _HomeScreenState extends State<HomeScreen> {
         container = const DashboardScreen();
         break;
       case DrawerSections.cards:
-        container =  CardSelectionScreen();
+        container =
+            const FinPayWelcomeScreen(); // Updated to FinPayWelcomeScreen
         break;
       case DrawerSections.transaction:
         container = const TransactionScreen();
@@ -151,86 +159,76 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Scaffold(
         resizeToAvoidBottomInset: true,
-        body: Stack(
-          children: [
-            // Main content
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 60.0), // Space for the custom top bar
-                child: container,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color.fromARGB(255, 20, 20, 20), // Primary color
+                  Color(0xFF8A2BE2), // Slightly lighter for gradient effect
+                  Color(0x00000000), // Transparent at the bottom
+                ],
+                stops: [0.0, 0.7, 1.0],
               ),
             ),
-
-            // Gradient overlay for fade effect
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 110, // Adjust height to cover the fade area
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.white30, // Match your background color
-                      Colors.white, // Slightly transparent
-                      Colors.white12, // Fully transparent at the bottom
-                    ],
-                    stops: [0.0, 0.5, 1.0], // Adjust stops for smoother transition
-                  ),
-                ),
+          ),
+          leading: Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+              color: Colors.white,
+              iconSize: 30,
+            ),
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ThemeToggleButton(isDark: isDark),
+                ],
               ),
             ),
-
-            // Positioned widgets for menu and logout icons
-            Positioned(
-              top: 40,
-              left: 10,
-              child: Builder(
-                builder: (context) => IconButton(
-                  icon: const Icon(Icons.menu),
-                  onPressed: () {
-                    Scaffold.of(context).openDrawer();
-                  },
-                  color: kPrimaryColor,
-                  iconSize: 30,
-                ),
-              ),
-            ),
-            Positioned(
-              top: 40,
-              right: 120,
-              child: IconButton(
-                icon: const Icon(Icons.notifications),
-                onPressed: () {
-                  // Add notification functionality here if needed
-                },
-                color: kPrimaryColor,
-                iconSize: 25,
-              ),
+            IconButton(
+              icon: const Icon(Icons.notifications),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => NotificationScreen(),
+                    ));
+              },
+              color: Colors.white,
+              iconSize: 25,
             ),
             if (AuthManager.getKycStatus() != "completed")
-              Positioned(
-                top: 48,
-                right: 80,
-                child: GestureDetector(
-                  onTap: () {
-                    if (AuthManager.getKycDocFront().isNotEmpty) {
-                      CustomSnackBar.showSnackBar(
-                          context: context,
-                          message:
-                              "Your details are already submitted, Admin will approve after review your kyc details!",
-                          color: kPrimaryColor);
-                    } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const KycHomeScreen(),
-                        ),
-                      );
-                    }
-                  },
+              GestureDetector(
+                onTap: () {
+                  if (AuthManager.getKycDocFront().isNotEmpty) {
+                    CustomSnackBar.showSnackBar(
+                        context: context,
+                        message:
+                            "Your details are already submitted, Admin will approve after review your kyc details!",
+                        color:
+                            Theme.of(context).extension<AppColors>()!.primary);
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const KycHomeScreen(),
+                      ),
+                    );
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Image.asset(
                     "assets/icons/kycpending.png",
                     width: 30,
@@ -239,16 +237,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               )
             else
-              Positioned(
-                top: 48,
-                right: 80,
-                child: GestureDetector(
-                  onTap: () {
-                    CustomSnackBar.showSnackBar(
-                        context: context,
-                        message: "KYC Verified",
-                        color: kPrimaryColor);
-                  },
+              GestureDetector(
+                onTap: () {
+                  CustomSnackBar.showSnackBar(
+                      context: context,
+                      message: "KYC Verified",
+                      color: Theme.of(context).extension<AppColors>()!.primary);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Image.asset(
                     "assets/icons/kycverify.png",
                     width: 30,
@@ -256,24 +253,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-
-            // Logout button
-            Positioned(
-              top: 40,
-              right: 10,
-              child: IconButton(
-                icon: const Icon(Icons.logout),
-                onPressed: () async {
-                  bool shouldLogout = await mLogoutDialog(); // Show logout dialog
-                  if (shouldLogout) {
-                    // Additional actions after logout can be added here if needed
-                  }
-                },
-                color: kPrimaryColor,
-                iconSize: 25,
-              ),
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: () async {
+                bool shouldLogout = await mLogoutDialog(); // Show logout dialog
+                if (shouldLogout) {
+                  // Additional actions after logout can be added here if needed
+                }
+              },
+              color: Colors.white,
+              iconSize: 25,
             ),
           ],
+        ),
+        body: SafeArea(
+          child: container,
         ),
         drawer: Drawer(
           child: SingleChildScrollView(
@@ -305,11 +299,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
           currentIndex: _selectedIndex,
-          selectedItemColor: kWhiteColor,
+          selectedItemColor: Colors.white,
           unselectedItemColor: Colors.white54,
           onTap: _onItemTapped,
           type: BottomNavigationBarType.fixed,
-          backgroundColor: kPrimaryColor,
+          backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         ),
       ),
     );
@@ -340,7 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return (await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            backgroundColor: kWhiteColor,
+            backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
@@ -389,23 +383,28 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: 100, // Reduced width
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.of(context).pop(false); // Dismiss dialog, return false
+                            Navigator.of(context)
+                                .pop(false); // Dismiss dialog, return false
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white, // Background color
                             foregroundColor: Colors.black, // Text/icon color
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(5),
-                              side: const BorderSide(
-                                color: kPrimaryColor, // Border color for Cancel button
+                              side: BorderSide(
+                                color: Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .primary, // Border color for Cancel button
                                 width: 1.5, // Border width
                               ),
                             ),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 10, // Reduced horizontal padding
-                              vertical: 8, // Reduced vertical padding to reduce height
+                              vertical:
+                                  8, // Reduced vertical padding to reduce height
                             ),
-                            minimumSize: const Size(0, 36), // Reduced minimum height
+                            minimumSize:
+                                const Size(0, 36), // Reduced minimum height
                           ),
                           child: const Text(
                             'Cancel',
@@ -424,7 +423,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           onPressed: () async {
                             // Log the user out
                             AuthManager.logout();
-                            Navigator.of(context).pop(true); // Close dialog, return true
+                            Navigator.of(context)
+                                .pop(true); // Close dialog, return true
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
@@ -433,20 +433,26 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: kPrimaryColor, // Teal background
+                            backgroundColor: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary, // Teal background
                             foregroundColor: Colors.white, // Text/icon color
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(5),
-                              side: const BorderSide(
-                                color: kPrimaryColor, // Darker teal border for Log Out button
+                              side: BorderSide(
+                                color: Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .primary, // Darker teal border for Log Out button
                                 width: 1.5, // Border width
                               ),
                             ),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 10, // Reduced horizontal padding
-                              vertical: 8, // Reduced vertical padding to reduce height
+                              vertical:
+                                  8, // Reduced vertical padding to reduce height
                             ),
-                            minimumSize: const Size(0, 36), // Reduced minimum height
+                            minimumSize:
+                                const Size(0, 36), // Reduced minimum height
                           ),
                           child: const Text(
                             'Log Out',
@@ -463,7 +469,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-        )) ?? false; // No trailing comma after false
+        )) ??
+        false;
   }
 
   Widget mMyDrawerList() {
@@ -516,7 +523,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           if (isCryptoExpanded) ...[
             submenuItem(
-              " - Buy / Sell",
+              " - Buy / Sell / Swap",
               () {
                 Navigator.pop(context);
                 setState(() {
@@ -679,7 +686,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget menuItem(int id, String title, Widget icon, bool selected,
       {bool isDropdown = false, bool isExpanded = false, Function()? onTap}) {
     return Material(
-      color: selected ? kPrimaryLightColor : Colors.transparent,
+      color: selected ? Color(0xFFF1E6FF) : Colors.transparent,
       child: InkWell(
         onTap: () {
           if (onTap != null) {
@@ -710,10 +717,11 @@ class _HomeScreenState extends State<HomeScreen> {
               icon,
               const SizedBox(width: 20),
               Text(title,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: kPrimaryColor)),
+                      color:
+                          Theme.of(context).extension<AppColors>()!.primary)),
               const Spacer(),
               if (isDropdown)
                 Icon(isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down),
@@ -735,10 +743,10 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(title,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
-                    color: kPrimaryColor)),
+                    color: Theme.of(context).extension<AppColors>()!.primary)),
           ],
         ),
       ),

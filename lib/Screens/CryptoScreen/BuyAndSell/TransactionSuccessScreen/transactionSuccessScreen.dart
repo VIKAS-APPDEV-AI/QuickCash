@@ -21,7 +21,8 @@ class TransactionSuccessScreen extends StatefulWidget {
   });
 
   @override
-  State<TransactionSuccessScreen> createState() => _TransactionSuccessScreenState();
+  State<TransactionSuccessScreen> createState() =>
+      _TransactionSuccessScreenState();
 }
 
 class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
@@ -30,14 +31,12 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
   @override
   void initState() {
     super.initState();
-    // Trigger the animation after the widget is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _isVisible = true;
       });
     });
 
-    // Determine if it's a crypto buy or sell
     if (widget.mCryptoType == "Crypto Buy") {
       isCryptoBuy = true;
     } else {
@@ -53,18 +52,27 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final primaryColor = isDarkMode
+        ? Colors.white
+        : Theme.of(context).extension<AppColors>()!.primary;
+    final textColor = isDarkMode ? Colors.white70 : Colors.black87;
+    final containerColor =
+        isDarkMode ? const Color(0xFF4A2A6A) : const Color(0xA66F35A5);
+    final shadowColor = isDarkMode
+        ? Colors.white.withOpacity(0.1)
+        : Colors.black.withOpacity(0.1);
+
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Background(
         child: Stack(
           children: [
-            // Lottie animation in the background
             Lottie.asset(
-              'assets/lottie/confetti.json', // Replace with your Lottie file path
-              repeat: true, // Loop the animation
-              fit: BoxFit.cover, // Ensure it covers the background
+              'assets/lottie/confetti.json',
+              repeat: true,
+              fit: BoxFit.cover,
             ),
-            // Animated central content with fade and scale
             AnimatedOpacity(
               duration: const Duration(milliseconds: 500),
               opacity: _isVisible ? 1.0 : 0.0,
@@ -77,7 +85,11 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
                     child: Column(
                       children: <Widget>[
                         const SizedBox(height: 100),
-                        isCryptoBuy ? mCryptoBuySuccess() : mCryptoSellSuccess(),
+                        isCryptoBuy
+                            ? mCryptoBuySuccess(primaryColor, textColor,
+                                containerColor, shadowColor)
+                            : mCryptoSellSuccess(primaryColor, textColor,
+                                containerColor, shadowColor),
                       ],
                     ),
                   ),
@@ -90,8 +102,9 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
     );
   }
 
-  // Widget Crypto Buy Transaction Success Screen
-  Widget mCryptoBuySuccess() {
+  Widget mCryptoBuySuccess(Color primaryColor, Color textColor,
+      Color containerColor, Color shadowColor) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -106,24 +119,24 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
         const Text(
           "Thank You!",
           style: TextStyle(
-            color: kGreenColor,
+            color: Colors.green,
             fontSize: 30,
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 4),
-        const Text(
+        Text(
           "Transaction Completed",
           style: TextStyle(
-            color: kPrimaryColor,
+            color: primaryColor,
             fontWeight: FontWeight.w500,
             fontSize: 16,
           ),
         ),
         const SizedBox(height: 35),
-        const Text(
+        Text(
           "Please wait for admin approval!",
-          style: TextStyle(color: Colors.black87, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16),
         ),
         const SizedBox(height: 55),
         Container(
@@ -131,11 +144,11 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(defaultPadding),
           decoration: BoxDecoration(
-            color: kPrimaryLightColor,
+            color: containerColor,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: shadowColor,
                 blurRadius: 8,
                 spreadRadius: 1,
                 offset: const Offset(0, 4),
@@ -146,10 +159,10 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 "Total",
                 style: TextStyle(
-                  color: kPrimaryColor,
+                  color: primaryColor,
                   fontWeight: FontWeight.w500,
                   fontSize: 16,
                 ),
@@ -157,8 +170,8 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
               const SizedBox(height: 5),
               Text(
                 "${widget.totalAmount} ${widget.currency}",
-                style: const TextStyle(
-                  color: kPrimaryColor,
+                style: TextStyle(
+                  color: primaryColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
@@ -173,11 +186,11 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(defaultPadding),
           decoration: BoxDecoration(
-            color: kPrimaryLightColor,
+            color: containerColor,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: shadowColor,
                 blurRadius: 8,
                 spreadRadius: 1,
                 offset: const Offset(0, 4),
@@ -188,10 +201,10 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 "Getting Coin",
                 style: TextStyle(
-                  color: kPrimaryColor,
+                  color: primaryColor,
                   fontWeight: FontWeight.w500,
                   fontSize: 16,
                 ),
@@ -199,8 +212,8 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
               const SizedBox(height: 5),
               Text(
                 '${widget.gettingCoin != null ? double.tryParse(widget.gettingCoin!)?.toStringAsFixed(7) ?? '0.00' : '0.00'} ${widget.coinName}',
-                style: const TextStyle(
-                  color: kPrimaryColor,
+                style: TextStyle(
+                  color: primaryColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
@@ -213,10 +226,11 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
         ),
         const SizedBox(height: 30),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 90),
+          padding: EdgeInsets.symmetric(
+              horizontal: screenWidth > 600 ? screenWidth * 0.25 : 90),
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: kPrimaryColor,
+              backgroundColor: primaryColor,
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -231,9 +245,14 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
                 ),
               );
             },
-            child: const Text(
+            child: Text(
               'Home',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.black
+                    : Colors.white,
+                fontSize: 16,
+              ),
             ),
           ),
         ),
@@ -241,8 +260,9 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
     );
   }
 
-  // Widget Crypto Sell Transaction Success Screen
-  Widget mCryptoSellSuccess() {
+  Widget mCryptoSellSuccess(Color primaryColor, Color textColor,
+      Color containerColor, Color shadowColor) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -257,16 +277,16 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
         const Text(
           "Thank You!",
           style: TextStyle(
-            color: kGreenColor,
+            color: Colors.green,
             fontSize: 30,
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 4),
-        const Text(
+        Text(
           "Transaction Completed",
           style: TextStyle(
-            color: kPrimaryColor,
+            color: primaryColor,
             fontWeight: FontWeight.w500,
             fontSize: 16,
           ),
@@ -277,11 +297,11 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(defaultPadding),
           decoration: BoxDecoration(
-            color: kPrimaryLightColor,
+            color: containerColor,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: shadowColor,
                 blurRadius: 8,
                 spreadRadius: 1,
                 offset: const Offset(0, 4),
@@ -292,10 +312,10 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 "Getting Amount",
                 style: TextStyle(
-                  color: kPrimaryColor,
+                  color: primaryColor,
                   fontWeight: FontWeight.w500,
                   fontSize: 16,
                 ),
@@ -303,8 +323,8 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
               const SizedBox(height: 5),
               Text(
                 '${(double.tryParse(widget.gettingCoin ?? '0.0') ?? 0.0).toStringAsFixed(2)} ${widget.currency}',
-                style: const TextStyle(
-                  color: kPrimaryColor,
+                style: TextStyle(
+                  color: primaryColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
@@ -319,11 +339,11 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(defaultPadding),
           decoration: BoxDecoration(
-            color: kPrimaryLightColor,
+            color: containerColor,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: shadowColor,
                 blurRadius: 8,
                 spreadRadius: 1,
                 offset: const Offset(0, 4),
@@ -334,10 +354,10 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 "Total Coin Sold",
                 style: TextStyle(
-                  color: kPrimaryColor,
+                  color: primaryColor,
                   fontWeight: FontWeight.w500,
                   fontSize: 16,
                 ),
@@ -345,8 +365,8 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
               const SizedBox(height: 5),
               Text(
                 '${(widget.totalAmount ?? 0.0).toStringAsFixed(0)} ${widget.coinName}',
-                style: const TextStyle(
-                  color: kPrimaryColor,
+                style: TextStyle(
+                  color: primaryColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
@@ -359,10 +379,11 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
         ),
         const SizedBox(height: 95),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 90),
+          padding: EdgeInsets.symmetric(
+              horizontal: screenWidth > 600 ? screenWidth * 0.25 : 90),
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: kPrimaryColor,
+              backgroundColor: primaryColor,
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -377,9 +398,14 @@ class _TransactionSuccessScreenState extends State<TransactionSuccessScreen> {
                 ),
               );
             },
-            child: const Text(
+            child: Text(
               'Home',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.black
+                    : Colors.white,
+                fontSize: 16,
+              ),
             ),
           ),
         ),

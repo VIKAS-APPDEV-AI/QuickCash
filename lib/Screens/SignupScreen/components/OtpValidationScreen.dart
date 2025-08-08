@@ -168,7 +168,7 @@ class _FilledRoundedPinPutState extends State<FilledRoundedPinPut> {
       CustomSnackBar.showSnackBar(
         context: context,
         message: 'OTP Resent Successfully!',
-        color: kGreenColor, // Set the color of the SnackBar
+        color: Colors.green, // Set the color of the SnackBar
       );
 
       print('New OTP: $newOtp');

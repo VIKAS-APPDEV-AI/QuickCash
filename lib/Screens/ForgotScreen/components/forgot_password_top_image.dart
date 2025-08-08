@@ -14,9 +14,9 @@ class ForgotPasswordTopImage extends StatelessWidget {
         Row(
           children: [
             IconButton(
-              icon: const Icon(
+              icon:  Icon(
                 Icons.arrow_back,
-                color: kPrimaryColor,
+                color: Theme.of(context).extension<AppColors>()!.primary,
               ),
               onPressed: () {
                 Navigator.pop(context); // Go back to previous screen
@@ -24,12 +24,12 @@ class ForgotPasswordTopImage extends StatelessWidget {
             ),
             Expanded(
               child: Center(
-                child: const Text(
+                child:  Text(
                   "Forgot Password",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 28,
-                    color: kPrimaryColor,
+                    color: Theme.of(context).extension<AppColors>()!.primary,
                   ),
                 ),
               ),

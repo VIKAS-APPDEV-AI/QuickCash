@@ -6,6 +6,7 @@ import 'package:quickcash/Screens/DashboardScreen/AllAccountsScreen/AccountDetai
 import 'package:quickcash/Screens/DashboardScreen/Dashboard/AccountsList/accountsListApi.dart';
 import 'package:quickcash/constants.dart';
 import 'package:quickcash/util/currency_utils.dart';
+import 'package:shimmer/shimmer.dart'; // Import shimmer package
 
 import '../Dashboard/AccountsList/accountsListModel.dart';
 
@@ -81,17 +82,97 @@ class _AllAccountsScreenState extends State<AllAccountsScreen> {
     return format.currencySymbol;
   }
 
+  // Widget to create shimmer effect for loading state
+  Widget _buildShimmerEffect() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: ListView.builder(
+        itemCount: 5, // Number of shimmer placeholders
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: smallPadding),
+            child: Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(defaultPadding),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(defaultPadding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: 35,
+                          height: 35,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        Container(
+                          width: 100,
+                          height: 30,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: defaultPadding),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: 100,
+                          height: 16,
+                          color: Colors.white,
+                        ),
+                        Container(
+                          width: 100,
+                          height: 16,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: defaultPadding),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: 80,
+                          height: 16,
+                          color: Colors.white,
+                        ),
+                        Container(
+                          width: 80,
+                          height: 16,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         toolbarHeight: 75,
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "All Accounts",
-          style: TextStyle(color: kWhiteColor),
+          style: TextStyle(color: Colors.white),
         ),
         actions: [
           Padding(
@@ -101,33 +182,47 @@ class _AllAccountsScreenState extends State<AllAccountsScreen> {
               height: 30,
               child: Container(
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: kWhiteColor),
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                ),
                 child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SelectCurrencyScreen(),
-                        ),
-                      );
-                    },
-                    child: Icon(
-                      Icons.add,
-                      color: kPrimaryColor,
-                      size: 25,
-                      weight: 10,
-                    )),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SelectCurrencyScreen(),
+                      ),
+                    );
+                  },
+                  child: Icon(
+                    Icons.add,
+                    color: Theme.of(context).extension<AppColors>()!.primary,
+                    size: 25,
+                    weight: 10,
+                  ),
+                ),
               ),
             ),
-          )
+          ),
         ],
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color.fromARGB(255, 20, 20, 20),
+                Color(0xFF8A2BE2),
+                Color(0x00000000),
+              ],
+              stops: [0.0, 0.7, 1.0],
+            ),
+          ),
+        ),
       ),
       body: Column(
         children: [
-          SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.all(defaultPadding),
             child: TextField(
@@ -145,7 +240,7 @@ class _AllAccountsScreenState extends State<AllAccountsScreen> {
             child: RefreshIndicator(
               onRefresh: mAccounts,
               child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? _buildShimmerEffect() // Show shimmer effect during loading
                   : filteredAccountsList.isEmpty
                       ? const Center(child: Text("No Account Found"))
                       : ListView.builder(
@@ -174,8 +269,7 @@ class _AllAccountsScreenState extends State<AllAccountsScreen> {
                                 },
                                 child: Card(
                                   elevation: 5,
-                                  color:
-                                      isSelected ? kPrimaryColor : Colors.white,
+                                  color: isSelected ? Theme.of(context).extension<AppColors>()!.primary : Colors.white,
                                   shape: RoundedRectangleBorder(
                                     borderRadius:
                                         BorderRadius.circular(defaultPadding),
@@ -191,7 +285,6 @@ class _AllAccountsScreenState extends State<AllAccountsScreen> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            // Use EU flag for EUR, country flag for others
                                             if (accountsData.currency
                                                     ?.toUpperCase() ==
                                                 'EUR')
@@ -233,7 +326,7 @@ class _AllAccountsScreenState extends State<AllAccountsScreen> {
                                                 fontWeight: FontWeight.bold,
                                                 color: isSelected
                                                     ? Colors.white
-                                                    : kPrimaryColor,
+                                                    : Theme.of(context).extension<AppColors>()!.primary,
                                               ),
                                             ),
                                             Text(
@@ -243,7 +336,7 @@ class _AllAccountsScreenState extends State<AllAccountsScreen> {
                                                 fontWeight: FontWeight.bold,
                                                 color: isSelected
                                                     ? Colors.white
-                                                    : kPrimaryColor,
+                                                    : Theme.of(context).extension<AppColors>()!.primary,
                                               ),
                                             ),
                                           ],
@@ -260,7 +353,7 @@ class _AllAccountsScreenState extends State<AllAccountsScreen> {
                                                 fontWeight: FontWeight.bold,
                                                 color: isSelected
                                                     ? Colors.white
-                                                    : kPrimaryColor,
+                                                    : Theme.of(context).extension<AppColors>()!.primary,
                                               ),
                                             ),
                                             Text(
@@ -270,7 +363,7 @@ class _AllAccountsScreenState extends State<AllAccountsScreen> {
                                                 fontWeight: FontWeight.bold,
                                                 color: isSelected
                                                     ? Colors.white
-                                                    : kPrimaryColor,
+                                                    : Theme.of(context).extension<AppColors>()!.primary,
                                               ),
                                             ),
                                           ],
@@ -287,8 +380,7 @@ class _AllAccountsScreenState extends State<AllAccountsScreen> {
           ),
         ],
       ),
-
-      //floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // Ensures it's at bottom-right
     );
   }
+
 }

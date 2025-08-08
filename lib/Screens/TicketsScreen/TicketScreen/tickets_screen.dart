@@ -1,5 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:quickcash/Screens/HomeScreen/home_screen.dart';
+import 'package:quickcash/Screens/NotificationsScreen.dart/NotificationScreen.dart';
 import 'package:quickcash/Screens/TicketsScreen/CreateTicketScreen/createTicketApi.dart';
 import 'package:quickcash/Screens/TicketsScreen/CreateTicketScreen/createTicketModel.dart';
 import 'package:quickcash/Screens/TicketsScreen/TicketScreen/model/ticketScreenApi.dart';
@@ -15,10 +18,13 @@ class TicketsScreen extends StatefulWidget {
   State<TicketsScreen> createState() => _TicketsScreenState();
 }
 
-class _TicketsScreenState extends State<TicketsScreen> {
-
+class _TicketsScreenState extends State<TicketsScreen>
+    with SingleTickerProviderStateMixin {
   final TicketListApi _ticketListApi = TicketListApi();
   List<TicketListsData> ticketHistory = [];
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  bool _isInitialized = false; // Safeguard for initialization
 
   bool isLoading = false;
   String? errorMessage;
@@ -26,7 +32,24 @@ class _TicketsScreenState extends State<TicketsScreen> {
   @override
   void initState() {
     super.initState();
+    // Initialize animation controller and animation
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+    _isInitialized = true; // Mark as initialized
+    _animationController.forward();
     mTicketHistory();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   Future<void> mTicketHistory() async {
@@ -35,21 +58,20 @@ class _TicketsScreenState extends State<TicketsScreen> {
       errorMessage = null;
     });
 
-    try{
+    try {
       final response = await _ticketListApi.ticketListApi();
 
-      if(response.ticketList !=null && response.ticketList!.isNotEmpty){
+      if (response.ticketList != null && response.ticketList!.isNotEmpty) {
         setState(() {
           ticketHistory = response.ticketList!;
           isLoading = false;
         });
-      }else {
+      } else {
         setState(() {
           isLoading = false;
-          errorMessage = 'No Statement List';
+          errorMessage = 'No Tickets Available';
         });
       }
-
     } catch (error) {
       setState(() {
         isLoading = false;
@@ -58,166 +80,360 @@ class _TicketsScreenState extends State<TicketsScreen> {
     }
   }
 
-  // Function to format the date
   String formatDate(String? dateTime) {
     if (dateTime == null) {
       return 'Date not available';
     }
     DateTime date = DateTime.parse(dateTime);
-    return DateFormat('yyyy-MM-dd').format(date);
+    return DateFormat('MMM dd, yyyy').format(date);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        iconTheme: const IconThemeData(color: Colors.transparent),
-        title: const Text("Tickets", style: TextStyle(color: Colors.transparent),),
-      ),
-      body: Column(
-        children: [
-          const SizedBox(height: 0),
-
-          // Create Ticket Button
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: SizedBox(
-            width: 200,
-            height: 50,
-            child: ElevatedButton(
-              onPressed: () {
-                // Pass mTicketHistory method as callback to showCreateTicketDialog
-                showCreateTicketDialog(context, mTicketHistory);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kPrimaryColor,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-              child: const Text('Create Ticket', style: TextStyle(color: Colors.white, fontSize: 16)),
-            ),
-          ),
-        ),
-
-          const SizedBox(height: defaultPadding),
-          Expanded(
-            child:  isLoading ? const Center(
-              child: CircularProgressIndicator(
-                color: kPrimaryColor,
-              ),
-            ) : SingleChildScrollView(
+      
+      body: _isInitialized // Only build FadeTransition if initialized
+          ? FadeTransition(
+              opacity: _fadeAnimation,
               child: Column(
-                children: ticketHistory.map((ticketsData) {
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    color: kPrimaryColor,
-                    child: ListTile(
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: defaultPadding),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text("Ticket ID:", style: TextStyle(color: Colors.white, fontSize: 16)),
-                              Text("${ticketsData.ticketId}", style: const TextStyle(color: Colors.white, fontSize: 16)),
-                            ],
+                children: [
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: SizedBox(
+                      width: 220,
+                      height: 50,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color(0xFF1A1A2E),
+                              Color(0xFF6B46C1),
+                              Color(0xFF2A1B3D),
+                            ], // Customize your gradient
                           ),
-                          const SizedBox(height: 8),
-                          const Divider(),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text("Created At:", style: TextStyle(color: Colors.white, fontSize: 16)),
-                              Text(formatDate(ticketsData.date), style: const TextStyle(color: Colors.white, fontSize: 16)),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          const Divider(),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text("Subject:", style: TextStyle(color: Colors.white, fontSize: 16)),
-                              Text("${ticketsData.subject}", style: const TextStyle(color: Colors.white, fontSize: 16)),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          const Divider(),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text("Message:", style: TextStyle(color: Colors.white, fontSize: 16)),
-                              Text("${ticketsData.message}", style: const TextStyle(color: Colors.white, fontSize: 16)),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          const Divider(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text("Status:", style: TextStyle(color: Colors.white, fontSize: 16)),
-                              OutlinedButton(
-                                onPressed: () {},
-                                style: OutlinedButton.styleFrom(
-                                  side: const BorderSide(color: Colors.white, width: 1),
-                                ),
-                                child: Text(
-                                  "${ticketsData.status}".isNotEmpty
-                                      ? "${ticketsData.status?[0].toUpperCase()}${ticketsData.status?.substring(1)}"
-                                      : "",  // Capitalize first letter and keep the rest as is
-                                  style: const TextStyle(color: Colors.green),
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          // View Button
-                          const SizedBox(height: 35),
-                          Center(
-                            child: SizedBox(
-                              width: 150,
-                              height: 50,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => ChatHistoryScreen(mID: ticketsData.id,mChatStatus: ticketsData.status,)),
-                                  );
-                                },
-                                child: const Text('View', style: TextStyle(color: kPrimaryColor, fontSize: 16)),
-                              ),
+                          borderRadius: BorderRadius.circular(25),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 5,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            showCreateTicketDialog(context, mTicketHistory);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
                             ),
                           ),
-                          const SizedBox(height: 8),
-                        ],
+                          child: const Text(
+                            'Create New Ticket',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  );
-                }).toList(),
+                  ),
+                  const SizedBox(height: defaultPadding),
+                  Expanded(
+                    child: isLoading
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary,
+                            ),
+                          )
+                        : errorMessage != null
+                            ? Center(
+                                child: Text(
+                                  errorMessage!,
+                                  style: const TextStyle(
+                                    color: Colors.redAccent,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              )
+                            : RefreshIndicator(
+                                onRefresh: mTicketHistory,
+                                child: ListView.builder(
+                                  padding: const EdgeInsets.all(16),
+                                  itemCount: ticketHistory.length,
+                                  itemBuilder: (context, index) {
+                                    final ticket = ticketHistory[index];
+                                    return Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 16),
+                                      child: Card(
+                                        elevation: 8,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                        ),
+                                        clipBehavior: Clip.antiAlias,
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                Color(0xFF1A1A2E),
+                                                Color(0xFF6B46C1),
+                                                Color(0xFF2A1B3D),
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(16),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    const Text(
+                                                      "Ticket ID:",
+                                                      style: TextStyle(
+                                                        color: Colors.white70,
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "${ticket.ticketId}",
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const Divider(
+                                                    color: Colors.white24,
+                                                    height: 20),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    const Text(
+                                                      "Created At:",
+                                                      style: TextStyle(
+                                                        color: Colors.white70,
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      formatDate(ticket.date),
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const Divider(
+                                                    color: Colors.white24,
+                                                    height: 20),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    const Text(
+                                                      "Subject:",
+                                                      style: TextStyle(
+                                                        color: Colors.white70,
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                    Flexible(
+                                                      child: Text(
+                                                        "${ticket.subject}",
+                                                        style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const Divider(
+                                                    color: Colors.white24,
+                                                    height: 20),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    const Text(
+                                                      "Message:",
+                                                      style: TextStyle(
+                                                        color: Colors.white70,
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                    Flexible(
+                                                      child: Text(
+                                                        "${ticket.message}",
+                                                        style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const Divider(
+                                                    color: Colors.white24,
+                                                    height: 20),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    const Text(
+                                                      "Status:",
+                                                      style: TextStyle(
+                                                        color: Colors.white70,
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                        horizontal: 12,
+                                                        vertical: 6,
+                                                      ),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.green
+                                                            .withOpacity(0.1),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12),
+                                                        border: Border.all(
+                                                            color:
+                                                                Colors.green),
+                                                      ),
+                                                      child: Text(
+                                                        "${ticket.status?.isNotEmpty == true ? ticket.status![0].toUpperCase() + ticket.status!.substring(1) : 'Unknown'}",
+                                                        style: const TextStyle(
+                                                          color: Colors.green,
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 20),
+                                                Center(
+                                                  child: SizedBox(
+                                                    width: 150,
+                                                    height: 45,
+                                                    child: ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        foregroundColor: Theme
+                                                                .of(context)
+                                                            .extension<
+                                                                AppColors>()!
+                                                            .primary,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(20),
+                                                        ),
+                                                        elevation: 3,
+                                                      ),
+                                                      onPressed: () {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                ChatHistoryScreen(
+                                                              mID: ticket.id,
+                                                              mChatStatus:
+                                                                  ticket.status,
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                      child: const Text(
+                                                        'View Details',
+                                                        style: TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                  ),
+                ],
               ),
+            )
+          : const Center(
+              child: CircularProgressIndicator(),
             ),
-          ),
-        ],
-      ),
     );
   }
 }
 
-// Function to show the dialog with barrierDismissible set to false
-Future<void> showCreateTicketDialog(BuildContext context, VoidCallback onTicketCreated) async {
+Future<void> showCreateTicketDialog(
+    BuildContext context, VoidCallback onTicketCreated) async {
   showDialog(
     context: context,
-    barrierDismissible: false, // Prevent closing the dialog by tapping outside
+    barrierDismissible: false,
     builder: (BuildContext context) {
       return CreateTicketScreen(
         onTicketCreated: onTicketCreated,
@@ -232,151 +448,266 @@ class CreateTicketScreen extends StatefulWidget {
 
   @override
   State<CreateTicketScreen> createState() => _CreateTicketScreenState();
-
 }
 
-class _CreateTicketScreenState extends State<CreateTicketScreen> {
+class _CreateTicketScreenState extends State<CreateTicketScreen>
+    with SingleTickerProviderStateMixin {
   final CreateTicketApi _createTicketApi = CreateTicketApi();
-
   final TextEditingController subjectController = TextEditingController();
   final TextEditingController messageController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  bool _isInitialized = false; // Safeguard for initialization
 
   bool isLoading = false;
   String? errorMessage;
 
-
   @override
   void initState() {
     super.initState();
-    mCreateTicket();
+    // Initialize animation controller and animation
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _scaleAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutBack,
+    );
+    _isInitialized = true; // Mark as initialized
+    _animationController.forward();
   }
 
-  Future<void> mCreateTicket() async{
-   if(_formKey.currentState!.validate()){
-     setState(() {
-       isLoading = true;
-       errorMessage = null;
-     });
+  @override
+  void dispose() {
+    _animationController.dispose();
+    subjectController.dispose();
+    messageController.dispose();
+    super.dispose();
+  }
 
-     try{
-       final request = CreateTicketRequest(cardStatus: "Pending", subject: subjectController.text, userId: AuthManager.getUserId(), message: messageController.text);
+  Future<void> mCreateTicket() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        isLoading = true;
+        errorMessage = null;
+      });
 
-       final response = await _createTicketApi.createTicket(request);
+      try {
+        final request = CreateTicketRequest(
+          cardStatus: "Pending",
+          subject: subjectController.text,
+          userId: AuthManager.getUserId(),
+          message: messageController.text,
+        );
 
-       if(response.message == "support ticket has been added !!!"){
-         setState(() {
-           ScaffoldMessenger.of(context).showSnackBar(
-             SnackBar(content: Text(response.message ?? 'Ticket Created Successfully')),
-           );
-           Navigator.pop(context);
-           isLoading = false;
-         });
-         widget.onTicketCreated();
-       }else{
-         setState(() {
-           ScaffoldMessenger.of(context).showSnackBar(
-             SnackBar(content: Text(response.message ?? 'We are facing some issue!')),
-           );
-           Navigator.pop(context);
-           isLoading = false;
-         });
-       }
-     }catch (error) {
-       setState(() {
-         isLoading = false;
-         errorMessage = error.toString();
-       });
-     }
-   }
+        final response = await _createTicketApi.createTicket(request);
+
+        if (response.message == "support ticket has been added !!!") {
+          setState(() {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content:
+                    Text(response.message ?? 'Ticket Created Successfully'),
+                backgroundColor: Colors.green,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            );
+            Navigator.pop(context);
+            isLoading = false;
+          });
+          widget.onTicketCreated();
+        } else {
+          setState(() {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(response.message ?? 'We are facing some issue!'),
+                backgroundColor: Colors.redAccent,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            );
+            Navigator.pop(context);
+            isLoading = false;
+          });
+        }
+      } catch (error) {
+        setState(() {
+          isLoading = false;
+          errorMessage = error.toString();
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Create Ticket'),
-      content: SizedBox(
-        width: 350, // Set your desired width here
-        height: 400, // Set your desired height here
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: subjectController,
-                  keyboardType: TextInputType.text,
-                  cursorColor: kPrimaryColor,
-                  textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
-                    labelText: 'Subject',
-                    labelStyle: const TextStyle(color: kPrimaryColor),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(),
-                    ),
-                    fillColor: Colors.transparent,
-                    filled: true,
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Subject is required';
-                    }
-                    return null; // Validation passed
-                  },
+      final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    return _isInitialized // Only build ScaleTransition if initialized
+        ? ScaleTransition(
+            scale: _scaleAnimation,
+            child: AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
+              title: const Text(
+                'Create New Ticket',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 20,
                 ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: messageController,
-                  keyboardType: TextInputType.text,
-                  cursorColor: kPrimaryColor,
-                  textInputAction: TextInputAction.none,
-                  decoration: InputDecoration(
-                    labelText: 'Message',
-                    labelStyle: const TextStyle(color: kPrimaryColor),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(),
+              ),
+              content: SizedBox(
+                width: 350,
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextFormField(
+                          controller: subjectController,
+                          keyboardType: TextInputType.text,
+                          cursorColor:
+                              Theme.of(context).extension<AppColors>()!.primary,
+                          textInputAction: TextInputAction.next,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: 'Subject',
+                            labelStyle: TextStyle(
+                               color: isDarkMode ? Colors.white : Colors.white,
+                            ),
+                            filled: true,
+                            fillColor: Colors.white.withOpacity(0.1),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .background,
+                                width: 2,
+                              ),
+                            ),
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Subject is required';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: messageController,
+                          keyboardType: TextInputType.text,
+                          cursorColor:
+                              Theme.of(context).extension<AppColors>()!.primary,
+                          textInputAction: TextInputAction.none,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: 'Message',
+                            labelStyle: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.white,
+                            ),
+                            filled: true,
+                            fillColor: Colors.white.withOpacity(0.1),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .background,
+                                width: 2,
+                              ),
+                            ),
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
+                          ),
+                          maxLines: 6,
+                          minLines: 4,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Message is required';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: defaultPadding),
+                        if (isLoading)
+                          CircularProgressIndicator(
+                            color: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary,
+                          ),
+                        if (errorMessage != null)
+                          Text(
+                            errorMessage!,
+                            style: const TextStyle(
+                              color: Colors.redAccent,
+                              fontSize: 14,
+                            ),
+                          ),
+                      ],
                     ),
-                    fillColor: Colors.transparent,
-                    filled: true,
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
                   ),
-                  maxLines: 10,
-                  minLines: 5,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Message is required';
-                    }
-                    return null; // Validation passed
-                  },
                 ),
-
-                const SizedBox(height: defaultPadding),
-                if (isLoading) const CircularProgressIndicator(color: kPrimaryColor,), // Show loading indicator
-                if (errorMessage != null) // Show error message if there's an error
-                  Text(errorMessage!, style: const TextStyle(color: Colors.red)),
-
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isLoading
+                      ? null
+                      : () {
+                          Navigator.of(context).pop();
+                        },
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: isLoading ? null : mCreateTicket,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).extension<AppColors>()!.background,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
+                  ),
+                  child:  Text(
+                    'Submit Ticket',
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.white : AppColors.light.primary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
               ],
             ),
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: isLoading ? null : mCreateTicket,
-          child: const Text('Post Ticket'),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop(); // Close the dialog
-          },
-          child: const Text('Close'),
-        ),
-      ],
-    );
+          )
+        : const Center(
+            child: CircularProgressIndicator(),
+          );
   }
 }
-
-

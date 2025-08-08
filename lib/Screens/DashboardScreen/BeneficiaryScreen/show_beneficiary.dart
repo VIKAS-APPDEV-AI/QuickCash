@@ -1,8 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quickcash/Screens/DashboardScreen/BeneficiaryScreen/select_beneficiary_screen.dart';
 import 'package:quickcash/Screens/DashboardScreen/SendMoneyScreen/PayRecipientsScree/recipientListModel/receipientModel.dart';
 import 'package:quickcash/Screens/DashboardScreen/SendMoneyScreen/PayRecipientsScree/recipientListModel/recipientApi.dart';
 import 'package:quickcash/Screens/DashboardScreen/SendMoneyScreen/UpdateRecipientScreen/updateRecipientScreen.dart';
+import 'package:quickcash/Screens/NotificationsScreen.dart/NotificationScreen.dart';
+import 'package:quickcash/Screens/TicketsScreen/TicketScreen/DashboardTicketScreen.dart';
 import 'package:quickcash/constants.dart';
 
 class ShowBeneficiaryScreen extends StatefulWidget {
@@ -24,43 +27,75 @@ class _ShowBeneficiaryScreen extends State<ShowBeneficiaryScreen> {
     super.initState();
   }
 
-
   Future<void> mRecipients() async {
     setState(() {
       isLoading = true;
     });
 
-    try{
+    try {
       final response = await _recipientsListApi.recipientsListApi();
 
-      if(response.recipients !=null && response.recipients!.isNotEmpty){
+      if (response.recipients != null && response.recipients!.isNotEmpty) {
         setState(() {
           isLoading = false;
           recipientsListData = response.recipients!;
         });
-      }else{
+      } else {
         setState(() {
           isLoading = false;
         });
       }
-
-    }catch (error) {
+    } catch (error) {
       setState(() {
         isLoading = false;
       });
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Recipients",
           style: TextStyle(color: Colors.white),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(CupertinoIcons.bell_fill),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => NotificationScreen(),
+                  ));
+            },
+            tooltip: 'Notifications',
+          ),
+          IconButton(
+            icon: const Icon(CupertinoIcons.headphones),
+            onPressed: () {
+             Navigator.push(context, CupertinoPageRoute(builder: (context) => DashboardTicketScreen(),));
+            },
+            tooltip: 'Support',
+          ),
+          const SizedBox(width: 8),
+        ],
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color.fromARGB(255, 20, 20, 20), // Primary color
+                Color(0xFF8A2BE2), // Slightly lighter for gradient effect
+                Color(0x00000000), // Transparent at the bottom
+              ],
+              stops: [0.0, 0.7, 1.0],
+            ),
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -73,94 +108,106 @@ class _ShowBeneficiaryScreen extends State<ShowBeneficiaryScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     "Select Beneficiary",
-                    style: TextStyle(color: kPrimaryColor,fontSize: 16),
+                    style: TextStyle(
+                        color:
+                            Theme.of(context).extension<AppColors>()!.primary,
+                        fontSize: 16),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.add,color: kPrimaryColor), // Replace with your desired icon
+                    icon: Icon(Icons.add,
+                        color: Theme.of(context)
+                            .extension<AppColors>()!
+                            .primary), // Replace with your desired icon
                     onPressed: () {
                       // Navigate to PayRecipientsScreen when tapped
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SelectBeneficiaryScreen()),
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const SelectBeneficiaryScreen()),
                       );
                     },
                   ),
                 ],
               ),
-
-              const SizedBox(height: defaultPadding,),
-
-              isLoading
-                  ? const Center(
-                child: CircularProgressIndicator(
-                  color: kPrimaryColor,
-                ),
-              )
-                  :ListView.builder(
-                shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: recipientsListData.length,
-                  itemBuilder: (context, index){
-                   final recipients = recipientsListData[index];
-
-                   return Padding(padding: const EdgeInsets.symmetric(vertical: 5,horizontal: smallPadding),
-                     child: GestureDetector(
-                       onTap: () {
-                         Navigator.push(
-                           context,
-                           MaterialPageRoute(builder: (context) =>  UpdateRecipientScreen(mRecipientId: recipients.id)),
-                         );
-                       },
-                       child: Card(
-                         elevation: 4.0,
-                         color: Colors.white,
-                         margin: const EdgeInsets.symmetric(
-                             vertical: 0, horizontal: 0),
-                         child: Padding(
-                           padding:
-                           const EdgeInsets.all(defaultPadding),
-                           child: Row(
-                             children: [
-                               const Icon(
-                                 Icons.badge,    // Example of a Material icon
-                                 size: 60.0,   // Icon size
-                                 color: kPrimaryColor,  // Icon color
-                               ),
-                               const SizedBox(width: defaultPadding),
-                               Expanded(
-                                 child: Column(
-                                   crossAxisAlignment:
-                                   CrossAxisAlignment.start,
-                                   children: [
-                                     Text(
-                                       '${recipients.name}',
-                                       style: const TextStyle(
-                                         fontWeight: FontWeight.bold,
-                                         fontSize: 16,
-                                       ),
-                                     ),
-                                     Text(
-                                       '${recipients.iban}',
-                                       style: const TextStyle(
-                                         color: Colors.grey,
-                                       ),
-                                     ),
-                                   ],
-                                 ),
-                               ),
-                             ],
-                           ),
-                         ),
-                       ),
-                     ),
-
-                   );
-
-                  }
+              const SizedBox(
+                height: defaultPadding,
               ),
+              isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        color:
+                            Theme.of(context).extension<AppColors>()!.primary,
+                      ),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: recipientsListData.length,
+                      itemBuilder: (context, index) {
+                        final recipients = recipientsListData[index];
 
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 5, horizontal: smallPadding),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => UpdateRecipientScreen(
+                                        mRecipientId: recipients.id)),
+                              );
+                            },
+                            child: Card(
+                              elevation: 4.0,
+                              color: Colors.white,
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 0, horizontal: 0),
+                              child: Padding(
+                                padding: const EdgeInsets.all(defaultPadding),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.badge, // Example of a Material icon
+                                      size: 60.0, // Icon size
+                                      color: Theme.of(context)
+                                          .extension<AppColors>()!
+                                          .primary, // Icon color
+                                    ),
+                                    const SizedBox(width: defaultPadding),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '${recipients.name}',
+                                            style:  TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                              color: Theme.of(context).extension<AppColors>()!.primary,
+                                            ),
+                                          ),
+                                          Text(
+                                            '${recipients.iban}',
+                                            style: const TextStyle(
+                                              color: Colors.grey,
+                                              
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
             ],
           ),
         ),

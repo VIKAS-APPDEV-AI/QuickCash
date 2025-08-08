@@ -66,7 +66,7 @@ class _WalletAddressScreenState extends State<WalletAddressScreen> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme:
             const IconThemeData(color: Colors.white, size: 30, weight: 10),
         title: const Text(
@@ -83,18 +83,33 @@ class _WalletAddressScreenState extends State<WalletAddressScreen> {
                 onPressed: () {
                   mAddNewCoinBottomSheet(context);
                 },
-                label: Icon(Icons.add, color: kPrimaryColor),
-                backgroundColor: kWhiteColor,
+                label: Icon(Icons.add, color: Theme.of(context).extension<AppColors>()!.primary),
+                backgroundColor: Colors.white,
               ),
             ),
           ),
         ],
+        flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color.fromARGB(255, 6, 6, 6), // Dark neo-banking color
+                      Color(0xFF8A2BE2), // Gradient transition
+                      Color(0x00000000), // Transparent fade
+                    ],
+                    stops: [0.0, 0.7, 1.0],
+                  ),
+                ),
+              ),
+
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
-              backgroundColor: kPrimaryColor,
-              color: kWhiteColor,
+              backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
+              color: Colors.white,
               onRefresh: _onRefresh,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -125,8 +140,8 @@ class _WalletAddressScreenState extends State<WalletAddressScreen> {
                                     children: [
                                       Text(
                                         walletData.coin!.split('_')[0],
-                                        style: const TextStyle(
-                                          color: kPrimaryColor,
+                                        style:  TextStyle(
+                                          color: Theme.of(context).extension<AppColors>()!.primary,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18,
                                         ),
@@ -151,7 +166,7 @@ class _WalletAddressScreenState extends State<WalletAddressScreen> {
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18,
-                                          color: kPurpleColor,
+                                          color: Color(0xFF9568ff),
                                         ),
                                       ),
                                     ],
@@ -171,7 +186,7 @@ class _WalletAddressScreenState extends State<WalletAddressScreen> {
                                                 walletData.coin!.split('_')[0]);
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: kPrimaryColor,
+                                            backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                                             shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12), // Adjust the radius value as needed
           ),
@@ -265,7 +280,7 @@ class _AddNewCoinBottomSheet extends State<AddNewCoinBottomSheet> {
           CustomSnackBar.showSnackBar(
               context: context,
               message: 'Wallet Address Added Successfully!',
-              color: kGreenColor);
+              color: Colors.green);
 
           Navigator.pop(context);
 
@@ -281,7 +296,7 @@ class _AddNewCoinBottomSheet extends State<AddNewCoinBottomSheet> {
           CustomSnackBar.showSnackBar(
               context: context,
               message: 'We are facing some issue',
-              color: kRedColor);
+              color: Colors.red);
 
           isLoading = false;
         });
@@ -327,8 +342,8 @@ class _AddNewCoinBottomSheet extends State<AddNewCoinBottomSheet> {
           const SizedBox(width: defaultPadding),
           Text(
             type,
-            style: const TextStyle(
-                color: kPrimaryColor,
+            style:  TextStyle(
+                color: Theme.of(context).extension<AppColors>()!.primary,
                 fontSize: 15,
                 fontWeight: FontWeight.bold),
           ),
@@ -353,16 +368,16 @@ class _AddNewCoinBottomSheet extends State<AddNewCoinBottomSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+               Text(
                 'Request Wallet Address',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: kPrimaryColor,
+                  color: Theme.of(context).extension<AppColors>()!.primary,
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.close, color: kPrimaryColor),
+                icon:  Icon(Icons.close, color: Theme.of(context).extension<AppColors>()!.primary),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -410,21 +425,21 @@ class _AddNewCoinBottomSheet extends State<AddNewCoinBottomSheet> {
                         selectedTransferType != null
                             ? '$selectedTransferType'
                             : 'Select Coin',
-                        style: const TextStyle(
-                            color: kPrimaryColor,
+                        style:  TextStyle(
+                            color: Theme.of(context).extension<AppColors>()!.primary,
                             fontSize: 15,
                             fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
-                  const Icon(Icons.arrow_drop_down, color: kPrimaryColor),
+                   Icon(Icons.arrow_drop_down, color: Theme.of(context).extension<AppColors>()!.primary),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 45),
           const SizedBox(height: defaultPadding),
-          if (isLoading) const CircularProgressIndicator(color: kPrimaryColor),
+          if (isLoading)  CircularProgressIndicator(color: Theme.of(context).extension<AppColors>()!.primary),
           if (errorMessage != null)
             Text(errorMessage!, style: const TextStyle(color: Colors.red)),
           Padding(
@@ -490,16 +505,16 @@ class _WalletAddressBottomSheetState extends State<WalletAddressBottomSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                 Text(
                   'Wallet Address',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: kPrimaryColor,
+                    color: Theme.of(context).extension<AppColors>()!.primary,
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: kPrimaryColor),
+                  icon:  Icon(Icons.close, color: Theme.of(context).extension<AppColors>()!.primary),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -509,25 +524,25 @@ class _WalletAddressBottomSheetState extends State<WalletAddressBottomSheet> {
             const SizedBox(height: 20),
             Text(
               'Wallet Address for $mCoinName',
-              style: const TextStyle(
+              style:  TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: kPurpleColor),
+                  color: Color(0xFF9568ff)),
             ),
             const SizedBox(height: 20),
             TextFormField(
               controller: walledAddress,
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.none,
-              cursorColor: kPrimaryColor,
+              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
               onSaved: (value) {},
               readOnly: true,
               maxLines: 12,
               minLines: 1,
-              style: const TextStyle(color: kPrimaryColor),
+              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
               decoration: InputDecoration(
                 labelText: "Wallet Address",
-                labelStyle: const TextStyle(color: kPrimaryColor),
+                labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: const BorderSide(),
@@ -538,7 +553,7 @@ class _WalletAddressBottomSheetState extends State<WalletAddressBottomSheet> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 IconButton(
-                  icon: const Icon(Icons.copy, color: kPrimaryColor),
+                  icon:  Icon(Icons.copy, color: Theme.of(context).extension<AppColors>()!.primary),
                   onPressed: _copyWalletAddress,
                 ),
               ],

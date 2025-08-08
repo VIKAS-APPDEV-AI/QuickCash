@@ -105,7 +105,7 @@ class _LoginHistoryScreen extends State<LoginHistoryScreen> {
                 itemBuilder: (context, index) {
                   final history = loginHistoryData[index];
                   return Card(
-                    color: kPrimaryColor, // Change this to your desired color
+                    color: Theme.of(context).extension<AppColors>()!.primary, // Change this to your desired color
                     margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),

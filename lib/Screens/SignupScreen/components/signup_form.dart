@@ -1,16 +1,18 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:lottie/lottie.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:quickcash/Screens/SignupScreen/components/OtpField.dart';
 import 'package:quickcash/Screens/SignupScreen/model/signupApi.dart';
 import 'package:quickcash/util/customSnackBar.dart';
-import 'package:flutter/gestures.dart'; // For TapGestureRecognizer
-import 'package:url_launcher/url_launcher.dart'; // For launching URLs
+import 'package:flutter/gestures.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../components/check_already_have_an_account.dart';
 import '../../../constants.dart';
@@ -91,7 +93,7 @@ class _SignUpFormState extends State<SignUpForm> {
           CustomSnackBar.showSnackBar(
             context: context,
             message: "Signup failed: ${error.toString()}",
-            color: kRedColor,
+            color: Theme.of(context).colorScheme.error,
           );
         }
       } else {
@@ -146,10 +148,16 @@ class _SignUpFormState extends State<SignUpForm> {
     });
   }
 
+  int _generateRandomOtp() {
+    final random = Random();
+    return 1000 + random.nextInt(9000); // Generates a 4-digit OTP
+  }
+
   void _generateAndSendOtp(String email) async {
     setState(() {
       isLoading = true;
       errorMessage = null;
+      generateOtp = _generateRandomOtp();
     });
 
     try {
@@ -173,7 +181,7 @@ class _SignUpFormState extends State<SignUpForm> {
       CustomSnackBar.showSnackBar(
         context: context,
         message: 'OTP Sent Successfully to $email',
-        color: kGreenColor,
+        color: Theme.of(context).colorScheme.secondary,
       );
 
       Navigator.of(context).pop();
@@ -187,39 +195,57 @@ class _SignUpFormState extends State<SignUpForm> {
       CustomSnackBar.showSnackBar(
         context: context,
         message: "Failed to send OTP: ${e.toString()}",
-        color: kRedColor,
+        color: Theme.of(context).colorScheme.error,
       );
     }
   }
 
   Future<void> _sendOtpToEmail(String email, int otp) async {
-    String username = '8e8f35001@smtp-brevo.com';
-    String password = 'wxLQ4UIADtXZCBMb';
+    final String username = dotenv.env['SMTP_MAIL_USER']!;
+    final String password = dotenv.env['SMTP_MAIL_PASSWORD']!;
     final smtpServer = SmtpServer(
-      'smtp-relay.brevo.com',
-      port: 587,
+      dotenv.env['SMTP_MAIL_HOST']!,
+      port: int.parse(dotenv.env['SMTP_MAIL_PORT']!),
+      ssl: dotenv.env['SMTP_MAIL_ENCRYPTION'] == 'ssl',
       username: username,
       password: password,
     );
 
     final message = Message()
-      ..from = Address(username, 'quickcash')
+      ..from = Address(username, 'QuickCash')
       ..recipients.add(email)
-      ..subject = 'quickcash OTP Verification'
+      ..subject = 'QuickCash OTP Verification'
       ..html = '''
-      <div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
-        <div style="margin:50px auto;width:70%;padding:20px 0">
-          <div style="border-bottom:1px solid #eee">
-            <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">$email</a>
-          </div>
-          <p style="font-size:1.1em">Hi,</p>
-          <p>Thank you for choosing quickcash. Use the following OTP to Verify Your Email ID. OTP is valid for 5 minutes:</p>
-          <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">$otp</h2>
-          <p style="font-size:0.9em;">Regards,<br/>quickcash</p>
-          <hr style="border:none;border-top:1px solid #eee" />
-        </div>
+  <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f9f9f9; padding: 30px;">
+    <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      <div style="background-color: #6F35A5; padding: 20px; text-align: center;">
+        <h1 style="color: #ffffff; margin: 0; font-size: 24px;">QuickCash</h1>
       </div>
-    ''';
+      <div style="padding: 30px;">
+        <p style="font-size: 16px; color: #333333;">Hi, $email</p>
+        <p style="font-size: 15px; color: #555555;">
+          Thank you for choosing <strong>QuickCash</strong>.<br>
+          Please use the following OTP to verify your email address. The OTP is valid for <strong>5 minutes</strong>.
+        </p>
+        <div style="text-align: center; margin: 30px 0;">
+          <span style="display: inline-block; background-color: #6F35A5; color: #ffffff; font-size: 24px; letter-spacing: 4px; padding: 12px 30px; border-radius: 8px; font-weight: bold;">
+            $otp
+          </span>
+        </div>
+        <p style="font-size: 14px; color: #888888;">
+          If you didn’t request this OTP, please ignore this email or contact support if you have concerns.
+        </p>
+        <p style="font-size: 14px; color: #555555; margin-top: 30px;">
+          Regards,<br>
+          <strong>QuickCash Team</strong>
+        </p>
+      </div>
+      <div style="background-color: #f0f0f0; padding: 15px; text-align: center; font-size: 12px; color: #999999;">
+        © ${DateTime.now().year} QuickCash. All rights reserved.
+      </div>
+    </div>
+  </div>
+  ''';
 
     try {
       final sendReport = await send(message, smtpServer);
@@ -230,29 +256,65 @@ class _SignUpFormState extends State<SignUpForm> {
     }
   }
 
-  void _showOtpDialog(String email) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.white,
+ 
+void _showOtpDialog(String email) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 6.0, sigmaY: 6.0),
+        child: Dialog(
+          backgroundColor: Colors.white.withOpacity(0.1),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
+            borderRadius: BorderRadius.circular(25),
           ),
-          child: SizedBox(
-            height: 450,
-            width: 600,
-            child: OTPSCREEN(
-              email: email,
-              generatedOtp: generateOtp,
-              onVerified: _onOtpVerified,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+          child: Container(
+            constraints: const BoxConstraints(
+              maxWidth: 400,
+              maxHeight: 450,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(25),
+              gradient: LinearGradient(
+                colors: [
+                  Colors.white.withOpacity(0.3),
+                  Colors.white.withOpacity(0.1),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              border: Border.all(color: Colors.white.withOpacity(0.2)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.25),
+                  blurRadius: 15,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: Material(
+                color: Colors.transparent,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: OTPSCREEN(
+                    email: email,
+                    generatedOtp: generateOtp,
+                    onVerified: _onOtpVerified,
+                  ),
+                ),
+              ),
             ),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
+
 
   void _onOtpVerified(bool success) {
     Navigator.of(context).pop();
@@ -269,7 +331,7 @@ class _SignUpFormState extends State<SignUpForm> {
       CustomSnackBar.showSnackBar(
         context: context,
         message: "OTP verification failed. Please try again.",
-        color: kRedColor,
+        color: Theme.of(context).colorScheme.error,
       );
     }
   }
@@ -286,9 +348,11 @@ class _SignUpFormState extends State<SignUpForm> {
             TextFormField(
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.next,
-              cursorColor: kPrimaryColor,
-              style: const TextStyle(
-                  color: kPrimaryColor, fontWeight: FontWeight.w500),
+              cursorColor: Theme.of(context).colorScheme.primary,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
+              ),
               onSaved: (value) {
                 fullName = value;
               },
@@ -298,12 +362,23 @@ class _SignUpFormState extends State<SignUpForm> {
                 }
                 return null;
               },
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: "Full Name",
-                hintStyle: TextStyle(color: kHintColor),
+                hintStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
                 prefixIcon: Padding(
-                  padding: EdgeInsets.all(defaultPadding),
-                  child: Icon(Icons.person),
+                  padding: const EdgeInsets.all(defaultPadding),
+                  child: Icon(
+                    Icons.person,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                filled: true,
+                fillColor: Theme.of(context).colorScheme.surface,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide.none,
                 ),
               ),
             ),
@@ -313,9 +388,12 @@ class _SignUpFormState extends State<SignUpForm> {
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.done,
-                cursorColor: kPrimaryColor,
+                cursorColor: Theme.of(context).colorScheme.primary,
+                enabled: !isVerified, // 👈 Disable when verified
                 style: TextStyle(
-                  color: isVerified ? Colors.black26 : kPrimaryColor,
+                  color: isVerified
+                      ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5)
+                      : Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w500,
                 ),
                 onSaved: (value) {
@@ -332,17 +410,38 @@ class _SignUpFormState extends State<SignUpForm> {
                 },
                 decoration: InputDecoration(
                   hintText: "Your Email",
-                  hintStyle: const TextStyle(color: kHintColor),
+                  hintStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                   prefixIcon: Padding(
                     padding: const EdgeInsets.all(defaultPadding),
                     child: Icon(
                       Icons.email,
-                      color: isVerified ? Colors.black26 : kPrimaryColor,
+                      color: isVerified
+                          ? Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.5)
+                          : Theme.of(context).colorScheme.primary,
                     ),
                   ),
-                  suffixIcon: null,
-                  fillColor: isVerified ? Colors.black12 : kPrimaryLightColor,
+                  suffixIcon: isVerified
+                      ? Padding(
+                          padding: const EdgeInsets.all(defaultPadding),
+                          child: Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                          ),
+                        )
+                      : null,
+                  fillColor: isVerified
+                      ? Theme.of(context).colorScheme.surfaceVariant
+                      : Theme.of(context).colorScheme.surface,
                   filled: true,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide.none,
+                  ),
                   errorText: _emailController.text.isNotEmpty &&
                           !isVerified &&
                           !_isValidEmail(_emailController.text)
@@ -351,12 +450,15 @@ class _SignUpFormState extends State<SignUpForm> {
                 ),
               ),
             ),
+
             TextFormField(
               textInputAction: TextInputAction.done,
               obscureText: _obsecureText,
-              cursorColor: kPrimaryColor,
-              style: const TextStyle(
-                  color: kPrimaryColor, fontWeight: FontWeight.w500),
+              cursorColor: Theme.of(context).colorScheme.primary,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
+              ),
               onSaved: (value) {
                 password = value;
               },
@@ -371,17 +473,29 @@ class _SignUpFormState extends State<SignUpForm> {
               },
               decoration: InputDecoration(
                 hintText: "Your Password",
-                hintStyle: const TextStyle(color: kHintColor),
-                prefixIcon: const Padding(
-                  padding: EdgeInsets.all(defaultPadding),
-                  child: Icon(Icons.lock),
+                hintStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
+                ),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.all(defaultPadding),
+                  child: Icon(
+                    Icons.lock,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
                 suffixIcon: IconButton(
                   onPressed: _togglePasswordVisibilty,
                   icon: Icon(
                     _obsecureText ? Icons.visibility : Icons.visibility_off,
-                    color: kPrimaryColor,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
+                ),
+                filled: true,
+                fillColor: Theme.of(context).colorScheme.surface,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide.none,
                 ),
               ),
             ),
@@ -401,19 +515,33 @@ class _SignUpFormState extends State<SignUpForm> {
                 textInputAction: TextInputAction.done,
                 enabled: false,
                 controller: TextEditingController(text: selectedCountry),
-                cursorColor: kPrimaryColor,
-                style: const TextStyle(
-                    color: kPrimaryColor, fontWeight: FontWeight.w500),
+                cursorColor: Theme.of(context).colorScheme.primary,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.w500,
+                ),
                 decoration: InputDecoration(
                   hintText: selectedCountry ?? "Select Country",
-                  hintStyle: const TextStyle(color: kHintColor),
-                  prefixIcon: const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Icon(Icons.flag),
+                  hintStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
                   ),
-                  suffixIcon: const Icon(
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Icon(
+                      Icons.flag,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  suffixIcon: Icon(
                     Icons.arrow_drop_down,
-                    color: kPrimaryColor,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surface,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide.none,
                   ),
                 ),
               ),
@@ -431,18 +559,25 @@ class _SignUpFormState extends State<SignUpForm> {
                   ),
                 ),
               ),
-            if (errorMessage != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  errorMessage!,
-                  style: const TextStyle(color: Colors.red),
-                  textAlign: TextAlign.center,
-                ),
-              ),
+            // if (errorMessage != null)
+            //   Padding(
+            //     padding: const EdgeInsets.symmetric(vertical: 8.0),
+            //     child: Text(
+            //       errorMessage!,
+            //       style: TextStyle(color: Theme.of(context).colorScheme.error),
+            //       textAlign: TextAlign.center,
+            //     ),
+            //   ),
             const SizedBox(height: defaultPadding),
             ElevatedButton(
               onPressed: isLoading ? null : mSignUp,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
               child: const Text("Sign Up"),
             ),
             const SizedBox(height: defaultPadding),
@@ -464,37 +599,36 @@ class _SignUpFormState extends State<SignUpForm> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Red curved arrow
-               
-                const SizedBox(width: 10),
-                // RichText for clickable and bold links
                 Expanded(
                   child: RichText(
                     textAlign: TextAlign.center,
                     text: TextSpan(
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                       children: [
-                        const TextSpan(text: 'By Continuing, you agree to our\n'),
+                        const TextSpan(
+                            text: 'By Continuing, you agree to our\n'),
                         TextSpan(
                           text: 'Terms and Conditions',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: kPrimaryColor,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () async {
-                              const url = 'https://yourwebsite.com/terms'; // Replace with your Terms URL
+                              const url =
+                                  'https://quickcash.oyefin.com/privacy-policy';
                               final uri = Uri.parse(url);
                               if (await canLaunchUrl(uri)) {
                                 await launchUrl(uri);
                               } else {
                                 CustomSnackBar.showSnackBar(
                                   context: context,
-                                  message: "Could not open Terms and Conditions",
-                                  color: kRedColor,
+                                  message:
+                                      "Could not open Terms and Conditions",
+                                  color: Theme.of(context).colorScheme.error,
                                 );
                               }
                             },
@@ -502,13 +636,14 @@ class _SignUpFormState extends State<SignUpForm> {
                         const TextSpan(text: ' and have read our '),
                         TextSpan(
                           text: 'Privacy Policy',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: kPrimaryColor,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () async {
-                              const url = 'https://yourwebsite.com/privacy'; // Replace with your Privacy Policy URL
+                              const url =
+                                  'https://quickcash.oyefin.com/privacy-policy';
                               final uri = Uri.parse(url);
                               if (await canLaunchUrl(uri)) {
                                 await launchUrl(uri);
@@ -516,7 +651,7 @@ class _SignUpFormState extends State<SignUpForm> {
                                 CustomSnackBar.showSnackBar(
                                   context: context,
                                   message: "Could not open Privacy Policy",
-                                  color: kRedColor,
+                                  color: Theme.of(context).colorScheme.error,
                                 );
                               }
                             },

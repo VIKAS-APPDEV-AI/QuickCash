@@ -134,14 +134,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
         setState(() {
           isLoading = false;
           errorMessage = null;
-          CustomSnackBar.showSnackBar(context: context, message: "Product details has been updated successfully!", color: kGreenColor);
+          CustomSnackBar.showSnackBar(context: context, message: "Product details has been updated successfully!", color: Colors.green);
 
         });
       }else{
         setState(() {
           isLoading = false;
           errorMessage = null;
-          CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: kRedColor);
+          CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: Colors.red);
         });
       }
 
@@ -163,7 +163,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Update Product",
@@ -183,11 +183,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   controller: name,
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.next,
-                  cursorColor: kPrimaryColor,
-                  style: const TextStyle(color: kPrimaryColor),
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                  style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   decoration: InputDecoration(
                     labelText: "Name",
-                    labelStyle: const TextStyle(color: kPrimaryColor, fontSize: 16),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -208,12 +208,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   controller: productCode, // Use the controller
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.next,
-                  cursorColor: kPrimaryColor,
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                   readOnly: true,
-                  style: const TextStyle(color: kPrimaryColor),
+                  style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   decoration: InputDecoration(
                     labelText: "Product Code",
-                    labelStyle: const TextStyle(color: kPrimaryColor, fontSize: 16),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -222,9 +222,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     fillColor: Colors.transparent,
                     suffixIcon: GestureDetector(
                       onTap: updateProductCode, // Call the function on tap
-                      child: const Padding(
+                      child:  Padding(
                         padding: EdgeInsets.all(defaultPadding),
-                        child: Icon(Icons.repeat, color: kPrimaryColor,),
+                        child: Icon(Icons.repeat, color: Theme.of(context).extension<AppColors>()!.primary,),
                       ),
                     ),
                   ),
@@ -233,10 +233,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 const SizedBox(height: largePadding),
                 DropdownButtonFormField<String>(
                   value: selectedCategory,
-                  style: const TextStyle(color: kPrimaryColor),
+                  style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   decoration: InputDecoration(
                     labelText: 'Category',
-                    labelStyle: const TextStyle(color: kPrimaryColor),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -250,7 +250,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   ].map((String categoryName) {
                     return DropdownMenuItem(
                       value: categoryName,
-                      child: Text(categoryName, style: const TextStyle(color: kPrimaryColor, fontSize: 16)),
+                      child: Text(categoryName, style:  TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16)),
                     );
                   }).toList(),
                   onChanged: (newValue) {
@@ -273,11 +273,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   controller: unitPrice,
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
-                  cursorColor: kPrimaryColor,
-                  style: const TextStyle(color: kPrimaryColor),
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                  style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   decoration: InputDecoration(
                     labelText: "Unit Price",
-                    labelStyle: const TextStyle(color: kPrimaryColor, fontSize: 16),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -298,13 +298,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   controller: description,
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.next,
-                  cursorColor: kPrimaryColor,
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                   minLines: 6,
                   maxLines: 12,
-                  style: const TextStyle(color: kPrimaryColor),
+                  style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   decoration: InputDecoration(
                     labelText: "Description",
-                    labelStyle: const TextStyle(color: kPrimaryColor, fontSize: 16),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -322,9 +322,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 ),
 
                 const SizedBox(height: largePadding),
-                if (isLoading) const Center(
+                if (isLoading)  Center(
                   child: CircularProgressIndicator(
-                    color: kPrimaryColor,
+                    color: Theme.of(context).extension<AppColors>()!.primary,
                   ),
                 ), // Show loading indicator
                 if (errorMessage != null) // Show error message if there's an error
@@ -335,7 +335,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 50),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: kPrimaryColor,
+                      backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -347,7 +347,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           if (selectedCategoryId !=null) {
                             mUpdateProduct(selectedCategoryId!);
                           }else{
-                            CustomSnackBar.showSnackBar(context: context, message: "message", color: kPrimaryColor);
+                            CustomSnackBar.showSnackBar(context: context, message: "message", color: Theme.of(context).extension<AppColors>()!.primary);
                           }
                         });
                       }

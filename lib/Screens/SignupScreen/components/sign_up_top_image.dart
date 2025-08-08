@@ -13,12 +13,12 @@ class SignUpScreenTopImage extends StatelessWidget {
       children: [
         Column(
           children: [
-            const Text(
+            Text(
               "Sign Up",
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 25,
-                  color: kPrimaryColor),
+                  color: Theme.of(context).extension<AppColors>()!.primary),
             ),
             const SizedBox(height: defaultPadding),
             Row(
@@ -39,9 +39,9 @@ class SignUpScreenTopImage extends StatelessWidget {
           top: 0,
           left: 0,
           child: IconButton(
-            icon: const Icon(
+            icon:  Icon(
               Icons.arrow_back,
-              color: kPrimaryColor,
+              color: Theme.of(context).extension<AppColors>()!.primary,
               size: 28,
             ),
             onPressed: () {

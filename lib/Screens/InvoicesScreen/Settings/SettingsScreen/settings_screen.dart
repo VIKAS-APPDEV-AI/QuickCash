@@ -112,7 +112,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             CustomSnackBar.showSnackBar(
               context: context,
               message: "Settings ID is missing.",
-              color: kRedColor,
+              color: Colors.red,
             );
           });
           return;
@@ -128,7 +128,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             CustomSnackBar.showSnackBar(
               context: context,
               message: "Settings has been updated successfully!",
-              color: kGreenColor,
+              color: Colors.green,
             );
           });
         } else {
@@ -138,7 +138,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             CustomSnackBar.showSnackBar(
               context: context,
               message: "We are facing some issue!",
-              color: kRedColor,
+              color: Colors.red,
             );
           });
         }
@@ -149,7 +149,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           CustomSnackBar.showSnackBar(
             context: context,
             message: errorMessage!,
-            color: kRedColor,
+            color: Colors.red,
           );
         });
       }
@@ -160,9 +160,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: isLoading
-          ? const Center(
+          ? Center(
               child: CircularProgressIndicator(
-                color: kPrimaryColor,
+                color: Theme.of(context).extension<AppColors>()!.primary,
               ),
             )
           : SingleChildScrollView(
@@ -186,7 +186,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         controller: companyNameController,
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.next,
-                        cursorColor: kPrimaryColor,
+                        cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your company name';
@@ -195,7 +195,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         },
                         decoration: InputDecoration(
                           labelText: "Company Name",
-                          labelStyle: const TextStyle(color: kPrimaryColor),
+                          labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(),
@@ -211,7 +211,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         controller: mobileController,
                         keyboardType: TextInputType.phone,
                         textInputAction: TextInputAction.next,
-                        cursorColor: kPrimaryColor,
+                        cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                         readOnly: true,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -221,7 +221,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         },
                         decoration: InputDecoration(
                           labelText: "Phone Number",
-                          labelStyle: const TextStyle(color: kPrimaryColor),
+                          labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(),
@@ -240,11 +240,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         dialogColor: Colors.white,
                         textFieldDecoration: InputDecoration(
                           filled: true,
-                          counterStyle: const TextStyle(color: kPrimaryColor),
-                          labelStyle: const TextStyle(color: kPrimaryColor),
-                          hintStyle: const TextStyle(color: kPrimaryColor),
-                          suffixStyle: const TextStyle(color: kPrimaryColor),
-                          suffixIcon: const Icon(Icons.arrow_drop_down, color: kPrimaryColor),
+                          counterStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                          labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                          hintStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                          suffixStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                          suffixIcon: Icon(Icons.arrow_drop_down, color: Theme.of(context).extension<AppColors>()!.primary),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(),
@@ -259,7 +259,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         controller: postalCodeController,
                         keyboardType: TextInputType.number,
                         textInputAction: TextInputAction.done,
-                        cursorColor: kPrimaryColor,
+                        cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your zip code';
@@ -268,7 +268,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         },
                         decoration: InputDecoration(
                           labelText: "Zip Code",
-                          labelStyle: const TextStyle(color: kPrimaryColor),
+                          labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(),
@@ -284,7 +284,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         controller: companyAddressController,
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.next,
-                        cursorColor: kPrimaryColor,
+                        cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                         minLines: 6,
                         maxLines: 12,
                         validator: (value) {
@@ -295,7 +295,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         },
                         decoration: InputDecoration(
                           labelText: "Company Address",
-                          labelStyle: const TextStyle(color: kPrimaryColor, fontSize: 16),
+                          labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(),
@@ -367,11 +367,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     );
                                   }
                                 },
-                                child: const CircleAvatar(
+                                child: CircleAvatar(
                                   backgroundColor: Colors.white,
                                   child: Icon(
                                     Icons.edit,
-                                    color: kPrimaryColor,
+                                    color: Theme.of(context).extension<AppColors>()!.primary,
                                   ),
                                 ),
                               ),
@@ -382,15 +382,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                       // Invoice Settings
                       const SizedBox(height: largePadding),
-                      const Text(
+                      Text(
                         "Invoice Settings",
                         style: TextStyle(
-                          color: kPrimaryColor,
+                          color: Theme.of(context).extension<AppColors>()!.primary,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Divider(color: kPrimaryLightColor),
+                      Divider(color: AppColors.light.hint),
                       const SizedBox(height: defaultPadding),
 
                       // Invoice Prefix
@@ -398,7 +398,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         controller: invoicePrefixController,
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.next,
-                        cursorColor: kPrimaryColor,
+                        cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your invoice prefix';
@@ -407,7 +407,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         },
                         decoration: InputDecoration(
                           labelText: "Invoice Prefix",
-                          labelStyle: const TextStyle(color: kPrimaryColor),
+                          labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(),
@@ -423,7 +423,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         controller: regardsTextController,
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.next,
-                        cursorColor: kPrimaryColor,
+                        cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your regards text';
@@ -432,7 +432,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         },
                         decoration: InputDecoration(
                           labelText: "Regards Text",
-                          labelStyle: const TextStyle(color: kPrimaryColor),
+                          labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(),
@@ -444,9 +444,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                       const SizedBox(height: defaultPadding),
                       if (isUpdateLoading)
-                        const Center(
+                         Center(
                           child: CircularProgressIndicator(
-                            color: kPrimaryColor,
+                            color: Theme.of(context).extension<AppColors>()!.primary,
                           ),
                         ),
 
@@ -455,7 +455,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 50),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: kPrimaryColor,
+                            backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),

@@ -82,13 +82,13 @@ class _ClientsScreenState extends State<ClientsScreen> {
         setState(() {
           mClientsApi();
           Navigator.of(context).pop(true);
-          CustomSnackBar.showSnackBar(context: context, message: response.message!, color: kGreenColor);
+          CustomSnackBar.showSnackBar(context: context, message: response.message!, color: Colors.green);
         });
 
       }else{
         setState(() {
           Navigator.of(context).pop(true);
-          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue", color: kGreenColor);
+          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue", color: Colors.green);
         });
       }
 
@@ -124,7 +124,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       child: TextFormField(
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.next,
-                        cursorColor: kPrimaryColor,
+                        cursorColor: Theme.of(context).extension<AppColors>()!.primary,
 
                         onSaved: (value){
 
@@ -138,7 +138,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                           filled: true,
                           fillColor: Colors.transparent,
                           hintText: "Search",
-                          hintStyle: const TextStyle(color: kPrimaryColor),
+                          hintStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                           prefixIcon: const Padding(
                             padding: EdgeInsets.all(defaultPadding),
                             child: Icon(Icons.search),
@@ -156,16 +156,16 @@ class _ClientsScreenState extends State<ClientsScreen> {
                         MaterialPageRoute(builder: (context) => const AddClientsFormScreen()),
                       );
                     },
-                    child: const Icon(Icons.add,color: kPrimaryColor,),
+                    child:  Icon(Icons.add,color: Theme.of(context).extension<AppColors>()!.primary,),
                   ),
                 ],
               ),
 
               const SizedBox(height: largePadding,),
 
-              isLoading ? const Center(
+              isLoading ?  Center(
                 child: CircularProgressIndicator(
-                  color: kPrimaryColor,
+                  color: Theme.of(context).extension<AppColors>()!.primary,
                 ),
               ) : ListView.builder(
                 shrinkWrap: true,
@@ -179,7 +179,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(defaultPadding),
                       decoration: BoxDecoration(
-                        color: kPrimaryColor,
+                        color: Theme.of(context).extension<AppColors>()!.primary,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
@@ -202,7 +202,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                           ),
 
                           const SizedBox(height: smallPadding,),
-                          const Divider(color: kPrimaryLightColor,),
+                          const Divider(color: Color(0xA66F35A5),),
                           const SizedBox(height: smallPadding,),
 
                           Row(
@@ -214,7 +214,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                           ),
 
                           const SizedBox(height: smallPadding,),
-                          const Divider(color: kPrimaryLightColor,),
+                          const Divider(color: Color(0xA66F35A5),),
                           const SizedBox(height: smallPadding,),
 
 

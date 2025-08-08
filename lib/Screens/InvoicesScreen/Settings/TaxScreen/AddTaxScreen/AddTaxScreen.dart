@@ -1,5 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quickcash/Screens/InvoicesScreen/Settings/TaxScreen/AddTaxScreen/model/addTaxApi.dart';
+import 'package:quickcash/Screens/NotificationsScreen.dart/NotificationScreen.dart';
+import 'package:quickcash/Screens/TicketsScreen/TicketScreen/DashboardTicketScreen.dart';
 import 'package:quickcash/util/customSnackBar.dart';
 
 import '../../../../../constants.dart';
@@ -44,13 +47,13 @@ class _AddTaxScreenState extends State<AddTaxScreen> {
             errorMessage = null;
             name.clear();
             taxRate.clear();
-            CustomSnackBar.showSnackBar(context: context, message: "Tax Data has been Submitted!", color: kPrimaryColor);
+            CustomSnackBar.showSnackBar(context: context, message: "Tax Data has been Submitted!", color: Theme.of(context).extension<AppColors>()!.primary);
           });
         }else{
           setState(() {
             isLoading = false;
             errorMessage = null;
-            CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: kPrimaryColor);
+            CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: Theme.of(context).extension<AppColors>()!.primary);
           });
         }
 
@@ -59,7 +62,7 @@ class _AddTaxScreenState extends State<AddTaxScreen> {
           isLoading = false;
           errorMessage = error.toString();
           CustomSnackBar.showSnackBar(
-              context: context, message: errorMessage!, color: kRedColor);
+              context: context, message: errorMessage!, color: Colors.red);
         });
       }
     }
@@ -69,12 +72,47 @@ class _AddTaxScreenState extends State<AddTaxScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Add Tax",
           style: TextStyle(color: Colors.white),
         ),
+        flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color.fromARGB(255, 6, 6, 6), // Dark neo-banking color
+                      Color(0xFF8A2BE2), // Gradient transition
+                      Color(0x00000000), // Transparent fade
+                    ],
+                    stops: [0.0, 0.7, 1.0],
+                  ),
+                ),
+              ),
+          actions: [
+          IconButton(
+            icon: const Icon(CupertinoIcons.bell_fill),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => NotificationScreen(),
+                  ));
+            },
+            tooltip: 'Notifications',
+          ),
+          IconButton(
+            icon: const Icon(CupertinoIcons.headphones),
+            onPressed: () {
+             Navigator.push(context, CupertinoPageRoute(builder: (context) => DashboardTicketScreen(),));
+            },
+            tooltip: 'Support',
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -92,7 +130,7 @@ class _AddTaxScreenState extends State<AddTaxScreen> {
                     controller: name,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
+                    cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                     onSaved: (value) {},
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -101,11 +139,11 @@ class _AddTaxScreenState extends State<AddTaxScreen> {
                       return null;
                     },
                     readOnly: false,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     decoration: InputDecoration(
                       labelText: "Name",
                       labelStyle:
-                          const TextStyle(color: kPrimaryColor, fontSize: 16),
+                          TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(),
@@ -121,7 +159,7 @@ class _AddTaxScreenState extends State<AddTaxScreen> {
                     controller: taxRate,
                     keyboardType: TextInputType.number,
                     textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
+                    cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                     onSaved: (value) {},
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -130,11 +168,11 @@ class _AddTaxScreenState extends State<AddTaxScreen> {
                       return null;
                     },
                     readOnly: false,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     decoration: InputDecoration(
                       labelText: "Tax Rate",
                       labelStyle:
-                          const TextStyle(color: kPrimaryColor, fontSize: 16),
+                          TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(),
@@ -144,10 +182,10 @@ class _AddTaxScreenState extends State<AddTaxScreen> {
                     ),
                   ),
                   const SizedBox(height: 35),
-                  const Text(
+                   Text(
                     "Default",
                     style: TextStyle(
-                        color: kPrimaryColor,
+                        color: Theme.of(context).extension<AppColors>()!.primary,
                         fontSize: 16,
                         fontWeight: FontWeight.w500),
                   ),
@@ -163,7 +201,7 @@ class _AddTaxScreenState extends State<AddTaxScreen> {
                           });
                         },
                       ),
-                      const Text('Yes', style: TextStyle(color: kPrimaryColor)),
+                       Text('Yes', style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary)),
                       Radio<String>(
                         value: 'no',
                         groupValue: selectedType,
@@ -173,14 +211,14 @@ class _AddTaxScreenState extends State<AddTaxScreen> {
                           });
                         },
                       ),
-                      const Text('No', style: TextStyle(color: kPrimaryColor)),
+                      Text('No', style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary)),
                     ],
                   ),
 
                   const SizedBox(height: defaultPadding,),
-                  if (isLoading) const Center(
+                  if (isLoading) Center(
                     child: CircularProgressIndicator(
-                      color: kPrimaryColor,
+                      color: Theme.of(context).extension<AppColors>()!.primary,
                     ),
                   ), // Show loading indicator
                   if (errorMessage != null) // Show error message if there's an error
@@ -201,7 +239,7 @@ class _AddTaxScreenState extends State<AddTaxScreen> {
                           'Submit',
                           style: TextStyle(color: Colors.white, fontSize: 15),
                         ),
-                        backgroundColor: kPrimaryColor,
+                        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                       ),
                     ),
                   )

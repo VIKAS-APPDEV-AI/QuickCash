@@ -16,7 +16,7 @@ class SessionExpiredScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.lock_clock, size: 80, color: kPrimaryColor),
+              Icon(Icons.lock_clock, size: 80, color: Theme.of(context).extension<AppColors>()!.primary),
               const SizedBox(height: 20),
               Text(
                 "Your Login Session Has Expired",
@@ -48,7 +48,7 @@ class SessionExpiredScreen extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: kPrimaryColor,
+                  backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -68,9 +68,9 @@ class SessionExpiredScreen extends StatelessWidget {
                     ),
                   );
                 },
-                child: const Text(
+                child:  Text(
                   "Contact Support",
-                  style: TextStyle(fontSize: 14, color: kPrimaryColor),
+                  style: TextStyle(fontSize: 14, color: Theme.of(context).extension<AppColors>()!.primary),
                 ),
               ),
             ],

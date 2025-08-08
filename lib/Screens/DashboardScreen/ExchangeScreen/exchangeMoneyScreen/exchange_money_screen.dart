@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'package:country_flags/country_flags.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quickcash/Screens/DashboardScreen/Dashboard/AccountsList/accountsListApi.dart';
 import 'package:quickcash/Screens/DashboardScreen/ExchangeScreen/exchangeMoneyScreen/exchangeMoneyModel/exchangeMoneyApi.dart';
 import 'package:quickcash/Screens/DashboardScreen/ExchangeScreen/exchangeMoneyScreen/exchangeMoneyModel/exchangeMoneyModel.dart';
+import 'package:quickcash/Screens/NotificationsScreen.dart/NotificationScreen.dart';
+import 'package:quickcash/Screens/TicketsScreen/TicketScreen/DashboardTicketScreen.dart';
 import 'package:quickcash/constants.dart';
 import 'package:intl/intl.dart';
 import 'package:quickcash/util/auth_manager.dart';
@@ -35,7 +38,7 @@ class ExchangeMoneyScreen extends StatefulWidget {
 }
 
 class _ExchangeMoneyScreen extends State<ExchangeMoneyScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin  {
   final ExchangeMoneyApi _exchangeMoneyApi = ExchangeMoneyApi();
 
   final TextEditingController mFromAmountController = TextEditingController();
@@ -46,6 +49,9 @@ class _ExchangeMoneyScreen extends State<ExchangeMoneyScreen>
 
   late AnimationController _arrowAnimationController;
   late Animation<Offset> _arrowAnimation;
+  late AnimationController _contentAnimationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
 
   // From Account ---
   String? mFromAccountId;
@@ -75,6 +81,7 @@ class _ExchangeMoneyScreen extends State<ExchangeMoneyScreen>
     super.initState();
     mSetDefaultAccountData();
 
+    // Initialize arrow animation
     _arrowAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -86,12 +93,39 @@ class _ExchangeMoneyScreen extends State<ExchangeMoneyScreen>
       parent: _arrowAnimationController,
       curve: Curves.easeInOut,
     ));
+
+    // Initialize content animation
+    _contentAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _contentAnimationController,
+        curve: Curves.linear,
+      ),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.1), // Slight slide from below
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _contentAnimationController,
+        curve: Curves.linear,
+      ),
+    );
+
+    // Start content animation on page load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _contentAnimationController.forward();
+    });
   }
 
   @override
   void dispose() {
     _debounce?.cancel();
     _arrowAnimationController.dispose();
+    _contentAnimationController.dispose();
     mFromAmountController.dispose();
     mToAmountController.dispose();
     super.dispose();
@@ -126,7 +160,7 @@ class _ExchangeMoneyScreen extends State<ExchangeMoneyScreen>
       mToCurrencySymbol = getCurrencySymbol(mToCurrency!);
     });
 
-    // Stop animation when an account is selected
+    // Stop arrow animation when an account is selected
     if (mToAccountId != null && mToAccountId!.isNotEmpty) {
       _arrowAnimationController.stop();
     }
@@ -143,12 +177,12 @@ class _ExchangeMoneyScreen extends State<ExchangeMoneyScreen>
   }
 
   Future<void> mExchangeMoneyApi() async {
-    if (!mounted) return; // Check if widget is still mounted
+    if (!mounted) return;
 
     setState(() {
       isLoading = true;
-      isReviewOrder = false; // Reset review order flag
-      mToAmountController.clear(); // Clear converted amount until API responds
+      isReviewOrder = false;
+      mToAmountController.clear();
     });
 
     try {
@@ -158,7 +192,7 @@ class _ExchangeMoneyScreen extends State<ExchangeMoneyScreen>
         CustomSnackBar.showSnackBar(
             context: context,
             message: "Please select a valid exchange account!",
-            color: kPrimaryColor);
+            color: Theme.of(context).extension<AppColors>()!.primary);
         setState(() {
           isLoading = false;
         });
@@ -172,7 +206,7 @@ class _ExchangeMoneyScreen extends State<ExchangeMoneyScreen>
           toCurrency: mToCurrency!);
       final response = await _exchangeMoneyApi.exchangeMoneyApi(request);
 
-      if (!mounted) return; // Check again before updating state
+      if (!mounted) return;
 
       if (response.message == "Success") {
         setState(() {
@@ -190,7 +224,7 @@ class _ExchangeMoneyScreen extends State<ExchangeMoneyScreen>
           CustomSnackBar.showSnackBar(
               context: context,
               message: "We are facing some issue!",
-              color: kPrimaryColor);
+              color: Theme.of(context).extension<AppColors>()!.primary);
         });
       }
     } catch (error) {
@@ -199,7 +233,7 @@ class _ExchangeMoneyScreen extends State<ExchangeMoneyScreen>
         isLoading = false;
         isReviewOrder = false;
         CustomSnackBar.showSnackBar(
-            context: context, message: error.toString(), color: kPrimaryColor);
+            context: context, message: error.toString(), color: Theme.of(context).extension<AppColors>()!.primary);
       });
     }
   }
@@ -208,415 +242,460 @@ class _ExchangeMoneyScreen extends State<ExchangeMoneyScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Exchange Money",
           style: TextStyle(color: Colors.white),
         ),
+        
+        actions: [
+          IconButton(
+            icon: const Icon(CupertinoIcons.bell_fill),
+            onPressed: () {
+              Navigator.push(context, CupertinoPageRoute(builder: (context) => NotificationScreen(),));
+            },
+          ),
+           IconButton(
+            icon: const Icon(CupertinoIcons.headphones),
+            onPressed: () {
+             Navigator.push(context, CupertinoPageRoute(builder: (context) => DashboardTicketScreen(),));
+            },
+            tooltip: 'Support',
+          ),
+          const SizedBox(width: 8),
+        ],
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color.fromARGB(255, 20, 20, 20),
+                Color(0xFF8A2BE2),
+                Color(0x00000000),
+              ],
+              stops: [0.0, 0.7, 1.0],
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(defaultPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Card(
-                elevation: 4.0,
-                color: Colors.white,
-                margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(defaultPadding),
-                      child: Column(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              // Navigate to PayRecipientsScreen when tapped
-                            },
-                            child: Card(
-                              elevation: 1.0,
-                              color: kPrimaryLightColor,
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 0, horizontal: 0),
-                              child: Padding(
-                                padding: const EdgeInsets.all(defaultPadding),
-                                child: Row(
-                                  children: [
-                                    if (mFromCurrency?.toUpperCase() == 'EUR')
-                                      getEuFlagWidget()
-                                    else
-                                      CountryFlag.fromCountryCode(
-                                        width: 35,
-                                        height: 35,
-                                        mFromCountry!,
-                                        shape: const Circle(),
-                                      ),
-                                    const SizedBox(width: defaultPadding),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '$mFromCurrency Account',
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                              color: kPrimaryColor,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: defaultPadding),
-                          TextFormField(
-                            controller: mFromAmountController,
-                            keyboardType: TextInputType.number,
-                            textInputAction: TextInputAction.next,
-                            cursorColor: kPrimaryColor,
-                            style: const TextStyle(color: kPrimaryColor),
-                            onChanged: (value) {
-                              // Debounce the API call
-                              if (_debounce?.isActive ?? false)
-                                _debounce!.cancel();
-                              _debounce =
-                                  Timer(const Duration(milliseconds: 500), () {
-                                if (!mounted) return;
-
-                                if (mToCurrency == "Select") {
-                                  CustomSnackBar.showSnackBar(
-                                      context: context,
-                                      message:
-                                          "Please select an exchange account",
-                                      color: kPrimaryColor);
-                                  setState(() {
-                                    isReviewOrder = false;
-                                    mToAmountController.clear();
-                                  });
-                                  return;
-                                }
-
-                                if (value.isEmpty) {
-                                  setState(() {
-                                    isReviewOrder = false;
-                                    mToAmountController.clear();
-                                  });
-                                  CustomSnackBar.showSnackBar(
-                                      context: context,
-                                      message: "Please enter an amount",
-                                      color: kPrimaryColor);
-                                  return;
-                                }
-
-                                double enteredAmount;
-                                try {
-                                  enteredAmount = double.parse(value);
-                                } catch (e) {
-                                  setState(() {
-                                    isReviewOrder = false;
-                                    mToAmountController.clear();
-                                  });
-                                  CustomSnackBar.showSnackBar(
-                                      context: context,
-                                      message: "Invalid amount entered",
-                                      color: kPrimaryColor);
-                                  return;
-                                }
-
-                                if (enteredAmount <= mFromAmount!) {
-                                  mExchangeMoneyApi();
-                                } else {
-                                  setState(() {
-                                    isReviewOrder = false;
-                                    mToAmountController.clear();
-                                  });
-                                  CustomSnackBar.showSnackBar(
-                                      context: context,
-                                      message:
-                                          "You don't have sufficient balance to exchange money",
-                                      color: kPrimaryColor);
-                                }
-                              });
-                            },
-                            decoration: InputDecoration(
-                              prefix: Text(
-                                '$mFromCurrencySymbol ',
-                                style: TextStyle(
-                                  color: mToCurrency == "Select"
-                                      ? Colors.grey.withOpacity(0.5)
-                                      : kPrimaryColor,
-                                ),
-                              ),
-                              labelText: "Amount",
-                              labelStyle: TextStyle(
-                                color: mToCurrency == "Select"
-                                    ? Colors.grey.withOpacity(0.9)
-                                    : kPrimaryColor,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(),
-                              ),
-                              filled: true,
-                              fillColor: mToCurrency == "Select"
-                                  ? Colors.grey.withOpacity(0.3)
-                                  : Colors.transparent,
-                            ),
-                            enabled: mToCurrency != "Select",
-                            maxLines: 2,
-                            minLines: 1,
-                          ),
-                          const SizedBox(height: 30),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                "Fee:",
-                                style: TextStyle(
-                                    color: kPrimaryColor,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                "$mFromCurrencySymbol ${mFromTotalFees?.toStringAsFixed(2) ?? '0.00'}",
-                                style: const TextStyle(
-                                    color: kPrimaryColor,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          const Divider(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                "Balance:",
-                                style: TextStyle(
-                                    color: kPrimaryColor,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                "$mFromCurrencySymbol ${mFromAmount?.toStringAsFixed(2) ?? '0.00'}",
-                                style: const TextStyle(
-                                    color: kPrimaryColor,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8.0),
-                        ],
-                      ),
-                    ),
-                  ],
+          child: AnimatedBuilder(
+            animation: _contentAnimationController,
+            builder: (context, child) {
+              return Opacity(
+                opacity: _fadeAnimation.value,
+                child: Transform.translate(
+                  offset: _slideAnimation.value,
+                  child: child,
                 ),
-              ),
-              const SizedBox(height: 8),
-              Center(
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Container(
-                      height: 1,
-                      width: double.maxFinite,
-                      color: kPrimaryLightColor,
-                    ),
-                    Material(
-                      elevation: 6.0,
-                      shape: const CircleBorder(),
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                        ),
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          transitionBuilder: (child, animation) =>
-                              FadeTransition(
-                            opacity: animation,
-                            child: child,
-                          ),
-                          child: mToAccountId == null || mToAccountId!.isEmpty
-                              ? SlideTransition(
-                                  position: _arrowAnimation,
-                                  child: const Icon(
-                                    Icons.arrow_downward,
-                                    key: ValueKey("floating_arrow"),
-                                    size: 37,
-                                    color: kPrimaryColor,
+              );
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Card(
+                  elevation: 4.0,
+                  color: Colors.white,
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(defaultPadding),
+                        child: Column(
+                          children: [
+                            GestureDetector(
+                              onTap: () {},
+                              child: Card(
+                                elevation: 1.0,
+                                color: Color(0xFFF1E6FF),
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 0),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(defaultPadding),
+                                  child: Row(
+                                    children: [
+                                      if (mFromCurrency?.toUpperCase() == 'EUR')
+                                        getEuFlagWidget()
+                                      else
+                                        CountryFlag.fromCountryCode(
+                                          width: 35,
+                                          height: 35,
+                                          mFromCountry!,
+                                          shape: const Circle(),
+                                        ),
+                                      const SizedBox(width: defaultPadding),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '$mFromCurrency Account',
+                                              style:  TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                                color: Theme.of(context).extension<AppColors>()!.primary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                )
-                              : const Icon(
-                                  Icons.arrow_downward,
-                                  key: ValueKey("static_arrow"),
-                                  size: 30,
-                                  color: kPrimaryColor,
                                 ),
+                              ),
+                            ),
+                            const SizedBox(height: defaultPadding),
+                            TextFormField(
+                              controller: mFromAmountController,
+                              keyboardType: TextInputType.number,
+                              textInputAction: TextInputAction.next,
+                              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                              onChanged: (value) {
+                                if (_debounce?.isActive ?? false)
+                                  _debounce!.cancel();
+                                _debounce = Timer(
+                                    const Duration(milliseconds: 500), () {
+                                  if (!mounted) return;
+
+                                  if (mToCurrency == "Select") {
+                                    CustomSnackBar.showSnackBar(
+                                        context: context,
+                                        message:
+                                            "Please select an exchange account",
+                                        color: Theme.of(context).extension<AppColors>()!.primary);
+                                    setState(() {
+                                      isReviewOrder = false;
+                                      mToAmountController.clear();
+                                    });
+                                    return;
+                                  }
+
+                                  if (value.isEmpty) {
+                                    setState(() {
+                                      isReviewOrder = false;
+                                      mToAmountController.clear();
+                                    });
+                                    CustomSnackBar.showSnackBar(
+                                        context: context,
+                                        message: "Please enter an amount",
+                                        color: Theme.of(context).extension<AppColors>()!.primary);
+                                    return;
+                                  }
+
+                                  double enteredAmount;
+                                  try {
+                                    enteredAmount = double.parse(value);
+                                  } catch (e) {
+                                    setState(() {
+                                      isReviewOrder = false;
+                                      mToAmountController.clear();
+                                    });
+                                    CustomSnackBar.showSnackBar(
+                                        context: context,
+                                        message: "Invalid amount entered",
+                                        color: Theme.of(context).extension<AppColors>()!.primary);
+                                    return;
+                                  }
+
+                                  if (enteredAmount <= mFromAmount!) {
+                                    mExchangeMoneyApi();
+                                  } else {
+                                    setState(() {
+                                      isReviewOrder = false;
+                                      mToAmountController.clear();
+                                    });
+                                    CustomSnackBar.showSnackBar(
+                                        context: context,
+                                        message:
+                                            "You don't have sufficient balance to exchange money",
+                                        color: Theme.of(context).extension<AppColors>()!.primary);
+                                  }
+                                });
+                              },
+                              decoration: InputDecoration(
+                                prefix: Text(
+                                  '$mFromCurrencySymbol ',
+                                  style: TextStyle(
+                                    color: mToCurrency == "Select"
+                                        ? Colors.grey.withOpacity(0.5)
+                                        : Theme.of(context).extension<AppColors>()!.primary,
+                                  ),
+                                ),
+                                labelText: "Amount",
+                                labelStyle: TextStyle(
+                                  color: mToCurrency == "Select"
+                                      ? Colors.grey.withOpacity(0.9)
+                                      : Theme.of(context).extension<AppColors>()!.primary,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(),
+                                ),
+                                filled: true,
+                                fillColor: mToCurrency == "Select"
+                                    ? Colors.grey.withOpacity(0.3)
+                                    : Colors.transparent,
+                              ),
+                              enabled: mToCurrency != "Select",
+                              maxLines: 2,
+                              minLines: 1,
+                            ),
+                            const SizedBox(height: 30),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                 Text(
+                                  "Fee:",
+                                  style: TextStyle(
+                                      color: Theme.of(context).extension<AppColors>()!.primary,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  "$mFromCurrencySymbol ${mFromTotalFees?.toStringAsFixed(2) ?? '0.00'}",
+                                  style:  TextStyle(
+                                      color: Theme.of(context).extension<AppColors>()!.primary,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            const Divider(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                 Text(
+                                  "Balance:",
+                                  style: TextStyle(
+                                      color: Theme.of(context).extension<AppColors>()!.primary,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  "$mFromCurrencySymbol ${mFromAmount?.toStringAsFixed(2) ?? '0.00'}",
+                                  style:  TextStyle(
+                                      color: Theme.of(context).extension<AppColors>()!.primary,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8.0),
+                          ],
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Card(
-                elevation: 4.0,
-                color: Colors.white,
-                margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(defaultPadding),
-                      child: Column(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              mGetAllAccountBottomSheet(context, mFromCurrency);
-                            },
-                            child: Card(
-                              elevation: 1.0,
-                              color: kPrimaryLightColor,
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 0, horizontal: 0),
-                              child: Padding(
-                                padding: const EdgeInsets.all(defaultPadding),
-                                child: Row(
-                                  children: [
-                                    if (mToCurrency?.toUpperCase() == 'EUR')
-                                      getEuFlagWidget()
-                                    else
-                                      CountryFlag.fromCountryCode(
-                                        width: 35,
-                                        height: 35,
-                                        mToCountry!.isEmpty
-                                            ? 'US'
-                                            : mToCountry!,
-                                        shape: const Circle(),
-                                      ),
-                                    const SizedBox(width: defaultPadding),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '$mToCurrency Account',
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                              color: kPrimaryColor,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                const SizedBox(height: 8),
+                Center(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        height: 1,
+                        width: double.maxFinite,
+                        color: Color(0xA66F35A5),
+                      ),
+                      Material(
+                        elevation: 6.0,
+                        shape: const CircleBorder(),
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                          ),
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            transitionBuilder: (child, animation) =>
+                                FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            ),
+                            child: mToAccountId == null || mToAccountId!.isEmpty
+                                ? SlideTransition(
+                                    position: _arrowAnimation,
+                                    child:  Icon(
+                                      Icons.arrow_downward,
+                                      key: ValueKey("floating_arrow"),
+                                      size: 37,
+                                      color: Theme.of(context).extension<AppColors>()!.primary,
                                     ),
-                                    const Icon(Icons.navigate_next_rounded,
-                                        color: kPrimaryColor),
-                                  ],
+                                  )
+                                :  Icon(
+                                    Icons.arrow_downward,
+                                    key: ValueKey("static_arrow"),
+                                    size: 30,
+                                    color: Theme.of(context).extension<AppColors>()!.primary,
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Card(
+                  elevation: 4.0,
+                  color: Colors.white,
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(defaultPadding),
+                        child: Column(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                mGetAllAccountBottomSheet(
+                                    context, mFromCurrency);
+                              },
+                              child: Card(
+                                elevation: 1.0,
+                                color: Color(0xFFF1E6FF),
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 0),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(defaultPadding),
+                                  child: Row(
+                                    children: [
+                                      if (mToCurrency?.toUpperCase() == 'EUR')
+                                        getEuFlagWidget()
+                                      else
+                                        CountryFlag.fromCountryCode(
+                                          width: 35,
+                                          height: 35,
+                                          mToCountry!.isEmpty
+                                              ? 'US'
+                                              : mToCountry!,
+                                          shape: const Circle(),
+                                        ),
+                                      const SizedBox(width: defaultPadding),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '$mToCurrency Account',
+                                              style:  TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                                color: Theme.of(context).extension<AppColors>()!.primary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                       Icon(Icons.navigate_next_rounded,
+                                          color: Theme.of(context).extension<AppColors>()!.primary),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: defaultPadding),
-                          TextFormField(
-                            controller: mToAmountController,
-                            keyboardType: TextInputType.number,
-                            textInputAction: TextInputAction.next,
-                            cursorColor: kPrimaryColor,
-                            style: const TextStyle(color: kPrimaryColor),
-                            decoration: InputDecoration(
-                              prefixText: '$mToCurrencySymbol ',
-                              prefixStyle:
-                                  const TextStyle(color: kPrimaryColor),
-                              labelText: "Converted Amount",
-                              labelStyle: const TextStyle(color: kPrimaryColor),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(),
+                            const SizedBox(height: defaultPadding),
+                            TextFormField(
+                              controller: mToAmountController,
+                              keyboardType: TextInputType.number,
+                              textInputAction: TextInputAction.next,
+                              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                              decoration: InputDecoration(
+                                prefixText: '$mToCurrencySymbol ',
+                                prefixStyle:
+                                    TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                                labelText: "Converted Amount",
+                                labelStyle:
+                                    TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(),
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey.withOpacity(0.1),
                               ),
-                              filled: true,
-                              fillColor: Colors.grey.withOpacity(0.1),
+                              enabled: false,
                             ),
-                            enabled: false,
-                          ),
-                          const SizedBox(height: 30),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                "Balance:",
-                                style: TextStyle(
-                                    color: kPrimaryColor,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                "$mToCurrencySymbol ${mToAmount?.toStringAsFixed(2) ?? '0.00'}",
-                                style: const TextStyle(
-                                    color: kPrimaryColor,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                        ],
+                            const SizedBox(height: 30),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                 Text(
+                                  "Balance:",
+                                  style: TextStyle(
+                                      color: Theme.of(context).extension<AppColors>()!.primary,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  "$mToCurrencySymbol ${mToAmount?.toStringAsFixed(2) ?? '0.00'}",
+                                  style:  TextStyle(
+                                      color: Theme.of(context).extension<AppColors>()!.primary,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 30),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 50),
-                child: isReviewOrder
-                    ? ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: kPrimaryColor,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ReviewExchangeMoneyScreen(
-                                fromAccountId: mFromAccountId,
-                                fromCountry: mFromCountry,
-                                fromCurrency: mFromCurrency,
-                                fromIban: mFromIban,
-                                fromAmount: mFromAmount,
-                                fromCurrencySymbol: mFromCurrencySymbol,
-                                fromTotalFees: mFromTotalFees,
-                                fromRate: mFromRate,
-                                fromExchangeAmount: mFromAmountController.text,
-                                toAccountId: mToAccountId,
-                                toCountry: mToCountry,
-                                toCurrency: mToCurrency,
-                                toIban: mToIban,
-                                toAmount: mToAmount,
-                                toCurrencySymbol: mToCurrencySymbol,
-                                toExchangedAmount: mToAmountController.text,
-                              ),
+                const SizedBox(height: 30),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 50),
+                  child: isReviewOrder
+                      ? ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 32, vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                          );
-                        },
-                        child: const Text(
-                          'Review Order',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      )
-                    : Container(),
-              ),
-            ],
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ReviewExchangeMoneyScreen(
+                                  fromAccountId: mFromAccountId,
+                                  fromCountry: mFromCountry,
+                                  fromCurrency: mFromCurrency,
+                                  fromIban: mFromIban,
+                                  fromAmount: mFromAmount,
+                                  fromCurrencySymbol: mFromCurrencySymbol,
+                                  fromTotalFees: mFromTotalFees,
+                                  fromRate: mFromRate,
+                                  fromExchangeAmount:
+                                      mFromAmountController.text,
+                                  toAccountId: mToAccountId,
+                                  toCountry: mToCountry,
+                                  toCurrency: mToCurrency,
+                                  toIban: mToIban,
+                                  toAmount: mToAmount,
+                                  toCurrencySymbol: mToCurrencySymbol,
+                                  toExchangedAmount: mToAmountController.text,
+                                ),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            'Review Order',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        )
+                      : Container(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -673,7 +752,8 @@ class _ExchangeMoneyScreen extends State<ExchangeMoneyScreen>
 
 class AllAccountsBottomSheet extends StatefulWidget {
   final String? currency;
-  final Function(String, String, String, String, bool, double) onAccountSelected;
+  final Function(String, String, String, String, bool, double)
+      onAccountSelected;
 
   const AllAccountsBottomSheet({
     super.key,
@@ -715,7 +795,8 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
         setState(() {
           accountsListData = response.accountsList!;
           isLoading = false;
-          print("Available currencies: ${accountsListData.map((account) => account.currency).toList()}");
+          print(
+              "Available currencies: ${accountsListData.map((account) => account.currency).toList()}");
         });
       } else {
         setState(() {
@@ -749,21 +830,22 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+               Text(
                 'Change Account',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: kPrimaryColor,
+                  color: Theme.of(context).extension<AppColors>()!.primary,
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.close, color: kPrimaryColor),
+                icon:  Icon(Icons.close, color: Theme.of(context).extension<AppColors>()!.primary),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -771,22 +853,22 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
             ],
           ),
           const SizedBox(height: defaultPadding),
-          const Text(
+           Text(
             "Select your preferred account for currency exchange. Easily switch between different currencies to manage your transactions.",
-            style: TextStyle(color: kPrimaryColor),
+            style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: defaultPadding),
           Expanded(
             child: isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(color: kPrimaryColor),
+                ?  Center(
+                    child: CircularProgressIndicator(color: Theme.of(context).extension<AppColors>()!.primary),
                   )
                 : accountsListData.isEmpty
                     ? Center(
                         child: Text(
                           errorMessage ?? 'No accounts available',
-                          style: const TextStyle(color: kPrimaryColor),
+                          style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                         ),
                       )
                     : ListView.builder(
@@ -818,14 +900,14 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
                               },
                               child: Card(
                                 elevation: 5,
-                                color: isSelected ? kPrimaryColor : Colors.white,
+                                color:
+                                    isSelected ? Theme.of(context).extension<AppColors>()!.primary : Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.circular(defaultPadding),
                                 ),
                                 child: Container(
-                                  padding:
-                                      const EdgeInsets.all(defaultPadding),
+                                  padding: const EdgeInsets.all(defaultPadding),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -855,7 +937,7 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
                                               fontWeight: FontWeight.bold,
                                               color: isSelected
                                                   ? Colors.white
-                                                  : kPrimaryColor,
+                                                  : Theme.of(context).extension<AppColors>()!.primary,
                                             ),
                                           ),
                                         ],
@@ -872,7 +954,7 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
                                               fontWeight: FontWeight.bold,
                                               color: isSelected
                                                   ? Colors.white
-                                                  : kPrimaryColor,
+                                                  : Theme.of(context).extension<AppColors>()!.primary,
                                             ),
                                           ),
                                           Text(
@@ -882,7 +964,7 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
                                               fontWeight: FontWeight.bold,
                                               color: isSelected
                                                   ? Colors.white
-                                                  : kPrimaryColor,
+                                                  : Theme.of(context).extension<AppColors>()!.primary,
                                             ),
                                           ),
                                         ],
@@ -899,7 +981,7 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
                                               fontWeight: FontWeight.bold,
                                               color: isSelected
                                                   ? Colors.white
-                                                  : kPrimaryColor,
+                                                  : Theme.of(context).extension<AppColors>()!.primary,
                                             ),
                                           ),
                                           Text(
@@ -909,7 +991,7 @@ class _AllAccountsBottomSheetState extends State<AllAccountsBottomSheet> {
                                               fontWeight: FontWeight.bold,
                                               color: isSelected
                                                   ? Colors.white
-                                                  : kPrimaryColor,
+                                                  : Theme.of(context).extension<AppColors>()!.primary,
                                             ),
                                           ),
                                         ],

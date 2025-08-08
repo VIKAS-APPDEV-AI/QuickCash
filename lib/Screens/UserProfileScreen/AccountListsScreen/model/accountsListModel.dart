@@ -49,7 +49,7 @@ class AccountsListResponse {
 
   factory AccountsListResponse.fromJson(Map<String, dynamic> json) {
     return AccountsListResponse(
-      accountDetails: (json['data']?['accountDetails'] as List<dynamic>?)
+      accountDetails: (json['data'] as List<dynamic>?)
           ?.map((item) => AccountDetail.fromJson(item as Map<String, dynamic>))
           .toList(),
     );

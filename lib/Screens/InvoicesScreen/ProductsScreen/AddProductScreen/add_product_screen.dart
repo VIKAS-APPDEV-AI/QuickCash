@@ -102,7 +102,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         setState(() {
           isLoading = false;
           errorMessage = null;
-          CustomSnackBar.showSnackBar(context: context, message: "Product has been added Successfully!", color: kGreenColor);
+          CustomSnackBar.showSnackBar(context: context, message: "Product has been added Successfully!", color: Colors.green);
 
           updateProductCode();
           name.clear();
@@ -114,7 +114,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         setState(() {
           isLoading = false;
           errorMessage = null;
-          CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: kRedColor);
+          CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: Colors.red);
         });
       }
 
@@ -122,7 +122,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       setState(() {
         isLoading = false;
         errorMessage = error.toString();
-        CustomSnackBar.showSnackBar(context: context, message: 'We are facing some issue!', color: kRedColor);
+        CustomSnackBar.showSnackBar(context: context, message: 'We are facing some issue!', color: Colors.red);
       });
     }
 
@@ -138,7 +138,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Add Product",
@@ -159,11 +159,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   controller: name,
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.next,
-                  cursorColor: kPrimaryColor,
-                  style: const TextStyle(color: kPrimaryColor),
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                  style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   decoration: InputDecoration(
                     labelText: "Name",
-                    labelStyle: const TextStyle(color: kPrimaryColor, fontSize: 16),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -185,12 +185,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   controller: productCode, // Use the controller
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.next,
-                  cursorColor: kPrimaryColor,
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                   readOnly: true,
-                  style: const TextStyle(color: kPrimaryColor),
+                  style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   decoration: InputDecoration(
                     labelText: "Product Code",
-                    labelStyle: const TextStyle(color: kPrimaryColor, fontSize: 16),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -199,9 +199,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     fillColor: Colors.transparent,
                     suffixIcon: GestureDetector(
                       onTap: updateProductCode, // Call the function on tap
-                      child: const Padding(
+                      child:  Padding(
                         padding: EdgeInsets.all(defaultPadding),
-                        child: Icon(Icons.repeat, color: kPrimaryColor,),
+                        child: Icon(Icons.repeat, color: Theme.of(context).extension<AppColors>()!.primary,),
                       ),
                     ),
                   ),
@@ -211,10 +211,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 // Category Dropdown
                 DropdownButtonFormField<String>(
                   value: selectedCategory,
-                  style: const TextStyle(color: kPrimaryColor),
+                  style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   decoration: InputDecoration(
                     labelText: 'Category',
-                    labelStyle: const TextStyle(color: kPrimaryColor),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -228,7 +228,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   ].map((String categoryName) {
                     return DropdownMenuItem(
                       value: categoryName,
-                      child: Text(categoryName, style: const TextStyle(color: kPrimaryColor, fontSize: 16)),
+                      child: Text(categoryName, style:  TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16)),
                     );
                   }).toList(),
                   onChanged: (newValue) {
@@ -252,11 +252,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   controller: unitPrice,
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
-                  cursorColor: kPrimaryColor,
-                  style: const TextStyle(color: kPrimaryColor),
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                  style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   decoration: InputDecoration(
                     labelText: "Unit Price",
-                    labelStyle: const TextStyle(color: kPrimaryColor, fontSize: 16),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -277,13 +277,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   controller: description,
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.next,
-                  cursorColor: kPrimaryColor,
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                   minLines: 6,
                   maxLines: 12,
-                  style: const TextStyle(color: kPrimaryColor),
+                  style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   decoration: InputDecoration(
                     labelText: "Description",
-                    labelStyle: const TextStyle(color: kPrimaryColor, fontSize: 16),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -301,9 +301,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 ),
 
                 const SizedBox(height: largePadding),
-                if (isLoading) const Center(
+                if (isLoading)  Center(
                   child: CircularProgressIndicator(
-                    color: kPrimaryColor,
+                    color: Theme.of(context).extension<AppColors>()!.primary,
                   ),
                 ), // Show loading indicator
 
@@ -313,7 +313,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 50),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: kPrimaryColor,
+                      backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),

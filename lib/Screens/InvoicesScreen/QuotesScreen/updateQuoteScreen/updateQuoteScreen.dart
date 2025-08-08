@@ -178,14 +178,14 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
       }else{
         setState(() {
           isLoading = false;
-          CustomSnackBar.showSnackBar(context: context, message: 'We are facing some issue', color: kPrimaryColor);
+          CustomSnackBar.showSnackBar(context: context, message: 'We are facing some issue', color: Theme.of(context).extension<AppColors>()!.primary);
         });
       }
 
     } catch (error) {
       setState(() {
         isLoading = false;
-        CustomSnackBar.showSnackBar(context: context, message: 'Something went wrong', color: kPrimaryColor);
+        CustomSnackBar.showSnackBar(context: context, message: 'Something went wrong', color: Theme.of(context).extension<AppColors>()!.primary);
       });
     }
   }
@@ -225,7 +225,7 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Edit Quote",
@@ -233,9 +233,9 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
         ),
       ),
       body: isLoading
-          ? const Center(
+          ?  Center(
         child: CircularProgressIndicator(
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
         ),
       )
           : SingleChildScrollView(
@@ -252,14 +252,14 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                     controller: quoteNumber,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
+                    cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                     onSaved: (value) {},
                     readOnly: true,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     decoration: InputDecoration(
                       labelText: "Quote #",
                       labelStyle:
-                      const TextStyle(color: kPrimaryColor, fontSize: 16),
+                      TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(),
@@ -283,20 +283,20 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                               ? ''
                               : DateFormat('yyyy-MM-dd').format(quoteDate!),
                         ),
-                        style: const TextStyle(color: kPrimaryColor),
+                        style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                         decoration: InputDecoration(
                           labelText: "Quote Date*",
                           labelStyle:
-                          const TextStyle(color: kPrimaryColor, fontSize: 16),
+                          TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(),
                           ),
                           filled: true,
                           fillColor: Colors.transparent,
-                          suffixIcon: const Icon(
+                          suffixIcon:  Icon(
                             Icons.calendar_today,
-                            color: kPrimaryColor,
+                            color: Theme.of(context).extension<AppColors>()!.primary,
                           ), // Add calendar icon here
                         ),
                       ),
@@ -315,20 +315,20 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                               ? ''
                               : DateFormat('yyyy-MM-dd').format(dueDate!),
                         ),
-                        style: const TextStyle(color: kPrimaryColor),
+                        style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                         decoration: InputDecoration(
                           labelText: "Due Date*",
                           labelStyle:
-                          const TextStyle(color: kPrimaryColor, fontSize: 16),
+                          TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(),
                           ),
                           filled: true,
                           fillColor: Colors.transparent,
-                          suffixIcon: const Icon(
+                          suffixIcon:  Icon(
                             Icons.calendar_today,
-                            color: kPrimaryColor,
+                            color: Theme.of(context).extension<AppColors>()!.primary,
                           ), // Add calendar icon here
                         ),
                       ),
@@ -339,11 +339,11 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                   const SizedBox(height: largePadding),
                   DropdownButtonFormField<String>(
                     value: selectedInvoiceTemplate,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
                     decoration: InputDecoration(
                       labelText: 'Invoice Template',
-                      labelStyle: const TextStyle(color: kPrimaryColor),
+                      labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(),
@@ -366,8 +366,8 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                     ].map((String role) {
                       return DropdownMenuItem(
                         value: role,
-                        child: Text(role, style: const TextStyle(
-                            color: kPrimaryColor, fontSize: 16),),
+                        child: Text(role, style: TextStyle(
+                            color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),),
                       );
                     }).toList(),
                     onChanged: (newValue) {
@@ -399,8 +399,8 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                             return PopupMenuItem<String>(
                               value: currencyItem.currencyCode,
                               child: Text(currencyItem.currencyCode!,
-                                style: const TextStyle(
-                                    color: kPrimaryColor),), // Display the name or code of the currency
+                                style:  TextStyle(
+                                    color: Theme.of(context).extension<AppColors>()!.primary),), // Display the name or code of the currency
                             );
                           }).toList(),
                         ).then((String? newValue) {
@@ -421,16 +421,16 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                             horizontal: 12.0, vertical: 15.0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: kPrimaryColor),
+                          border: Border.all(color: Theme.of(context).extension<AppColors>()!.primary),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(selectedCurrency ?? "Select Currency",
-                                style: const TextStyle(
-                                    color: kPrimaryColor, fontSize: 16)),
-                            const Icon(Icons.arrow_drop_down,
-                                color: kPrimaryColor),
+                                style:  TextStyle(
+                                    color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16)),
+                             Icon(Icons.arrow_drop_down,
+                                color: Theme.of(context).extension<AppColors>()!.primary),
                           ],
                         ),
                       ),
@@ -494,12 +494,12 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                                       product.id ==
                                           productList[index].productId)
                                           : null,
-                                      style: const TextStyle(
-                                          color: kPrimaryColor),
+                                      style:  TextStyle(
+                                          color: Theme.of(context).extension<AppColors>()!.primary),
                                       decoration: InputDecoration(
                                         labelText: 'Product',
-                                        labelStyle: const TextStyle(
-                                            color: kPrimaryColor),
+                                        labelStyle:  TextStyle(
+                                            color: Theme.of(context).extension<AppColors>()!.primary),
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(
                                               12),
@@ -513,8 +513,8 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                                           child: Text(
                                             product.productName ??
                                                 'Unnamed Product',
-                                            style: const TextStyle(
-                                                color: kPrimaryColor,
+                                            style:  TextStyle(
+                                                color: Theme.of(context).extension<AppColors>()!.primary,
                                                 fontSize: 16),
                                           ),
                                         );
@@ -560,12 +560,12 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                                         text: productList[index].quantity,
                                       ),
                                       keyboardType: TextInputType.number,
-                                      style: const TextStyle(
-                                          color: kPrimaryColor),
+                                      style:  TextStyle(
+                                          color: Theme.of(context).extension<AppColors>()!.primary),
                                       decoration: InputDecoration(
                                         labelText: "Quantity",
-                                        labelStyle: const TextStyle(
-                                            color: kPrimaryColor),
+                                        labelStyle:  TextStyle(
+                                            color: Theme.of(context).extension<AppColors>()!.primary),
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(
                                               12),
@@ -596,12 +596,12 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                                         text: productList[index].price,
                                       ),
                                       keyboardType: TextInputType.number,
-                                      style: const TextStyle(
-                                          color: kPrimaryColor),
+                                      style:  TextStyle(
+                                          color: Theme.of(context).extension<AppColors>()!.primary),
                                       decoration: InputDecoration(
                                         labelText: "Price",
-                                        labelStyle: const TextStyle(
-                                            color: kPrimaryColor),
+                                        labelStyle:  TextStyle(
+                                            color: Theme.of(context).extension<AppColors>()!.primary),
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(
                                               12),
@@ -632,8 +632,8 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                                               horizontal: 14),
                                           child: Text(
                                             productList[index].amount,
-                                            style: const TextStyle(
-                                                color: kPrimaryColor,
+                                            style:  TextStyle(
+                                                color: Theme.of(context).extension<AppColors>()!.primary,
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 16),
                                           ),
@@ -674,7 +674,7 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                               onPressed: () {
                                 addProduct();
                               },
-                              child: const Icon(Icons.add, color: kPrimaryColor,),
+                              child:  Icon(Icons.add, color: Theme.of(context).extension<AppColors>()!.primary,),
                             ),
                           ],
                         ),
@@ -691,8 +691,8 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                                 controller: discount,
                                 keyboardType: TextInputType.number,
                                 textInputAction: TextInputAction.next,
-                                cursorColor: kPrimaryColor,
-                                style: const TextStyle(color: kPrimaryColor),
+                                cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                 onChanged: (value) {
                                   setState(() {
                                     mDiscount();
@@ -708,8 +708,8 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                                     borderSide: const BorderSide(),
                                   ),
                                   hintText: "0",
-                                  hintStyle: const TextStyle(
-                                      color: kPrimaryColor),
+                                  hintStyle:  TextStyle(
+                                      color: Theme.of(context).extension<AppColors>()!.primary),
                                 ),
                               ),
                             ),
@@ -717,12 +717,12 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                             const SizedBox(width: defaultPadding,),
                             Expanded(child: DropdownButtonFormField<String>(
                               value: selectedDiscount,
-                              style: const TextStyle(color: kPrimaryColor),
+                              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
                               decoration: InputDecoration(
                                 labelText: 'Discount',
-                                labelStyle: const TextStyle(
-                                    color: kPrimaryColor),
+                                labelStyle:  TextStyle(
+                                    color: Theme.of(context).extension<AppColors>()!.primary),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(),
@@ -733,8 +733,8 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                                   .map((String role) {
                                 return DropdownMenuItem(
                                   value: role,
-                                  child: Text(role, style: const TextStyle(
-                                      color: kPrimaryColor, fontSize: 16),),
+                                  child: Text(role, style:  TextStyle(
+                                      color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),),
                                 );
                               }).toList(),
                               onChanged: (newValue) {
@@ -755,19 +755,19 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                           child: InputDecorator(
                             decoration: InputDecoration(
                               labelText: 'Select Taxes',
-                              labelStyle: const TextStyle(color: kPrimaryColor),
+                              labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(),
                               ),
-                              suffixIcon: const Icon(
-                                  Icons.arrow_drop_down, color: kPrimaryColor),
+                              suffixIcon:  Icon(
+                                  Icons.arrow_drop_down, color: Theme.of(context).extension<AppColors>()!.primary),
                             ),
                             child: Text(
                               selectedTaxes.isEmpty
                                   ? 'Select Taxes'
                                   : selectedTaxes.join(', '),
-                              style: const TextStyle(color: kPrimaryColor),
+                              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                             ),
                           ),
                         ),
@@ -776,14 +776,14 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text("Sub Total:", style: TextStyle(
-                                color: kPrimaryColor,
+                             Text("Sub Total:", style: TextStyle(
+                                color: Theme.of(context).extension<AppColors>()!.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold),),
                             Padding(padding: const EdgeInsets.symmetric(
                                 horizontal: defaultPadding),
-                              child: Text(subTotal, style: const TextStyle(
-                                  color: kPrimaryColor,
+                              child: Text(subTotal, style:  TextStyle(
+                                  color: Theme.of(context).extension<AppColors>()!.primary,
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold),),),
                           ],
@@ -793,14 +793,14 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text("Discount:", style: TextStyle(
-                                color: kPrimaryColor,
+                             Text("Discount:", style: TextStyle(
+                                color: Theme.of(context).extension<AppColors>()!.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold),),
                             Padding(padding: const EdgeInsets.symmetric(
                                 horizontal: defaultPadding),
-                              child: Text(showDiscount, style: const TextStyle(
-                                  color: kPrimaryColor,
+                              child: Text(showDiscount, style:  TextStyle(
+                                  color: Theme.of(context).extension<AppColors>()!.primary,
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold),),),
                           ],
@@ -810,14 +810,14 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text("Tax:", style: TextStyle(
-                                color: kPrimaryColor,
+                             Text("Tax:", style: TextStyle(
+                                color: Theme.of(context).extension<AppColors>()!.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold),),
                             Padding(padding: const EdgeInsets.symmetric(
                                 horizontal: defaultPadding),
-                              child: Text(showTaxes, style: const TextStyle(
-                                  color: kPrimaryColor,
+                              child: Text(showTaxes, style:  TextStyle(
+                                  color: Theme.of(context).extension<AppColors>()!.primary,
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold),),),
                           ],
@@ -827,15 +827,15 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text("Total:", style: TextStyle(
-                                color: kPrimaryColor,
+                             Text("Total:", style: TextStyle(
+                                color: Theme.of(context).extension<AppColors>()!.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold),),
                             Padding(padding: const EdgeInsets.symmetric(
                                 horizontal: defaultPadding),
                               child: Text(
-                                showTotalAmount, style: const TextStyle(
-                                  color: kPrimaryColor,
+                                showTotalAmount, style:  TextStyle(
+                                  color: Theme.of(context).extension<AppColors>()!.primary,
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold),),),
                           ],
@@ -857,7 +857,7 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                                 _isAdded ? Icons.remove : Icons.add,
                                 color: Colors.white,
                               ),
-                              backgroundColor: _isAdded ? Colors.red : kPrimaryColor,
+                              backgroundColor: _isAdded ? Colors.red : Theme.of(context).extension<AppColors>()!.primary,
                             ),
                           ),
                         ),
@@ -873,17 +873,17 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                                 controller: noteController,
                                 keyboardType: TextInputType.text,
                                 textInputAction: TextInputAction.next,
-                                cursorColor: kPrimaryColor,
+                                cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                                 onSaved: (value) {},
                                 readOnly: false,
-                                style: const TextStyle(color: kPrimaryColor),
+                                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                 maxLines: 5,
                                 minLines: 1,
                                 decoration: InputDecoration(
                                   labelText: "Note",
                                   labelStyle:
-                                  const TextStyle(
-                                      color: kPrimaryColor, fontSize: 16),
+                                   TextStyle(
+                                      color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide: const BorderSide(),
@@ -901,17 +901,17 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                                 controller: termsController,
                                 keyboardType: TextInputType.text,
                                 textInputAction: TextInputAction.next,
-                                cursorColor: kPrimaryColor,
+                                cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                                 onSaved: (value) {},
                                 readOnly: false,
                                 maxLines: 5,
                                 minLines: 1,
-                                style: const TextStyle(color: kPrimaryColor),
+                                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                 decoration: InputDecoration(
                                   labelText: "Terms",
                                   labelStyle:
-                                  const TextStyle(
-                                      color: kPrimaryColor, fontSize: 16),
+                                   TextStyle(
+                                      color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide: const BorderSide(),
@@ -959,9 +959,9 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                           height: largePadding,
                         ),
                         if (isSubmitLoading)
-                          const Center(
+                           Center(
                             child: CircularProgressIndicator(
-                              color: kPrimaryColor,
+                              color: Theme.of(context).extension<AppColors>()!.primary,
                             ),
                           ), // Show loading indicator
 
@@ -985,7 +985,7 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 14),
                                 ),
-                                backgroundColor: kPrimaryColor,
+                                backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                               ),
                             ),*/
 
@@ -1004,28 +1004,28 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                                     CustomSnackBar.showSnackBar(
                                         context: context,
                                         message: "Please select invoice date",
-                                        color: kRedColor);
+                                        color: Colors.red);
                                   } else if (dueDate == null) {
                                     CustomSnackBar.showSnackBar(
                                         context: context,
                                         message: "Please select due date",
-                                        color: kRedColor);
+                                        color: Colors.red);
                                   } else if (selectedInvoiceTemplate.isEmpty) {
                                     CustomSnackBar.showSnackBar(
                                         context: context,
                                         message: "Please select invoice template",
-                                        color: kRedColor);
+                                        color: Colors.red);
                                   } else if (selectedCurrency!.isEmpty) {
                                     CustomSnackBar.showSnackBar(
                                         context: context,
                                         message: "Please select currency",
-                                        color: kRedColor);
+                                        color: Colors.red);
                                   } else {
 
                                     CustomSnackBar.showSnackBar(
                                         context: context,
                                         message: "Save",
-                                        color: kRedColor);
+                                        color: Colors.red);
                                   }
                                 },
                                 label: const Text(
@@ -1033,7 +1033,7 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 14),
                                 ),
-                                backgroundColor: kPrimaryColor,
+                                backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                               ),
                             ),
 
@@ -1071,14 +1071,14 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
         CustomSnackBar.showSnackBar(
           context: context,
           message: 'Selected product is incomplete.',
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
         );
       }
     } else {
       CustomSnackBar.showSnackBar(
         context: context,
         message: 'You cannot add more products.',
-        color: kPrimaryColor,
+        color: Theme.of(context).extension<AppColors>()!.primary,
       );
     }
   }
@@ -1120,7 +1120,7 @@ class _UpdateQuoteScreenState extends State<UpdateQuoteScreen> {
                     return CheckboxListTile(
                       title: Text(
                         '${tax.name ?? ''} - ${tax.taxValue ?? ''}',
-                        style: const TextStyle(color: kPrimaryColor),
+                        style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       ),
                       value: selectedTaxes.contains(
                           '${tax.name ?? ''} - ${tax.taxValue ?? ''}'),

@@ -10,7 +10,8 @@ class AddPaymentSuccessScreen extends StatefulWidget {
   const AddPaymentSuccessScreen({super.key, this.transactionId, this.amount});
 
   @override
-  State<AddPaymentSuccessScreen> createState() => _AddPaymentSuccessScreenState();
+  State<AddPaymentSuccessScreen> createState() =>
+      _AddPaymentSuccessScreenState();
 }
 
 class _AddPaymentSuccessScreenState extends State<AddPaymentSuccessScreen> {
@@ -33,6 +34,8 @@ class _AddPaymentSuccessScreenState extends State<AddPaymentSuccessScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Background(
@@ -64,10 +67,11 @@ class _AddPaymentSuccessScreenState extends State<AddPaymentSuccessScreen> {
                         height: 120,
                       ),
                       const SizedBox(height: largePadding),
-                      const Text(
+                      Text(
                         "Transaction Successful",
                         style: TextStyle(
-                          color: kPrimaryColor,
+                          color:
+                              Theme.of(context).extension<AppColors>()!.primary,
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                         ),
@@ -76,58 +80,91 @@ class _AddPaymentSuccessScreenState extends State<AddPaymentSuccessScreen> {
                       Text(
                         'Successfully paid ${widget.amount}',
                         maxLines: 3,
-                        style: const TextStyle(color: Colors.grey, fontSize: 18),
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 18),
                       ),
                       const SizedBox(height: 75),
                       Card(
                         elevation: 1.0,
-                        color: kPrimaryLightColor,
-                        margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                        color: isDarkMode
+                            ? const Color.fromARGB(166, 252, 251, 253)
+                            : const Color(0xA66F35A5),
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 0, horizontal: 0),
                         child: Padding(
                           padding: const EdgeInsets.all(defaultPadding),
                           child: Column(
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Transaction Id',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w500,
-                                      color: kPrimaryColor,
+                                      color: isDarkMode
+                                          ? const Color.fromARGB(
+                                              255, 15, 15, 15)
+                                          : Colors.grey[100],
                                     ),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
                                   ),
                                   Flexible(
                                     child: Text(
                                       '${widget.transactionId}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontWeight: FontWeight.w500,
-                                        fontSize: 16,
-                                        color: kPrimaryColor,
+                                        fontSize: 12,
+                                        color: Theme.of(context)
+                                            .extension<AppColors>()!
+                                            .primary,
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
                               const SizedBox(height: defaultPadding),
-                              const Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     'Status',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w500,
-                                      color: kPrimaryColor,
+                                      color: isDarkMode
+                                          ? const Color.fromARGB(
+                                              255, 15, 15, 15)
+                                          : Colors.grey[100],
                                     ),
                                   ),
-                                  Text(
-                                    'Success',
-                                    style: TextStyle(
-                                      color: kGreenColor,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16,
+                                  Container(
+                                    padding: EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.2),
+                                          spreadRadius: 2,
+                                          blurRadius: 6,
+                                          offset: Offset(0,
+                                              3), // changes position of shadow
+                                        ),
+                                      ],
                                     ),
-                                  ),
+                                    child: Text(
+                                      'Success',
+                                      style: TextStyle(
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  )
                                 ],
                               ),
                             ],
@@ -151,9 +188,12 @@ class _AddPaymentSuccessScreenState extends State<AddPaymentSuccessScreen> {
                             },
                             label: const Text(
                               'Home',
-                              style: TextStyle(color: Colors.white, fontSize: 14),
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 14),
                             ),
-                            backgroundColor: kPrimaryColor,
+                            backgroundColor: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary,
                           ),
                         ),
                       ),

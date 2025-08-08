@@ -1,8 +1,11 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:quickcash/Screens/InvoicesScreen/Settings/PaymentQRCodeScreen/AddPaymentQRCodeScreen/model/addPaymentQrCodeApi.dart';
+import 'package:quickcash/Screens/NotificationsScreen.dart/NotificationScreen.dart';
+import 'package:quickcash/Screens/TicketsScreen/TicketScreen/DashboardTicketScreen.dart';
 import 'package:quickcash/constants.dart';
 import 'package:quickcash/util/auth_manager.dart';
 
@@ -54,7 +57,7 @@ class _AddPaymentQRCodeScreenState extends State<AddPaymentQRCodeScreen>{
             CustomSnackBar.showSnackBar(
               context: context,
               message: "QrCode details is added Successfully!",
-              color: kPrimaryColor,
+              color: Theme.of(context).extension<AppColors>()!.primary,
             );
           });
         } else {
@@ -64,7 +67,7 @@ class _AddPaymentQRCodeScreenState extends State<AddPaymentQRCodeScreen>{
             CustomSnackBar.showSnackBar(
               context: context,
               message: "We are facing some issue!",
-              color: kPrimaryColor,
+              color: Theme.of(context).extension<AppColors>()!.primary,
             );
           });
         }
@@ -75,7 +78,7 @@ class _AddPaymentQRCodeScreenState extends State<AddPaymentQRCodeScreen>{
           CustomSnackBar.showSnackBar(
             context: context,
             message: errorMessage!,
-            color: kRedColor,
+            color: Colors.red,
           );
         });
       }
@@ -87,12 +90,47 @@ class _AddPaymentQRCodeScreenState extends State<AddPaymentQRCodeScreen>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Add QR Code",
           style: TextStyle(color: Colors.white),
         ),
+        flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color.fromARGB(255, 6, 6, 6), // Dark neo-banking color
+                      Color(0xFF8A2BE2), // Gradient transition
+                      Color(0x00000000), // Transparent fade
+                    ],
+                    stops: [0.0, 0.7, 1.0],
+                  ),
+                ),
+              ),
+          actions: [
+          IconButton(
+            icon: const Icon(CupertinoIcons.bell_fill),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => NotificationScreen(),
+                  ));
+            },
+            tooltip: 'Notifications',
+          ),
+          IconButton(
+            icon: const Icon(CupertinoIcons.headphones),
+            onPressed: () {
+             Navigator.push(context, CupertinoPageRoute(builder: (context) => DashboardTicketScreen(),));
+            },
+            tooltip: 'Support',
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -110,7 +148,7 @@ class _AddPaymentQRCodeScreenState extends State<AddPaymentQRCodeScreen>{
                     controller: title,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    cursorColor: kPrimaryColor,
+                    cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                     onSaved: (value) {},
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -119,11 +157,11 @@ class _AddPaymentQRCodeScreenState extends State<AddPaymentQRCodeScreen>{
                       return null;
                     },
                     readOnly: false,
-                    style: const TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     decoration: InputDecoration(
                       labelText: "Title",
                       labelStyle:
-                      const TextStyle(color: kPrimaryColor, fontSize: 16),
+                      TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(),
@@ -136,8 +174,8 @@ class _AddPaymentQRCodeScreenState extends State<AddPaymentQRCodeScreen>{
                     height: largePadding,
                   ),
 
-                  const Padding(padding: EdgeInsets.only(left: smallPadding),
-                  child: Text("Upload Payment QR-code",style: TextStyle(color: kPrimaryColor, fontWeight: FontWeight.bold),),),
+                  Padding(padding: EdgeInsets.only(left: smallPadding),
+                  child: Text("Upload Payment QR-code",style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontWeight: FontWeight.bold),),),
 
                   const SizedBox(height: 2.0,),
                   Card(
@@ -184,11 +222,11 @@ class _AddPaymentQRCodeScreenState extends State<AddPaymentQRCodeScreen>{
                                 );
                               }
                             },
-                            child: const CircleAvatar(
+                            child: CircleAvatar(
                               backgroundColor: Colors.white,
                               child: Icon(
                                 Icons.edit,
-                                color: kPrimaryColor,
+                                color: Theme.of(context).extension<AppColors>()!.primary,
                               ),
                             ),
                           ),
@@ -199,10 +237,10 @@ class _AddPaymentQRCodeScreenState extends State<AddPaymentQRCodeScreen>{
 
 
                   const SizedBox(height: largePadding),
-                  const Text(
+                  Text(
                     "Default",
                     style: TextStyle(
-                        color: kPrimaryColor,
+                        color: Theme.of(context).extension<AppColors>()!.primary,
                         fontSize: 16,
                         fontWeight: FontWeight.w500),
                   ),
@@ -218,7 +256,7 @@ class _AddPaymentQRCodeScreenState extends State<AddPaymentQRCodeScreen>{
                           });
                         },
                       ),
-                      const Text('Yes', style: TextStyle(color: kPrimaryColor)),
+                       Text('Yes', style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary)),
                       Radio<String>(
                         value: 'no',
                         groupValue: selectedType,
@@ -228,14 +266,14 @@ class _AddPaymentQRCodeScreenState extends State<AddPaymentQRCodeScreen>{
                           });
                         },
                       ),
-                      const Text('No', style: TextStyle(color: kPrimaryColor)),
+                       Text('No', style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary)),
                     ],
                   ),
 
                   const SizedBox(height: defaultPadding,),
-                  if (isLoading) const Center(
+                  if (isLoading)  Center(
                     child: CircularProgressIndicator(
-                      color: kPrimaryColor,
+                      color: Theme.of(context).extension<AppColors>()!.primary,
                     ),
                   ), // Show loading indicator
 
@@ -253,7 +291,7 @@ class _AddPaymentQRCodeScreenState extends State<AddPaymentQRCodeScreen>{
                           'Submit',
                           style: TextStyle(color: Colors.white, fontSize: 15),
                         ),
-                        backgroundColor: kPrimaryColor,
+                        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                       ),
                     ),
                   )

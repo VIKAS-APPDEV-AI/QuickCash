@@ -77,7 +77,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
       create: (_) => TransactionProvider(),
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: kPrimaryColor,
+          backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
           iconTheme: const IconThemeData(color: Colors.white),
           title: const Text(
             "Transaction Details",
@@ -88,8 +88,8 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
           future: _initialFetchFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(color: kPrimaryColor),
+              return Center(
+                child: CircularProgressIndicator(color: Theme.of(context).extension<AppColors>()!.primary),
               );
             }
 
@@ -197,7 +197,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                             ),
                             Text(
                               value,
-                              style: const TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white, fontSize: 12),
                             ),
                           ],
                         ),
@@ -228,7 +228,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            color: kPrimaryColor,
+                            color: Theme.of(context).extension<AppColors>()!.primary,
                             child: Padding(
                               padding: const EdgeInsets.all(defaultPadding),
                               child: Column(
@@ -248,8 +248,8 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                                         TableBorder.all(color: Colors.white38),
                                     children: [
                                       _buildTableRow(
-                                          "Trx:", provider.transactionId ?? "N/A"),
-                                      _buildTableRow("Requested Date:",
+                                          "Transaction ID:", provider.transactionId ?? "N/A"),
+                                      _buildTableRow("Requested Date: ",
                                           _formatDate(provider.requestDate)),
                                       _buildTableRow("Fee:",
                                           "${getCurrencySymbolForAmount()} ${provider.fee?.toStringAsFixed(2) ?? '0.00'}"),

@@ -36,9 +36,9 @@ class _MyAccountsScreen extends State<MyAccountsScreen> {
               ),
               child: Column(
                 children: [
-                  const Text(
+                   Text(
                     "Select Account",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: kPrimaryColor),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).extension<AppColors>()!.primary),
                   ),
                   const SizedBox(height: 16),
                   Expanded(
@@ -65,7 +65,7 @@ class _MyAccountsScreen extends State<MyAccountsScreen> {
 
                         return ListTile(
                           leading: Image.asset(iconPath, height: 40, width: 40),
-                          title: Text(account,style: const TextStyle(color: kPrimaryColor),),
+                          title: Text(account,style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),),
                           onTap: () {
                             Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -93,7 +93,7 @@ class _MyAccountsScreen extends State<MyAccountsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Select account to move money",
@@ -129,9 +129,9 @@ class _MyAccountsScreen extends State<MyAccountsScreen> {
                         Container(
                           height: 40,
                           width: 40,
-                          decoration: const BoxDecoration(
+                          decoration:  BoxDecoration(
                             shape: BoxShape.circle,
-                            color: kPrimaryColor,
+                            color: Theme.of(context).extension<AppColors>()!.primary,
                           ),
                           child: const Center(
                             child: Icon(Icons.flag, color: Colors.white),
@@ -175,7 +175,7 @@ class _MyAccountsScreen extends State<MyAccountsScreen> {
                         child: ElevatedButton(
                           onPressed: _showAccountBottomSheet,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: kPrimaryColor,
+                            backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -199,7 +199,7 @@ class _MyAccountsScreen extends State<MyAccountsScreen> {
                     Container(
                       height: 1,
                       width: double.maxFinite,
-                      color: kPrimaryLightColor,
+                      color: Color(0xA66F35A5),
                     ),
                     // Circular button
                     Material(
@@ -212,11 +212,11 @@ class _MyAccountsScreen extends State<MyAccountsScreen> {
                           shape: BoxShape.circle,
                           color: Colors.white,
                         ),
-                        child: const Center(
+                        child:  Center(
                           child: Icon(
                             Icons.arrow_downward,
                             size: 30,
-                            color: kPrimaryColor,
+                            color: Theme.of(context).extension<AppColors>()!.primary,
                           ),
                         ),
                       ),

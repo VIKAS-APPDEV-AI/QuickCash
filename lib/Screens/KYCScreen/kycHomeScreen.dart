@@ -98,7 +98,7 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                       if(response.message == "Kyc Updated !!!"){
                         setState(() {
                           isUpdateLoading = false;
-                          CustomSnackBar.showSnackBar(context: context, message: "You kyc documents uploaded successfully, Wait for admin side approval", color: kPrimaryColor);
+                          CustomSnackBar.showSnackBar(context: context, message: "You kyc documents uploaded successfully, Wait for admin side approval", color: Theme.of(context).extension<AppColors>()!.primary);
                           Navigator.of(context).pop();
                           Navigator.push(
                             context,
@@ -109,7 +109,7 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                         });
                       }else{
                         setState(() {
-                          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue, Please try after some time.", color: kPrimaryColor);
+                          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue, Please try after some time.", color: Theme.of(context).extension<AppColors>()!.primary);
                         });
                       }
 
@@ -117,49 +117,49 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                       CustomSnackBar.showSnackBar(
                           context: context,
                           message: "Upload residential document",
-                          color: kPrimaryColor);
+                          color: Theme.of(context).extension<AppColors>()!.primary);
                     }
                   } else {
                     CustomSnackBar.showSnackBar(
                         context: context,
                         message: "Please select residential document type",
-                        color: kPrimaryColor);
+                        color: Theme.of(context).extension<AppColors>()!.primary);
                   }
                 } else {
                   CustomSnackBar.showSnackBar(
                       context: context,
                       message: "Upload document back side",
-                      color: kPrimaryColor);
+                      color: Theme.of(context).extension<AppColors>()!.primary);
                 }
               } else {
                 CustomSnackBar.showSnackBar(
                     context: context,
                     message: "Upload document front side",
-                    color: kPrimaryColor);
+                    color: Theme.of(context).extension<AppColors>()!.primary);
               }
             } else {
               CustomSnackBar.showSnackBar(
                   context: context,
                   message: "Please enter selected documentId no",
-                  color: kPrimaryColor);
+                  color: Theme.of(context).extension<AppColors>()!.primary);
             }
           } else {
             CustomSnackBar.showSnackBar(
                 context: context,
                 message: "Please select a document type",
-                color: kPrimaryColor);
+                color: Theme.of(context).extension<AppColors>()!.primary);
           }
         } else {
           CustomSnackBar.showSnackBar(
               context: context,
               message: "Your additional number not verify",
-              color: kPrimaryColor);
+              color: Theme.of(context).extension<AppColors>()!.primary);
         }
       } else {
         CustomSnackBar.showSnackBar(
             context: context,
             message: "Your primary number not verify",
-            color: kPrimaryColor);
+            color: Theme.of(context).extension<AppColors>()!.primary);
       }
     } catch (error) {
       setState(() {
@@ -167,7 +167,7 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
         CustomSnackBar.showSnackBar(
           context: context,
           message: "Something went wrong!",
-          color: kRedColor,
+          color: Colors.red,
         );
       });
     }
@@ -182,11 +182,11 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Center(
+            Center(
               child: Text(
                 "Let's Verify KYC",
                 style: TextStyle(
-                    color: kPrimaryColor,
+                    color: Theme.of(context).extension<AppColors>()!.primary,
                     fontWeight: FontWeight.bold,
                     fontSize: 28),
               ),
@@ -200,11 +200,11 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                 padding: const EdgeInsets.all(smallPadding),
                 child: Column(
                   children: [
-                    const Center(
+                    Center(
                       child: Text(
                         "To fully activate your account and access all features, please complete the KYC (Know your Customer) process. It's quick and essential for your security and compliance. Don't miss out. Finish your KYC today!",
                         style: TextStyle(
-                            color: kPrimaryColor, fontWeight: FontWeight.w400),
+                            color: Theme.of(context).extension<AppColors>()!.primary, fontWeight: FontWeight.w400),
                         textAlign: TextAlign.center, // Ensure text is centered
                       ),
                     ),
@@ -217,25 +217,25 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                         padding: const EdgeInsets.all(defaultPadding),
                         child: Column(
                           children: [
-                            const Text(
+                            Text(
                               'Contact Details',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 24,
-                                  color: kPrimaryColor),
+                                  color: Theme.of(context).extension<AppColors>()!.primary),
                             ),
                             const SizedBox(height: 25),
                             TextFormField(
                               controller: mEmail,
                               keyboardType: TextInputType.emailAddress,
                               textInputAction: TextInputAction.next,
-                              cursorColor: kPrimaryColor,
-                              style: const TextStyle(color: kPrimaryColor),
+                              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                               readOnly: true,
                               decoration: InputDecoration(
                                 labelText: "Your Email",
                                 labelStyle:
-                                    const TextStyle(color: kPrimaryColor),
+                                    TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(),
@@ -262,13 +262,13 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                                 controller: mPrimaryPhoneNo,
                                 keyboardType: TextInputType.phone,
                                 focusNode: FocusNode(),
-                                style: const TextStyle(color: kPrimaryColor),
-                                dropdownIcon: const Icon(Icons.arrow_drop_down,
-                                    size: 28, color: kPrimaryColor),
+                                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                                dropdownIcon:  Icon(Icons.arrow_drop_down,
+                                    size: 28, color: Theme.of(context).extension<AppColors>()!.primary),
                                 decoration: InputDecoration(
                                   labelText: 'Mobile Number',
                                   labelStyle:
-                                      const TextStyle(color: kPrimaryColor),
+                                      TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide: const BorderSide(),
@@ -310,7 +310,7 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                                             context: context,
                                             message:
                                                 "Please enter a valid primary phone number",
-                                            color: kPrimaryColor,
+                                            color: Theme.of(context).extension<AppColors>()!.primary,
                                           );
                                         }
                                       } else {
@@ -318,7 +318,7 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                                           context: context,
                                           message:
                                               "Primary phone number is already verified",
-                                          color: kPrimaryColor,
+                                          color: Theme.of(context).extension<AppColors>()!.primary,
                                         );
                                       }
                                     },
@@ -327,7 +327,7 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                                       style: const TextStyle(
                                           color: Colors.white, fontSize: 14),
                                     ),
-                                    backgroundColor: kPrimaryColor,
+                                    backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                                   ),
                                 ),
                               ],
@@ -340,13 +340,13 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                                 controller: mAdditionalPhoneNo,
                                 keyboardType: TextInputType.phone,
                                 focusNode: FocusNode(),
-                                style: const TextStyle(color: kPrimaryColor),
-                                dropdownIcon: const Icon(Icons.arrow_drop_down,
-                                    size: 28, color: kPrimaryColor),
+                                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                                dropdownIcon:  Icon(Icons.arrow_drop_down,
+                                    size: 28, color: Theme.of(context).extension<AppColors>()!.primary),
                                 decoration: InputDecoration(
                                   labelText: 'Mobile Number',
                                   labelStyle:
-                                      const TextStyle(color: kPrimaryColor),
+                                      TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide: const BorderSide(),
@@ -388,7 +388,7 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                                             context: context,
                                             message:
                                                 "Please enter a valid additional phone number",
-                                            color: kPrimaryColor,
+                                            color: Theme.of(context).extension<AppColors>()!.primary,
                                           );
                                         }
                                       } else {
@@ -396,7 +396,7 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                                           context: context,
                                           message:
                                               "Additional phone number is already verified",
-                                          color: kPrimaryColor,
+                                          color: Theme.of(context).extension<AppColors>()!.primary,
                                         );
                                       }
                                     },
@@ -405,7 +405,7 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                                       style: const TextStyle(
                                           color: Colors.white, fontSize: 14),
                                     ),
-                                    backgroundColor: kPrimaryColor,
+                                    backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                                   ),
                                 ),
                               ],
@@ -428,13 +428,13 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Center(
+                            Center(
                               child: Text(
                                 'Document Details',
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 24,
-                                    color: kPrimaryColor),
+                                    color: Theme.of(context).extension<AppColors>()!.primary),
                               ),
                             ),
 
@@ -443,12 +443,12 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                             DropdownButtonFormField<String>(
                               value: selectedDocument,
                               // This binds to the selectedRole state
-                              style: const TextStyle(
-                                  color: kPrimaryColor, fontSize: 17),
+                              style:  TextStyle(
+                                  color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 17),
                               decoration: InputDecoration(
                                 labelText: 'ID Of Individual',
                                 labelStyle:
-                                    const TextStyle(color: kPrimaryColor),
+                                    TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(),
@@ -481,10 +481,10 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                               controller: _documentsNoController,
                               keyboardType: TextInputType.text,
                               textInputAction: TextInputAction.next,
-                              cursorColor: kPrimaryColor,
+                              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                               onSaved: (value) {},
                               readOnly: false,
-                              style: const TextStyle(color: kPrimaryColor),
+                              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter your Document ID No';
@@ -494,7 +494,7 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                               decoration: InputDecoration(
                                 labelText: "Document Id No",
                                 labelStyle:
-                                    const TextStyle(color: kPrimaryColor),
+                                    TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(),
@@ -507,12 +507,12 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                             const SizedBox(
                               height: 25,
                             ),
-                            const Text(
+                            Text(
                               'Upload Document (Front)',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
-                                  color: kPrimaryColor),
+                                  color: Theme.of(context).extension<AppColors>()!.primary),
                             ),
                             const SizedBox(
                               height: 0,
@@ -567,11 +567,11 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                                           );
                                         }
                                       },
-                                      child: const CircleAvatar(
+                                      child:  CircleAvatar(
                                         backgroundColor: Colors.white,
                                         child: Icon(
                                           Icons.edit,
-                                          color: kPrimaryColor,
+                                          color: Theme.of(context).extension<AppColors>()!.primary,
                                         ),
                                       ),
                                     ),
@@ -583,12 +583,12 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                             const SizedBox(
                               height: largePadding,
                             ),
-                            const Text(
+                             Text(
                               'Upload Document (Back)',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
-                                  color: kPrimaryColor),
+                                  color: Theme.of(context).extension<AppColors>()!.primary),
                             ),
                             const SizedBox(
                               height: 0,
@@ -642,11 +642,11 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                                           );
                                         }
                                       },
-                                      child: const CircleAvatar(
+                                      child:  CircleAvatar(
                                         backgroundColor: Colors.white,
                                         child: Icon(
                                           Icons.edit,
-                                          color: kPrimaryColor,
+                                          color: Theme.of(context).extension<AppColors>()!.primary,
                                         ),
                                       ),
                                     ),
@@ -673,13 +673,13 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Center(
+                             Center(
                               child: Text(
                                 'Residential Address',
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 24,
-                                    color: kPrimaryColor),
+                                    color: Theme.of(context).extension<AppColors>()!.primary),
                               ),
                             ),
 
@@ -687,12 +687,12 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                             const SizedBox(height: 25),
                             DropdownButtonFormField<String>(
                               value: selectedResidentialDocument,
-                              style: const TextStyle(
-                                  color: kPrimaryColor, fontSize: 17),
+                              style: TextStyle(
+                                  color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 17),
                               decoration: InputDecoration(
                                 labelText: 'Residential Document',
                                 labelStyle:
-                                    const TextStyle(color: kPrimaryColor),
+                                    TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(),
@@ -721,12 +721,12 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                             const SizedBox(
                               height: 25,
                             ),
-                            const Text(
+                            Text(
                               'Upload Residential Document',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
-                                  color: kPrimaryColor),
+                                  color: Theme.of(context).extension<AppColors>()!.primary),
                             ),
                             const SizedBox(
                               height: 0,
@@ -780,11 +780,11 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                                           );
                                         }
                                       },
-                                      child: const CircleAvatar(
+                                      child: CircleAvatar(
                                         backgroundColor: Colors.white,
                                         child: Icon(
                                           Icons.edit,
-                                          color: kPrimaryColor,
+                                          color: Theme.of(context).extension<AppColors>()!.primary,
                                         ),
                                       ),
                                     ),
@@ -801,9 +801,9 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                       height: defaultPadding,
                     ),
                     if (isUpdateLoading)
-                      const Center(
+                      Center(
                         child: CircularProgressIndicator(
-                          color: kPrimaryColor,
+                          color: Theme.of(context).extension<AppColors>()!.primary,
                         ),
                       ),
                     const SizedBox(height: largePadding),
@@ -820,7 +820,7 @@ class _KycHomeScreenState extends State<KycHomeScreen> {
                             'Submit',
                             style: TextStyle(color: Colors.white, fontSize: 14),
                           ),
-                          backgroundColor: kPrimaryColor,
+                          backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                         ),
                       ),
                     ),
@@ -915,15 +915,15 @@ class _PrimaryNoScreenState extends State<PrimaryNoScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Verify OTP',
                     style: TextStyle(
-                        color: kPrimaryColor,
+                        color: Theme.of(context).extension<AppColors>()!.primary,
                         fontWeight: FontWeight.bold,
                         fontSize: 18),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: kPrimaryColor),
+                    icon:  Icon(Icons.close, color: Theme.of(context).extension<AppColors>()!.primary),
                     onPressed: () {
                       Navigator.pop(context);
                     },
@@ -944,11 +944,11 @@ class _PrimaryNoScreenState extends State<PrimaryNoScreen> {
                     child: Column(
                       children: [
                         Text(
-                          '    $mGeneratedOTP    ',
-                          style: const TextStyle(
+                          '$mGeneratedOTP',
+                          style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 24,
-                              color: kPrimaryColor),
+                              color: Theme.of(context).extension<AppColors>()!.primary),
                         ),
                       ],
                     ),
@@ -960,11 +960,11 @@ class _PrimaryNoScreenState extends State<PrimaryNoScreen> {
                 controller: mOTP,
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
-                cursorColor: kPrimaryColor,
-                style: const TextStyle(color: kPrimaryColor),
+                cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 decoration: InputDecoration(
                   labelText: "Enter OTP",
-                  labelStyle: const TextStyle(color: kPrimaryColor),
+                  labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(),
@@ -992,20 +992,20 @@ class _PrimaryNoScreenState extends State<PrimaryNoScreen> {
                           CustomSnackBar.showSnackBar(
                               context: context,
                               message: "Please enter a valid OTP",
-                              color: kPrimaryColor);
+                              color: Theme.of(context).extension<AppColors>()!.primary);
                         }
                       } else {
                         CustomSnackBar.showSnackBar(
                             context: context,
                             message: "Please enter otp",
-                            color: kPrimaryColor);
+                            color: Theme.of(context).extension<AppColors>()!.primary);
                       }
                     },
                     label: const Text(
                       'Proceed',
                       style: TextStyle(color: Colors.white, fontSize: 14),
                     ),
-                    backgroundColor: kPrimaryColor,
+                    backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                   ),
                 ),
               ),
@@ -1068,15 +1068,15 @@ class _AdditionalNoScreenState extends State<AdditionalNoScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Verify OTP',
                     style: TextStyle(
-                        color: kPrimaryColor,
+                        color: Theme.of(context).extension<AppColors>()!.primary,
                         fontWeight: FontWeight.bold,
                         fontSize: 18),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: kPrimaryColor),
+                    icon:  Icon(Icons.close, color: Theme.of(context).extension<AppColors>()!.primary),
                     onPressed: () {
                       Navigator.pop(context);
                     },
@@ -1098,10 +1098,10 @@ class _AdditionalNoScreenState extends State<AdditionalNoScreen> {
                       children: [
                         Text(
                           '    $mGeneratedOTP    ',
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 24,
-                              color: kPrimaryColor),
+                              color: Theme.of(context).extension<AppColors>()!.primary),
                         ),
                       ],
                     ),
@@ -1113,11 +1113,11 @@ class _AdditionalNoScreenState extends State<AdditionalNoScreen> {
                 controller: mOTP,
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
-                cursorColor: kPrimaryColor,
-                style: const TextStyle(color: kPrimaryColor),
+                cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 decoration: InputDecoration(
                   labelText: "Enter OTP",
-                  labelStyle: const TextStyle(color: kPrimaryColor),
+                  labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(),
@@ -1145,20 +1145,20 @@ class _AdditionalNoScreenState extends State<AdditionalNoScreen> {
                           CustomSnackBar.showSnackBar(
                               context: context,
                               message: "Please enter a valid OTP",
-                              color: kPrimaryColor);
+                              color: Theme.of(context).extension<AppColors>()!.primary);
                         }
                       } else {
                         CustomSnackBar.showSnackBar(
                             context: context,
                             message: "Please enter otp",
-                            color: kPrimaryColor);
+                            color: Theme.of(context).extension<AppColors>()!.primary);
                       }
                     },
                     label: const Text(
                       'Proceed',
                       style: TextStyle(color: Colors.white, fontSize: 14),
                     ),
-                    backgroundColor: kPrimaryColor,
+                    backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                   ),
                 ),
               ),

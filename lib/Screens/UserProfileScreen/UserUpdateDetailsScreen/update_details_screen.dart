@@ -156,8 +156,8 @@ class _UpdateDetailsScreenState extends State<UpdateDetailsScreen> {
                     const SizedBox(height: defaultPadding),
 
                     if (isLoading)
-                      const CircularProgressIndicator(
-                        color: kPrimaryColor,
+                      CircularProgressIndicator(
+                        color: Theme.of(context).extension<AppColors>()!.primary,
                       ),
                     // Show loading indicator
                     // if (errorMessage != null) // Show error message if there's an error
@@ -171,10 +171,10 @@ class _UpdateDetailsScreenState extends State<UpdateDetailsScreen> {
                       controller: name,
                       keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.next,
-                      cursorColor: kPrimaryColor,
+                      cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                       onSaved: (value) {},
                       readOnly: false,
-                      style: const TextStyle(color: kPrimaryColor),
+                      style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                         return 'Please enter your full name';
@@ -183,7 +183,7 @@ class _UpdateDetailsScreenState extends State<UpdateDetailsScreen> {
                       },
                       decoration: InputDecoration(
                         labelText: "Full Name",
-                        labelStyle: const TextStyle(color: kPrimaryColor),
+                        labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(),
@@ -197,10 +197,10 @@ class _UpdateDetailsScreenState extends State<UpdateDetailsScreen> {
                       controller: email,
                       keyboardType: TextInputType.emailAddress,
                       textInputAction: TextInputAction.next,
-                      cursorColor: kPrimaryColor,
+                      cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                       onSaved: (value) {},
                       readOnly: false,
-                      style: const TextStyle(color: kPrimaryColor),
+                      style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your email';
@@ -212,7 +212,7 @@ class _UpdateDetailsScreenState extends State<UpdateDetailsScreen> {
                       },
                       decoration: InputDecoration(
                         labelText: "Your Email",
-                        labelStyle: const TextStyle(color: kPrimaryColor),
+                        labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(),
@@ -227,13 +227,13 @@ class _UpdateDetailsScreenState extends State<UpdateDetailsScreen> {
                       // Bind the controller
                       keyboardType: TextInputType.phone,
                       textInputAction: TextInputAction.next,
-                      cursorColor: kPrimaryColor,
+                      cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                       onSaved: (value) {},
                       readOnly: false,
-                      style: const TextStyle(color: kPrimaryColor),
+                      style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       decoration: InputDecoration(
                         labelText: "Mobile Number",
-                        labelStyle: const TextStyle(color: kPrimaryColor),
+                        labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide()),
@@ -243,11 +243,11 @@ class _UpdateDetailsScreenState extends State<UpdateDetailsScreen> {
                       controller: mobile,
                       keyboardType: TextInputType.phone,
                       focusNode: FocusNode(),
-                      style: const TextStyle(color: kPrimaryColor),
-                      dropdownIcon: const Icon(Icons.arrow_drop_down, size: 28, color: kPrimaryColor),
+                      style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                      dropdownIcon: const Icon(Icons.arrow_drop_down, size: 28, color: Theme.of(context).extension<AppColors>()!.primary),
                       decoration: InputDecoration(
                         labelText: 'Mobile Number',
-                        labelStyle: const TextStyle(color: kPrimaryColor),
+                        labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(),
@@ -271,12 +271,12 @@ class _UpdateDetailsScreenState extends State<UpdateDetailsScreen> {
                       controller: address,
                       keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.none,
-                      cursorColor: kPrimaryColor,
+                      cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                       onSaved: (value) {},
                       readOnly: false,
                       minLines: 1,
                       maxLines: 6,
-                      style: const TextStyle(color: kPrimaryColor),
+                      style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your address';
@@ -285,7 +285,7 @@ class _UpdateDetailsScreenState extends State<UpdateDetailsScreen> {
                       },
                       decoration: InputDecoration(
                         labelText: "Address",
-                        labelStyle: const TextStyle(color: kPrimaryColor),
+                        labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(),
@@ -302,10 +302,10 @@ class _UpdateDetailsScreenState extends State<UpdateDetailsScreen> {
                       dialogColor: Colors.white,
                       textFieldDecoration: InputDecoration(
                         filled: true,
-                        counterStyle: const TextStyle(color: kPrimaryColor),
-                        labelStyle: const TextStyle(color: kPrimaryColor),
-                        hintStyle: const TextStyle(color: kPrimaryColor),
-                        suffixIcon: const Icon(Icons.arrow_drop_down, color: kPrimaryColor),
+                        counterStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                        labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                        hintStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
+                        suffixIcon:  Icon(Icons.arrow_drop_down, color: Theme.of(context).extension<AppColors>()!.primary),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(),
@@ -320,10 +320,10 @@ class _UpdateDetailsScreenState extends State<UpdateDetailsScreen> {
                       controller: postalCode,
                       keyboardType: TextInputType.number,
                       textInputAction: TextInputAction.done,
-                      cursorColor: kPrimaryColor,
+                      cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                       onSaved: (value) {},
                       readOnly: false,
-                      style: const TextStyle(color: kPrimaryColor),
+                      style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your postal code';
@@ -332,7 +332,7 @@ class _UpdateDetailsScreenState extends State<UpdateDetailsScreen> {
                       },
                       decoration: InputDecoration(
                         labelText: "Postal Code",
-                        labelStyle: const TextStyle(color: kPrimaryColor),
+                        labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(),
@@ -344,10 +344,10 @@ class _UpdateDetailsScreenState extends State<UpdateDetailsScreen> {
                     const SizedBox(height: defaultPadding),
                     DropdownButtonFormField<String>(
                       value: selectedRole,
-                      style: const TextStyle(color: kPrimaryColor),
+                      style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       decoration: InputDecoration(
                         labelText: 'Title',
-                        labelStyle: const TextStyle(color: kPrimaryColor),
+                        labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(),
@@ -372,7 +372,7 @@ class _UpdateDetailsScreenState extends State<UpdateDetailsScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 50),
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: kPrimaryColor,
+                          backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),

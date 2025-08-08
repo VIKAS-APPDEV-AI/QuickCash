@@ -213,14 +213,14 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
-        iconTheme: const IconThemeData(color: kWhiteColor),
-        title: const Text("Edit Invoice", style: TextStyle(color: kWhiteColor),
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text("Edit Invoice", style: TextStyle(color: Colors.white),
         ),
       ),
-      body: isLoading ? const Center(
+      body: isLoading ?  Center(
         child: CircularProgressIndicator(
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
         ),
       ): SingleChildScrollView(
         child: Padding(
@@ -235,14 +235,14 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                 TextFormField(
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.next,
-                  cursorColor: kPrimaryColor,
+                  cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                   onSaved: (value) {},
                   readOnly: true,
-                  style: const TextStyle(color: kPrimaryColor),
+                  style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   decoration: InputDecoration(
                     labelText: "Invoice #",
                     labelStyle:
-                    const TextStyle(color: kPrimaryColor, fontSize: 16),
+                    TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -266,20 +266,20 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                             ? ''
                             : DateFormat('dd-MM-yyyy').format(invoiceDate!),
                       ),
-                      style: const TextStyle(color: kPrimaryColor),
+                      style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       decoration: InputDecoration(
                         labelText: "Invoice Date*",
                         labelStyle:
-                        const TextStyle(color: kPrimaryColor, fontSize: 16),
+                        TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(),
                         ),
                         filled: true,
                         fillColor: Colors.transparent,
-                        suffixIcon: const Icon(
+                        suffixIcon:  Icon(
                           Icons.calendar_today,
-                          color: kPrimaryColor,
+                          color: Theme.of(context).extension<AppColors>()!.primary,
                         ), // Add calendar icon here
                       ),
                     ),
@@ -297,20 +297,20 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                             ? ''
                             : DateFormat('dd-MM-yyyy').format(dueDate!),
                       ),
-                      style: const TextStyle(color: kPrimaryColor),
+                      style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       decoration: InputDecoration(
                         labelText: "Due Date*",
                         labelStyle:
-                        const TextStyle(color: kPrimaryColor, fontSize: 16),
+                        TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(),
                         ),
                         filled: true,
                         fillColor: Colors.transparent,
-                        suffixIcon: const Icon(
+                        suffixIcon:  Icon(
                           Icons.calendar_today,
-                          color: kPrimaryColor,
+                          color: Theme.of(context).extension<AppColors>()!.primary,
                         ), // Add calendar icon here
                       ),
                     ),
@@ -321,10 +321,10 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                 const SizedBox(height: largePadding),
                 DropdownButtonFormField<String>(
                   value: selectedStatus,
-                  style: const TextStyle(color: kPrimaryColor),
+                  style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   decoration: InputDecoration(
                     labelText: 'Status',
-                    labelStyle: const TextStyle(color: kPrimaryColor),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -345,7 +345,7 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                       child: Text(
                         role,
                         style:
-                        const TextStyle(color: kPrimaryColor, fontSize: 16),
+                        TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                       ),
                     );
                   }).toList(),
@@ -360,10 +360,10 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                 const SizedBox(height: largePadding),
                 DropdownButtonFormField<String>(
                   value: selectedInvoiceTemplate,
-                  style: const TextStyle(color: kPrimaryColor),
+                  style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   decoration: InputDecoration(
                     labelText: 'Invoice Template',
-                    labelStyle: const TextStyle(color: kPrimaryColor),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -388,7 +388,7 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                       child: Text(
                         role,
                         style:
-                        const TextStyle(color: kPrimaryColor, fontSize: 16),
+                        TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                       ),
                     );
                   }).toList(),
@@ -404,10 +404,10 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                 const SizedBox(height: largePadding),
                 DropdownButtonFormField<QrCodeData>(
                   value: selectedPaymentQR,
-                  style: const TextStyle(color: kPrimaryColor),
+                  style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   decoration: InputDecoration(
                     labelText: 'Payment QR Code',
-                    labelStyle: const TextStyle(color: kPrimaryColor),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -420,8 +420,8 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                       value: role,
                       child: Text(
                         '${role.title}',
-                        style: const TextStyle(
-                            color: kPrimaryColor, fontSize: 16),
+                        style:  TextStyle(
+                            color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                       ),
                     );
                   }).toList(),
@@ -456,8 +456,8 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                           return PopupMenuItem<String>(
                             value: currencyItem.currencyCode,
                             child: Text(currencyItem.currencyCode!,
-                              style: const TextStyle(
-                                  color: kPrimaryColor),),
+                              style:  TextStyle(
+                                  color: Theme.of(context).extension<AppColors>()!.primary),),
                           );
                         }).toList(),
                       ).then((String? newValue) {
@@ -478,16 +478,16 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                           horizontal: 12.0, vertical: 15.0),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: kPrimaryColor),
+                        border: Border.all(color: Theme.of(context).extension<AppColors>()!.primary),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(selectedCurrency ?? "Select Currency",
-                              style: const TextStyle(
-                                  color: kPrimaryColor, fontSize: 16)),
-                          const Icon(Icons.arrow_drop_down,
-                              color: kPrimaryColor),
+                              style:  TextStyle(
+                                  color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16)),
+                           Icon(Icons.arrow_drop_down,
+                              color: Theme.of(context).extension<AppColors>()!.primary),
                         ],
                       ),
                     ),
@@ -550,12 +550,12 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                                     product.id ==
                                         productList[index].productId)
                                         : null,
-                                    style: const TextStyle(
-                                        color: kPrimaryColor),
+                                    style:  TextStyle(
+                                        color: Theme.of(context).extension<AppColors>()!.primary),
                                     decoration: InputDecoration(
                                       labelText: 'Product',
-                                      labelStyle: const TextStyle(
-                                          color: kPrimaryColor),
+                                      labelStyle:  TextStyle(
+                                          color: Theme.of(context).extension<AppColors>()!.primary),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(
                                             12),
@@ -569,8 +569,8 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                                         child: Text(
                                           product.productName ??
                                               'Unnamed Product',
-                                          style: const TextStyle(
-                                              color: kPrimaryColor,
+                                          style:  TextStyle(
+                                              color: Theme.of(context).extension<AppColors>()!.primary,
                                               fontSize: 16),
                                         ),
                                       );
@@ -616,12 +616,12 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                                       text: productList[index].quantity,
                                     ),
                                     keyboardType: TextInputType.number,
-                                    style: const TextStyle(
-                                        color: kPrimaryColor),
+                                    style:  TextStyle(
+                                        color: Theme.of(context).extension<AppColors>()!.primary),
                                     decoration: InputDecoration(
                                       labelText: "Quantity",
-                                      labelStyle: const TextStyle(
-                                          color: kPrimaryColor),
+                                      labelStyle:  TextStyle(
+                                          color: Theme.of(context).extension<AppColors>()!.primary),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(
                                             12),
@@ -652,12 +652,12 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                                       text: productList[index].price,
                                     ),
                                     keyboardType: TextInputType.number,
-                                    style: const TextStyle(
-                                        color: kPrimaryColor),
+                                    style:  TextStyle(
+                                        color: Theme.of(context).extension<AppColors>()!.primary),
                                     decoration: InputDecoration(
                                       labelText: "Price",
-                                      labelStyle: const TextStyle(
-                                          color: kPrimaryColor),
+                                      labelStyle:  TextStyle(
+                                          color: Theme.of(context).extension<AppColors>()!.primary),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(
                                             12),
@@ -688,8 +688,8 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                                             horizontal: 14),
                                         child: Text(
                                           productList[index].amount,
-                                          style: const TextStyle(
-                                              color: kPrimaryColor,
+                                          style:  TextStyle(
+                                              color: Theme.of(context).extension<AppColors>()!.primary,
                                               fontWeight: FontWeight.bold,
                                               fontSize: 16),
                                         ),
@@ -732,11 +732,11 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                               onPressed: () {
                                 addProduct();
                               },
-                              label: const Text(
+                              label:  Text(
                                 'Add Product',
-                                style: TextStyle(color: kPrimaryColor, fontSize: 15),
+                                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 15),
                               ),
-                              icon: const Icon(Icons.add, color: kPrimaryColor),
+                              icon:  Icon(Icons.add, color: Theme.of(context).extension<AppColors>()!.primary),
                             ),
                           ),
                         ],
@@ -754,8 +754,8 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                               controller: discount,
                               keyboardType: TextInputType.number,
                               textInputAction: TextInputAction.next,
-                              cursorColor: kPrimaryColor,
-                              style: const TextStyle(color: kPrimaryColor),
+                              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                               onChanged: (value) {
                                 setState(() {
                                   mDiscount();
@@ -771,8 +771,8 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                                   borderSide: const BorderSide(),
                                 ),
                                 hintText: "0",
-                                hintStyle: const TextStyle(
-                                    color: kPrimaryColor),
+                                hintStyle:  TextStyle(
+                                    color: Theme.of(context).extension<AppColors>()!.primary),
                               ),
                             ),
                           ),
@@ -780,12 +780,12 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                           const SizedBox(width: defaultPadding,),
                           Expanded(child: DropdownButtonFormField<String>(
                             value: selectedDiscount,
-                            style: const TextStyle(color: kPrimaryColor),
+                            style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
                             decoration: InputDecoration(
                               labelText: 'Discount',
-                              labelStyle: const TextStyle(
-                                  color: kPrimaryColor),
+                              labelStyle:  TextStyle(
+                                  color: Theme.of(context).extension<AppColors>()!.primary),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(),
@@ -796,8 +796,8 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                                 .map((String role) {
                               return DropdownMenuItem(
                                 value: role,
-                                child: Text(role, style: const TextStyle(
-                                    color: kPrimaryColor, fontSize: 16),),
+                                child: Text(role, style:  TextStyle(
+                                    color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),),
                               );
                             }).toList(),
                             onChanged: (newValue) {
@@ -818,19 +818,19 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                         child: InputDecorator(
                           decoration: InputDecoration(
                             labelText: 'Select Taxes',
-                            labelStyle: const TextStyle(color: kPrimaryColor),
+                            labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: const BorderSide(),
                             ),
-                            suffixIcon: const Icon(
-                                Icons.arrow_drop_down, color: kPrimaryColor),
+                            suffixIcon:  Icon(
+                                Icons.arrow_drop_down, color: Theme.of(context).extension<AppColors>()!.primary),
                           ),
                           child: Text(
                             selectedTaxes.isEmpty
                                 ? 'Select Taxes'
                                 : selectedTaxes.join(', '),
-                            style: const TextStyle(color: kPrimaryColor),
+                            style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                           ),
                         ),
                       ),
@@ -839,14 +839,14 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text("Sub Total:", style: TextStyle(
-                              color: kPrimaryColor,
+                           Text("Sub Total:", style: TextStyle(
+                              color: Theme.of(context).extension<AppColors>()!.primary,
                               fontSize: 14,
                               fontWeight: FontWeight.bold),),
                           Padding(padding: const EdgeInsets.symmetric(
                               horizontal: defaultPadding),
-                            child: Text(subTotal, style: const TextStyle(
-                                color: kPrimaryColor,
+                            child: Text(subTotal, style:  TextStyle(
+                                color: Theme.of(context).extension<AppColors>()!.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold),),),
                         ],
@@ -856,14 +856,14 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text("Discount:", style: TextStyle(
-                              color: kPrimaryColor,
+                           Text("Discount:", style: TextStyle(
+                              color: Theme.of(context).extension<AppColors>()!.primary,
                               fontSize: 14,
                               fontWeight: FontWeight.bold),),
                           Padding(padding: const EdgeInsets.symmetric(
                               horizontal: defaultPadding),
-                            child: Text(showDiscount, style: const TextStyle(
-                                color: kPrimaryColor,
+                            child: Text(showDiscount, style:  TextStyle(
+                                color: Theme.of(context).extension<AppColors>()!.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold),),),
                         ],
@@ -873,14 +873,14 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text("Tax:", style: TextStyle(
-                              color: kPrimaryColor,
+                           Text("Tax:", style: TextStyle(
+                              color: Theme.of(context).extension<AppColors>()!.primary,
                               fontSize: 14,
                               fontWeight: FontWeight.bold),),
                           Padding(padding: const EdgeInsets.symmetric(
                               horizontal: defaultPadding),
-                            child: Text(showTaxes, style: const TextStyle(
-                                color: kPrimaryColor,
+                            child: Text(showTaxes, style:  TextStyle(
+                                color: Theme.of(context).extension<AppColors>()!.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold),),),
                         ],
@@ -890,15 +890,15 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text("Total:", style: TextStyle(
-                              color: kPrimaryColor,
+                           Text("Total:", style: TextStyle(
+                              color: Theme.of(context).extension<AppColors>()!.primary,
                               fontSize: 14,
                               fontWeight: FontWeight.bold),),
                           Padding(padding: const EdgeInsets.symmetric(
                               horizontal: defaultPadding),
                             child: Text(
-                              showTotalAmount, style: const TextStyle(
-                                color: kPrimaryColor,
+                              showTotalAmount, style:  TextStyle(
+                                color: Theme.of(context).extension<AppColors>()!.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold),),),
                         ],
@@ -919,7 +919,7 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                               _isAdded ? Icons.remove : Icons.add,
                               color: Colors.white,
                             ),
-                            backgroundColor: _isAdded ? Colors.red : kPrimaryColor,
+                            backgroundColor: _isAdded ? Colors.red : Theme.of(context).extension<AppColors>()!.primary,
                           ),
                         ),
                       ),
@@ -934,16 +934,16 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                               controller: noteController,
                               keyboardType: TextInputType.text,
                               textInputAction: TextInputAction.next,
-                              cursorColor: kPrimaryColor,
+                              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                               onSaved: (value) {},
                               readOnly: false,
-                              style: const TextStyle(color: kPrimaryColor),
+                              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                               maxLines: 5,
                               minLines: 1,
                               decoration: InputDecoration(
                                 labelText: "Note",
-                                labelStyle: const TextStyle(
-                                    color: kPrimaryColor, fontSize: 16),
+                                labelStyle:  TextStyle(
+                                    color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(),
@@ -960,16 +960,16 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                               controller: termsController,
                               keyboardType: TextInputType.text,
                               textInputAction: TextInputAction.next,
-                              cursorColor: kPrimaryColor,
+                              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                               onSaved: (value) {},
                               readOnly: false,
                               maxLines: 5,
                               minLines: 1,
-                              style: const TextStyle(color: kPrimaryColor),
+                              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                               decoration: InputDecoration(
                                 labelText: "Terms",
-                                labelStyle: const TextStyle(
-                                    color: kPrimaryColor, fontSize: 16),
+                                labelStyle:  TextStyle(
+                                    color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(),
@@ -989,9 +989,9 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                         height: largePadding,
                       ),
                       if (isSubmitLoading)
-                        const Center(
+                         Center(
                           child: CircularProgressIndicator(
-                            color: kPrimaryColor,
+                            color: Theme.of(context).extension<AppColors>()!.primary,
                           ),
                         ), // Show loading indicator
 
@@ -1016,7 +1016,7 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 14),
                               ),
-                              backgroundColor: kPrimaryColor,
+                              backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                             ),
                           ),*/
 
@@ -1036,25 +1036,25 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                                 } else if (invoiceDate == null) {
                                   CustomSnackBar.showSnackBar(context: context,
                                       message: "Please select invoice date",
-                                      color: kRedColor);
+                                      color: Colors.red);
                                 } else if (dueDate == null) {
                                   CustomSnackBar.showSnackBar(context: context,
                                       message: "Please select due date",
-                                      color: kRedColor);
+                                      color: Colors.red);
                                 } else if (selectedStatus.isEmpty) {
                                   CustomSnackBar.showSnackBar(context: context,
                                       message: "Please select status",
-                                      color: kRedColor);
+                                      color: Colors.red);
                                 } else if (selectedInvoiceTemplate.isEmpty) {
                                   CustomSnackBar.showSnackBar(context: context,
                                       message: "Please select invoice template",
-                                      color: kRedColor);
+                                      color: Colors.red);
                                 } else if (selectedCurrency!.isEmpty) {
                                   CustomSnackBar.showSnackBar(context: context,
                                       message: "Please select currency",
-                                      color: kRedColor);
+                                      color: Colors.red);
                                 } else {
-                                  // CustomSnackBar.showSnackBar(context: context, message: "Save", color: kRedColor);
+                                  // CustomSnackBar.showSnackBar(context: context, message: "Save", color: Colors.red);
                                 }
 
                                 /**/
@@ -1064,7 +1064,7 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 14),
                               ),
-                              backgroundColor: kPrimaryColor,
+                              backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                             ),
                           ),
                         ],
@@ -1102,14 +1102,14 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
         CustomSnackBar.showSnackBar(
           context: context,
           message: 'Selected product is incomplete.',
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
         );
       }
     } else {
       CustomSnackBar.showSnackBar(
         context: context,
         message: 'You cannot add more products.',
-        color: kPrimaryColor,
+        color: Theme.of(context).extension<AppColors>()!.primary,
       );
     }
   }
@@ -1151,7 +1151,7 @@ class _UpdateInvoiceState extends State<UpdateInvoiceScreen>{
                     return CheckboxListTile(
                       title: Text(
                         '${tax.name ?? ''} - ${tax.taxValue ?? ''}',
-                        style: const TextStyle(color: kPrimaryColor),
+                        style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       ),
                       value: selectedTaxes.contains(
                           '${tax.name ?? ''} - ${tax.taxValue ?? ''}'),

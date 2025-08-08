@@ -11,6 +11,8 @@ class LoginAndSignupBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppColors>()!;
+
     return Column(
       children: [
         ElevatedButton(
@@ -41,12 +43,12 @@ class LoginAndSignupBtn extends StatelessWidget {
             );
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: kPrimaryLightColor,
+            backgroundColor: AppColors.light.primaryLight,
             elevation: 0,
           ),
-          child: const Text(
+          child: Text(
             "Sign Up",
-            style: TextStyle(color: kPrimaryColor),
+            style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
           ),
         ),
       ],

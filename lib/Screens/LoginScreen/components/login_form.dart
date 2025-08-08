@@ -1,470 +1,335 @@
-import 'package:coincraze/AuthManager.dart';
-import 'package:coincraze/BottomBar.dart';
-import 'package:coincraze/Constants/API.dart';
-import 'package:coincraze/ForgotPassword.dart';
-import 'package:coincraze/SignUp.dart';
-import 'package:coincraze/newKyc.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:quickcash/Screens/ForgotScreen/forgot_pasword_screen.dart';
+import 'package:quickcash/Screens/HomeScreen/home_screen.dart';
+import 'package:quickcash/Screens/LoginScreen/components/PopUpMessagesSnackbar.dart';
+import 'package:quickcash/components/check_already_have_an_account.dart';
+import 'package:quickcash/constants.dart';
+import 'package:quickcash/Screens/SignupScreen/signup_screen.dart';
+import 'package:quickcash/util/auth_manager.dart';
+import 'package:quickcash/util/error_handler.dart';
+import '../models/loginApi.dart';
+import 'package:local_auth/local_auth.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+
+class LoginForm extends StatefulWidget {
+  const LoginForm({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<LoginForm> createState() => _LoginFormState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
-    with SingleTickerProviderStateMixin {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  bool _obscurePassword = true;
-  bool _isLoading = false;
-  late AnimationController _animationController;
-  late Animation<Offset> _slideAnimation;
+class _LoginFormState extends State<LoginForm> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController email = TextEditingController();
+  final TextEditingController password = TextEditingController();
+  final LoginApi _loginApi = LoginApi();
+  final LocalAuthentication _localAuth = LocalAuthentication();
+  bool _obsecureText = true;
+  bool isLoading = false;
+  String? errorMessage;
 
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(seconds: 2),
-      vsync: this,
-    );
-    _slideAnimation =
-        Tween<Offset>(begin: const Offset(2, 0.4), end: Offset.zero).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.ease),
-    );
-    _animationController.forward();
-    _initAuthManager();
+  bool _isPasswordValid(String password) {
+    final regex =
+        RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%&*,.?])(?=.*[0-9]).{8,}$');
+    return regex.hasMatch(password);
   }
 
-  Future<void> _initAuthManager() async {
-    await AuthManager().init();
-    if (AuthManager().email != null) {
+  Future<void> _login() async {
+    if (_formKey.currentState!.validate()) {
       setState(() {
-        emailController.text = AuthManager().email!;
+        isLoading = true;
+        errorMessage = null;
       });
+
+      print("Email: ${email.text}");
+      print("Password: ${password.text}");
+
+      try {
+        final response = await _loginApi.login(email.text, password.text);
+
+        print("Login Response: ${response.toString()}");
+        print('User ID: ${response.userId}');
+        print('Token: ${response.token}');
+        print('Name: ${response.name}');
+        print('Email: ${response.email}');
+        print('Owner Profile: ${response.ownerProfile}');
+        print('KycStatus: ${response.kycStatus}');
+
+        await AuthManager.saveCredentials(email.text, password.text);
+        await AuthManager.login(response.token);
+        await AuthManager.saveUserId(response.userId);
+        await AuthManager.saveUserName(response.name);
+        await AuthManager.saveUserEmail(response.email);
+        await AuthManager.saveUserImage(
+            response.ownerProfile?.toString() ?? '');
+
+        if (response.kycStatus == false) {
+          await AuthManager.saveKycStatus("completed");
+        } else {
+          await AuthManager.saveKycStatus(response.kycStatus.toString());
+        }
+
+        setState(() {
+          isLoading = false;
+        });
+
+        CustomSnackbar.show(context, "Login successful!");
+
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
+        }
+      } catch (error) {
+        print("Login Error: $error");
+
+        setState(() {
+          isLoading = false;
+        });
+
+        // 🔥 Friendly user-facing message
+        String userMessage = getFriendlyErrorMessage(error);
+        CustomSnackbar.show(context, userMessage, isError: true);
+      }
+    }
+  }
+
+  Future<void> _loginWithFingerprint() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
+    try {
+      bool canCheckBiometrics = await _localAuth.canCheckBiometrics;
+      bool isDeviceSupported = await _localAuth.isDeviceSupported();
+
+      if (!canCheckBiometrics || !isDeviceSupported) {
+        setState(() {
+          isLoading = false;
+        });
+        CustomSnackbar.show(context, "Biometric not available on this device",
+            isError: true);
+        return;
+      }
+
+      bool authenticated = await _localAuth.authenticate(
+        localizedReason: 'Please authenticate to log in',
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+          stickyAuth: true,
+        ),
+      );
+
+      if (authenticated) {
+        final credentials = await AuthManager.getCredentials();
+        if (credentials['email'] == null || credentials['password'] == null) {
+          setState(() {
+            isLoading = false;
+          });
+          CustomSnackbar.show(context, "No stored credentials found.",
+              isError: true);
+          return;
+        }
+
+        email.text = credentials['email']!;
+        password.text = credentials['password']!;
+        await _login();
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        CustomSnackbar.show(context, "Fingerprint authentication failed.",
+            isError: true);
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+      });
+      CustomSnackbar.show(context, "Error: $error", isError: true);
     }
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
-    emailController.dispose();
-    passwordController.dispose();
+    email.dispose();
+    password.dispose();
     super.dispose();
   }
 
-  void _togglePasswordVisibility() {
+  void _togglePasswordVisibilty() {
     setState(() {
-      _obscurePassword = !_obscurePassword;
-    });
-  }
-
-  Future<void> _handleLogin() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    final email = emailController.text.trim();
-    final password = passwordController.text;
-
-    if (email.isEmpty || !email.contains('@')) {
-      setState(() {
-        _isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please enter a valid email'),
-          backgroundColor: const Color(0xFFD1493B),
-        ),
-      );
-      return;
-    }
-
-    if (password.isEmpty || password.length < 6) {
-      setState(() {
-        _isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Password must be at least 6 characters'),
-          backgroundColor: const Color(0xFFD1493B),
-        ),
-      );
-      return;
-    }
-
-    try {
-      print('Sending request to $baseUrl/api/auth/login');
-      final response = await http.post(
-        Uri.parse('$baseUrl/api/auth/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({'email': email, 'password': password}),
-      );
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
-      final loginResponse = json.decode(response.body);
-
-      if (response.statusCode == 200) {
-        await AuthManager().saveLoginDetails(loginResponse);
-        print(
-          'User data saved: Token = ${AuthManager().token}, UserId = ${AuthManager().userId}',
-        );
-
-        if (AuthManager().kycCompleted == true) {
-          Navigator.pushReplacement(
-            context,
-            CupertinoPageRoute(builder: (context) => MainScreen()),
-          );
-        } else {
-          Navigator.pushReplacement(
-            context,
-            CupertinoPageRoute(builder: (context) => NewKYC()),
-          );
-        }
-      } else {
-        final error = loginResponse['error'] ?? 'Login failed';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(error),
-            backgroundColor: const Color(0xFFD1493B),
-          ),
-        );
-      }
-    } catch (e) {
-      print('Error occurred: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: const Color(0xFFD1493B),
-        ),
-      );
-    }
-
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _handleBiometricLogin() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      bool authenticated = await AuthManager().authenticateWithBiometrics();
-      if (authenticated) {
-        if (AuthManager().email != null) {
-          setState(() {
-            emailController.text = AuthManager().email!;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Fingerprint verified. Please enter your password.',
-              ),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'No stored email found. Please login manually first.',
-              ),
-              backgroundColor: const Color(0xFFD1493B),
-            ),
-          );
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Biometric authentication failed'),
-            backgroundColor: const Color(0xFFD1493B),
-          ),
-        );
-      }
-    } catch (e) {
-      print('Biometric login error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: const Color(0xFFD1493B),
-        ),
-      );
-    }
-
-    setState(() {
-      _isLoading = false;
+      _obsecureText = !_obsecureText;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final isTablet = screenWidth > 600;
-
-    return Scaffold(
-      body: Container(
-        width: screenWidth, // Full screen width
-        height: screenHeight, // Full screen height
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: const AssetImage('assets/images/e.jpg'),
-            fit: BoxFit.cover, // Image covers entire screen
-            colorFilter: ColorFilter.mode(
-              Colors.black.withOpacity(0.7), // Original opacity
-              BlendMode.darken,
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(defaultPadding),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            TextFormField(
+              controller: email,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+              cursorColor: Color(0xFF9568ff),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your email';
+                }
+                final regex =
+                    RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+                if (!regex.hasMatch(value)) {
+                  return 'Please enter a valid email address';
+                }
+                return null;
+              },
+              decoration: InputDecoration(
+                hintText: "Your Email",
+                prefixIcon: Padding(
+                  padding: EdgeInsets.all(defaultPadding),
+                  child: Icon(Icons.email, color: AppColors.light.primary,),
+                ),
+              ),
             ),
-          ),
-          gradient: const LinearGradient(
-            colors: [Color.fromARGB(255, 3, 4, 4), Colors.white], // Original gradient
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                padding: EdgeInsets.symmetric(
-                  horizontal: isTablet ? screenWidth * 0.15 : 32.0,
-                  vertical: isTablet ? 20.0 : 10.0,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: defaultPadding),
+              child: TextFormField(
+                controller: password,
+                textInputAction: TextInputAction.done,
+                obscureText: _obsecureText,
+                cursorColor: Color(0xFF9568ff),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  if (!_isPasswordValid(value)) {
+                    return 'Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character.';
+                  }
+                  return null;
+                },
+                decoration: InputDecoration(
+                  hintText: "Your Password",
+                  prefixIcon: Padding(
+                    padding: EdgeInsets.all(defaultPadding),
+                    child: Icon(Icons.lock, color: AppColors.light.primary,),
+                  ),
+                  suffixIcon: IconButton(
+                    onPressed: _togglePasswordVisibilty,
+                    icon: Icon(
+                      _obsecureText ? Icons.visibility : Icons.visibility_off,
+                      color: AppColors.light.primary,
+                    ),
+                  ),
                 ),
-                child: Column(
-                  children: [
-                    SizedBox(height: screenHeight * 0.05), // Adjusted spacing
-                    SlideTransition(
-                      position: _slideAnimation,
-                      child: Image.asset(
-                        'assets/images/whtLogo.png',
-                        width: isTablet ? 300 : 260,
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ForgotPasswordScreen(),
                       ),
+                    );
+                  },
+                  child:  Text(
+                    'Forgot Password?',
+                    style: TextStyle(
+                      color: AppColors.light.primary,
+                      fontWeight: FontWeight.bold,
                     ),
-                    SizedBox(height: screenHeight * 0.02),
-                    SlideTransition(
-                      position: _slideAnimation,
-                      child: Text(
-                        "LOGIN",
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                          fontSize: isTablet ? 30.0 : 27.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white54,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.01),
-                    SlideTransition(
-                      position: _slideAnimation,
-                      child: Text(
-                        "Login with email and password or use fingerprint",
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                          fontSize: isTablet ? 16.0 : 14.0,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.03),
-                    SlideTransition(
-                      position: _slideAnimation,
-                      child: TextField(
-                        controller: emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        style: GoogleFonts.poppins(
-                          fontSize: isTablet ? 18.0 : 16.0,
-                          color: Colors.black,
-                        ),
-                        decoration: InputDecoration(
-                          prefixIcon: const Icon(
-                            Icons.email,
-                            color: Colors.grey,
-                          ),
-                          hintText: 'Email',
-                          hintStyle: GoogleFonts.poppins(color: Colors.grey),
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(isTablet ? 18.0 : 15.0),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.015),
-                    SlideTransition(
-                      position: _slideAnimation,
-                      child: TextField(
-                        controller: passwordController,
-                        obscureText: _obscurePassword,
-                        style: GoogleFonts.poppins(
-                          fontSize: isTablet ? 18.0 : 16.0,
-                          color: Colors.black,
-                        ),
-                        decoration: InputDecoration(
-                          prefixIcon: const Icon(
-                            Icons.lock,
-                            color: Colors.grey,
-                          ),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: Colors.grey,
-                            ),
-                            onPressed: _togglePasswordVisibility,
-                          ),
-                          hintText: 'Password',
-                          hintStyle: GoogleFonts.poppins(color: Colors.grey),
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(isTablet ? 18.0 : 15.0),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SlideTransition(
-                      position: _slideAnimation,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) => ForgotPassword(),
-                              ),
-                            );
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: defaultPadding),
+            if (isLoading)
+              const CircularProgressIndicator(
+                color: Color(0xFF9568ff),
+              ),
+            if (errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  errorMessage!,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
+            const SizedBox(height: 35),
+            ElevatedButton(
+              onPressed: isLoading ? null : _login,
+              child: const Text("Sign In"),
+            ),
+            const SizedBox(height: 20),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                    width: 120,
+                    child: Divider(
+                      color: Color(0xFF9568ff),
+                      thickness: 1,
+                    )),
+                SizedBox(
+                  width: 10,
+                ),
+                Text("Or"),
+                SizedBox(
+                  width: 10,
+                ),
+                SizedBox(
+                    width: 120,
+                    child: Divider(
+                      color: Color(0xFF9568ff),
+                      thickness: 1,
+                    )),
+              ],
+            ),
+            const SizedBox(height: 10),
+            FutureBuilder<bool>(
+              future: _localAuth.canCheckBiometrics,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.data == true) {
+                  return GestureDetector(
+                    onTap: isLoading
+                        ? null
+                        : () async {
+                            await _loginWithFingerprint(); // Properly call the async function
                           },
-                          child: Text(
-                            'Forgot Password?',
-                            style: GoogleFonts.poppins(
-                              fontSize: isTablet ? 16.0 : 14.0,
-                              color: const Color.fromARGB(255, 0, 0, 0),
-                            ),
-                          ),
-                        ),
-                      ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.fingerprint, size: 20),
+                        SizedBox(width: 10),
+                        Text("Login With FingerPrints"),
+                      ],
                     ),
-                    SizedBox(height: screenHeight * 0.015),
-                    SlideTransition(
-                      position: _slideAnimation,
-                      child: _isLoading
-                          ? const CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Color(0xFFD1493B),
-                              ),
-                            )
-                          : Column(
-                              children: [
-                                ElevatedButton(
-                                  onPressed: _handleLogin,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color.fromARGB(255, 0, 0, 0),
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: isTablet ? 40.0 : 32.0,
-                                      vertical: isTablet ? 18.0 : 16.0,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(isTablet ? 18.0 : 15.0),
-                                    ),
-                                    minimumSize: Size(double.infinity, isTablet ? 55 : 50),
-                                  ),
-                                  child: Text(
-                                    'Login',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: isTablet ? 18.0 : 16.0,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: screenHeight * 0.015),
-                                ElevatedButton(
-                                  onPressed: _handleBiometricLogin,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color.fromARGB(255, 0, 0, 0),
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: isTablet ? 40.0 : 32.0,
-                                      vertical: isTablet ? 18.0 : 16.0,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(isTablet ? 18.0 : 15.0),
-                                    ),
-                                    minimumSize: Size(double.infinity, isTablet ? 55 : 50),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                        Icons.fingerprint,
-                                        color: Colors.white,
-                                        size: 24,
-                                      ),
-                                      const SizedBox(width: 8.0),
-                                      Text(
-                                        'Login with Fingerprint',
-                                        style: GoogleFonts.poppins(
-                                          fontSize: isTablet ? 18.0 : 16.0,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                    ),
-                    SizedBox(height: screenHeight * 0.04),
-                    SlideTransition(
-                      position: _slideAnimation,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Don't have an account? ",
-                            style: GoogleFonts.poppins(
-                              fontSize: isTablet ? 16.0 : 14.0,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (context) => const SignUpScreen(),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              'Sign Up',
-                              style: GoogleFonts.poppins(
-                                fontSize: isTablet ? 16.0 : 14.0,
-                                color: const Color.fromARGB(255, 11, 11, 11),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+            const SizedBox(height: 30),
+            AlreadyHaveAnAccountCheck(
+              press: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SignUpScreen(),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );

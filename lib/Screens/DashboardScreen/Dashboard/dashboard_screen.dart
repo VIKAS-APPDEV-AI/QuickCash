@@ -3,7 +3,6 @@ import 'package:country_flags/country_flags.dart';
 import 'package:excel/excel.dart' as excel_;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:open_file/open_file.dart';
@@ -13,22 +12,28 @@ import 'package:provider/provider.dart';
 import 'package:quickcash/Screens/CryptoScreen/BuyAndSell/CryptoBuyAndSellScreen/crypto_sell_exchange_screen.dart';
 import 'package:quickcash/Screens/CryptoScreen/WalletAddress/model/walletAddressModel.dart';
 import 'package:quickcash/Screens/CryptoScreen/WalletAddress/walletAddress_screen.dart';
+import 'package:quickcash/Screens/CryptoScreen/utils/CryptoImageUtils.dart';
 import 'package:quickcash/Screens/DashboardScreen/AddMoneyScreen/add_money_screen.dart';
 import 'package:quickcash/Screens/DashboardScreen/AllAccountsScreen/allAccountsScreen.dart';
 import 'package:quickcash/Screens/DashboardScreen/Dashboard/AccountsList/accountsListModel.dart';
 import 'package:quickcash/Screens/DashboardScreen/Dashboard/DashboardBanner.dart';
 import 'package:quickcash/Screens/DashboardScreen/Dashboard/KycStatusWidgets/KycStatusWidgets.dart';
+import 'package:quickcash/Screens/DashboardScreen/Dashboard/ThemeToggle.dart';
 import 'package:quickcash/Screens/DashboardScreen/Dashboard/TransactionList/transactionListModel.dart';
 import 'package:quickcash/Screens/DashboardScreen/DashboardProvider/DashboardProvider.dart';
 import 'package:quickcash/Screens/DashboardScreen/ExchangeScreen/exchangeMoneyScreen/exchange_money_screen.dart';
 import 'package:quickcash/Screens/DashboardScreen/SendMoneyScreen/send_money_screen.dart';
 import 'package:quickcash/Screens/HomeScreen/ViewAllTransactionScreen.dart';
 import 'package:quickcash/Screens/LoginScreen/login_screen.dart';
+import 'package:quickcash/Screens/TicketsScreen/TicketScreen/DashboardTicketScreen.dart';
+import 'package:quickcash/Screens/TicketsScreen/TicketScreen/tickets_screen.dart';
 import 'package:quickcash/Screens/TransactionScreen/TransactionDetailsScreen/transaction_details_screen.dart';
 import 'package:quickcash/components/background.dart';
 import 'package:quickcash/constants.dart';
 import 'package:quickcash/util/auth_manager.dart';
 import 'package:quickcash/util/customSnackBar.dart';
+import 'package:quickcash/utils/themeProvider.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'dart:io';
 import 'dart:math';
@@ -51,19 +56,16 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   bool _hasShownTokenDialog = false;
   bool _hasReloadedAfterLogin = false;
-  bool _isHovered = false;
 
   @override
   void initState() {
     super.initState();
-    // Initialize AnimationController
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 650),
       vsync: this,
     );
 
-    // Define animations
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 2.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeIn),
     );
 
@@ -79,32 +81,8 @@ class _DashboardScreenState extends State<DashboardScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _handleInitialState(context);
-      // Start animation when the page loads
       _controller.forward();
-      // Uncomment the line below to enable pre-caching of crypto images
-      // _precacheCryptoImages();
     });
-  }
-
-  // Optional: Pre-cache crypto images
-  void _precacheCryptoImages() {
-    const cryptoCoins = [
-      'BTC',
-      'BCH',
-      'BNB',
-      'ADA',
-      'SOL',
-      'DOGE',
-      'LTC',
-      'ETH',
-      'SHIB'
-    ];
-    for (var coin in cryptoCoins) {
-      precacheImage(
-        CachedNetworkImageProvider(_getImageForCoin(coin)),
-        context,
-      );
-    }
   }
 
   @override
@@ -115,9 +93,6 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   Future<void> _handleInitialState(BuildContext context) async {
     final provider = Provider.of<DashboardProvider>(context, listen: false);
-    print('Checking initial state - TokenExpired: ${provider.isTokenExpired}, '
-        'FreshLogin: ${AuthManager.isFreshLogin()}');
-
     if (provider.isTokenExpired && !_hasShownTokenDialog) {
       setState(() => _hasShownTokenDialog = true);
       await mTokenExpireDialog(context).then((value) {
@@ -137,31 +112,6 @@ class _DashboardScreenState extends State<DashboardScreen>
       }).whenComplete(() {
         setState(() => _hasReloadedAfterLogin = false);
       });
-    }
-  }
-
-  String _getImageForCoin(String coin) {
-    switch (coin) {
-      case "BTC":
-        return 'https://assets.coincap.io/assets/icons/btc@2x.png';
-      case "BCH":
-        return 'https://assets.coincap.io/assets/icons/bch@2x.png';
-      case "BNB":
-        return 'https://assets.coincap.io/assets/icons/bnb@2x.png';
-      case "ADA":
-        return 'https://assets.coincap.io/assets/icons/ada@2x.png';
-      case "SOL":
-        return 'https://assets.coincap.io/assets/icons/sol@2x.png';
-      case "DOGE":
-        return 'https://assets.coincap.io/assets/icons/doge@2x.png';
-      case "LTC":
-        return 'https://assets.coincap.io/assets/icons/ltc@2x.png';
-      case "ETH":
-        return 'https://assets.coincap.io/assets/icons/eth@2x.png';
-      case "SHIB":
-        return 'https://assets.coincap.io/assets/icons/shib@2x.png';
-      default:
-        return 'assets/icons/default.png';
     }
   }
 
@@ -197,7 +147,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     return (await showDialog<bool>(
           context: context,
           barrierDismissible: false,
-          barrierColor: kPrimaryColor,
+          barrierColor: Theme.of(context).extension<AppColors>()!.primary,
           builder: (context) => AlertDialog(
             title: const Text("Login Again"),
             content: const Text("Token has been expired, Please Login Again!"),
@@ -213,7 +163,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                         builder: (context) => const LoginScreen()),
                   );
                 },
-                child: const Text("OK", style: TextStyle(color: kPrimaryColor)),
+                child: Text("OK",
+                    style: TextStyle(
+                        color:
+                            Theme.of(context).extension<AppColors>()!.primary)),
               ),
             ],
           ),
@@ -289,7 +242,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       CustomSnackBar.showSnackBar(
           context: context,
           message: "Failed to download Excel: $e",
-          color: kRedColor);
+          color: Colors.red);
     }
   }
 
@@ -364,86 +317,105 @@ class _DashboardScreenState extends State<DashboardScreen>
       CustomSnackBar.showSnackBar(
           context: context,
           message: "Failed to download PDF: $e",
-          color: kRedColor);
+          color: Colors.red);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final appColors = Theme.of(context).extension<AppColors>();
+    final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
+
     return Consumer<DashboardProvider>(
       builder: (context, provider, child) {
         try {
-          return RefreshIndicator(
-            onRefresh: provider.refreshData,
-            child: Background(
-              child: SingleChildScrollView(
-                child: provider.isLoading
-                    ? const Center(
-                        child:
-                            SpinKitWaveSpinner(color: kPrimaryColor, size: 75))
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 25),
-                          FadeTransition(
-                            opacity: _fadeAnimation,
-                            child: CheckKycStatus(),
-                          ),
-                          const SizedBox(height: 0),
-                          if (AuthManager.getKycStatus() == "completed") ...[
-                            SlideTransition(
-                              position: _slideFromLeftAnimation,
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Welcome ',
-                                      style: TextStyle(
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      '${AuthManager.getUserName() ?? 'User'}!',
-                                      style: const TextStyle(
-                                        fontSize: 23,
-                                        fontWeight: FontWeight.bold,
-                                        color: kPrimaryColor,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            SlideTransition(
-                              position: _slideFromRightAnimation,
-                              child: provider.selectedCardType == "fiat"
-                                  ? _buildFiatSection(context, provider)
-                                  : provider.selectedCardType == "crypto"
-                                      ? _buildCryptoSection(context, provider)
-                                      : provider.selectedCardType == "card"
-                                          ? _buildCardSection(context, provider)
-                                          : _buildSavingsSection(
-                                              context, provider),
-                            ),
+          return Scaffold(
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const DashboardTicketScreen()),
+                );
+              },
+              backgroundColor:
+                  Theme.of(context).extension<AppColors>()!.primary,
+              child: const Icon(Icons.chat, color: Colors.white),
+              tooltip: 'Open Chat',
+            ),
+            body: RefreshIndicator(
+              onRefresh: provider.refreshData,
+              child: Background(
+                child: SingleChildScrollView(
+                  child: provider.isLoading
+                      ? _buildSkeletonLoading(context)
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 25),
                             FadeTransition(
                               opacity: _fadeAnimation,
-                              child: _buildActionButtons(context, provider),
+                              child: CheckKycStatus(),
                             ),
-                            const SizedBox(height: largePadding),
-                            SlideTransition(
-                              position: _slideFromLeftAnimation,
-                              child:
-                                  _buildTransactionSection(context, provider),
-                            ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 0),
+                            if (AuthManager.getKycStatus() == "completed") ...[
+                              SlideTransition(
+                                position: _slideFromLeftAnimation,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Welcome ',
+                                        style: TextStyle(
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${AuthManager.getUserName() ?? 'User'}!',
+                                        style: TextStyle(
+                                          fontSize: 23,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context)
+                                              .extension<AppColors>()!
+                                              .primary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              SlideTransition(
+                                position: _slideFromRightAnimation,
+                                child: provider.selectedCardType == "fiat"
+                                    ? _buildFiatSection(context, provider)
+                                    : provider.selectedCardType == "crypto"
+                                        ? _buildCryptoSection(context, provider)
+                                        : provider.selectedCardType == "card"
+                                            ? _buildCardSection(
+                                                context, provider)
+                                            : _buildSavingsSection(
+                                                context, provider),
+                              ),
+                              FadeTransition(
+                                opacity: _fadeAnimation,
+                                child: _buildActionButtons(context, provider),
+                              ),
+                              const SizedBox(height: largePadding),
+                              SlideTransition(
+                                position: _slideFromLeftAnimation,
+                                child:
+                                    _buildTransactionSection(context, provider),
+                              ),
+                              const SizedBox(height: 20),
+                            ],
                           ],
-                        ],
-                      ),
+                        ),
+                ),
               ),
             ),
           );
@@ -453,6 +425,77 @@ class _DashboardScreenState extends State<DashboardScreen>
               child: Text('Something went wrong. Please try again.'));
         }
       },
+    );
+  }
+
+  Widget _buildSkeletonLoading(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 25),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            height: 50,
+            width: double.infinity,
+            color: Colors.white,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Container(
+              height: 30,
+              width: 200,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Container(
+            margin: const EdgeInsets.all(15),
+            padding: const EdgeInsets.all(15),
+            decoration: _cardDecoration(),
+            child: Column(
+              children: [
+                Container(
+                  height: 20,
+                  width: 100,
+                  color: Colors.white,
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  height: 168,
+                  width: 340,
+                  color: Colors.white,
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  height: 5,
+                  width: 50,
+                  color: Colors.white,
+                ),
+              ],
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(10),
+            color: Colors.white,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(
+                4,
+                (index) => Container(
+                  width: 50,
+                  height: 80,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          _buildSkeletonTransactionSection(context),
+        ],
+      ),
     );
   }
 
@@ -485,23 +528,29 @@ class _DashboardScreenState extends State<DashboardScreen>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('FIAT',
+                  Text('FIAT',
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: kPrimaryColor)),
+                          color: Theme.of(context)
+                              .extension<AppColors>()!
+                              .primary)),
                   InkWell(
                     onTap: () {
                       provider.setSelectedCardType("crypto");
                       setState(() {});
                     },
-                    hoverColor: kPrimaryColor.withOpacity(0.1),
+                    hoverColor: Theme.of(context)
+                        .extension<AppColors>()!
+                        .primary
+                        .withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
-                    child: const Padding(
+                    child: Padding(
                       padding: EdgeInsets.all(4.0),
                       child: Icon(
                         Icons.currency_exchange_outlined,
-                        color: kPrimaryColor,
+                        color:
+                            Theme.of(context).extension<AppColors>()!.primary,
                         size: 24,
                       ),
                     ),
@@ -510,7 +559,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               ),
               const SizedBox(height: 10),
               if (provider.isLoading)
-                const Center(child: CircularProgressIndicator())
+                _buildSkeletonFiatCard(context)
               else if (provider.accountsListData.isEmpty &&
                   provider.errorMessage != null &&
                   provider.isTokenExpired == true)
@@ -548,13 +597,86 @@ class _DashboardScreenState extends State<DashboardScreen>
                     AnimatedSmoothIndicator(
                       activeIndex: provider.currentFiatPage,
                       count: provider.accountsListData.length,
-                      effect: const ExpandingDotsEffect(
-                          activeDotColor: kPrimaryColor,
+                      effect: ExpandingDotsEffect(
+                          activeDotColor:
+                              Theme.of(context).extension<AppColors>()!.primary,
                           dotHeight: 5,
                           dotWidth: 5),
                     ),
                   ],
                 ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonFiatCard(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Card(
+        elevation: 5,
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(defaultPadding)),
+        child: Container(
+          width: 340,
+          padding: const EdgeInsets.all(defaultPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: 35,
+                    height: 35,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Container(
+                    width: 50,
+                    height: 20,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+              const SizedBox(height: defaultPadding),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: 50,
+                    height: 20,
+                    color: Colors.white,
+                  ),
+                  Container(
+                    width: 100,
+                    height: 20,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+              const SizedBox(height: defaultPadding),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: 50,
+                    height: 20,
+                    color: Colors.white,
+                  ),
+                  Container(
+                    width: 80,
+                    height: 20,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -576,23 +698,29 @@ class _DashboardScreenState extends State<DashboardScreen>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('CRYPTO',
+                  Text('CRYPTO',
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: kPrimaryColor)),
+                          color: Theme.of(context)
+                              .extension<AppColors>()!
+                              .primary)),
                   InkWell(
                     onTap: () {
                       provider.setSelectedCardType("fiat");
                       setState(() {});
                     },
-                    hoverColor: kPrimaryColor.withOpacity(0.1),
+                    hoverColor: Theme.of(context)
+                        .extension<AppColors>()!
+                        .primary
+                        .withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
-                    child: const Padding(
+                    child: Padding(
                       padding: EdgeInsets.all(4.0),
                       child: Icon(
                         Icons.currency_exchange_outlined,
-                        color: kPrimaryColor,
+                        color:
+                            Theme.of(context).extension<AppColors>()!.primary,
                         size: 24,
                       ),
                     ),
@@ -601,7 +729,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               ),
               const SizedBox(height: 10),
               if (provider.isLoading)
-                const Center(child: CircularProgressIndicator())
+                _buildSkeletonCryptoCard(context)
               else if (provider.walletAddressList.isEmpty &&
                   provider.errorMessage != null &&
                   !provider.isTokenExpired)
@@ -639,13 +767,70 @@ class _DashboardScreenState extends State<DashboardScreen>
                     AnimatedSmoothIndicator(
                       activeIndex: provider.currentCryptoPage,
                       count: provider.walletAddressList.length,
-                      effect: const ExpandingDotsEffect(
-                          activeDotColor: kPrimaryColor,
+                      effect: ExpandingDotsEffect(
+                          activeDotColor:
+                              Theme.of(context).extension<AppColors>()!.primary,
                           dotHeight: 5,
                           dotWidth: 5),
                     ),
                   ],
                 ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonCryptoCard(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Card(
+        elevation: 5,
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(defaultPadding)),
+        child: Container(
+          width: 340,
+          padding: const EdgeInsets.all(defaultPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Container(
+                    width: 50,
+                    height: 20,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+              const SizedBox(height: defaultPadding),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: 50,
+                    height: 20,
+                    color: Colors.white,
+                  ),
+                  Container(
+                    width: 80,
+                    height: 20,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -660,13 +845,13 @@ class _DashboardScreenState extends State<DashboardScreen>
         margin: const EdgeInsets.all(15),
         padding: const EdgeInsets.all(15),
         decoration: _cardDecoration(),
-        child: const Column(
+        child: Column(
           children: [
             Text('CARD',
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: kPrimaryColor)),
+                    color: Theme.of(context).extension<AppColors>()!.primary)),
             SizedBox(height: 10),
             Center(
                 child: Text('Card section not implemented yet.',
@@ -685,13 +870,13 @@ class _DashboardScreenState extends State<DashboardScreen>
         margin: const EdgeInsets.all(15),
         padding: const EdgeInsets.all(15),
         decoration: _cardDecoration(),
-        child: const Column(
+        child: Column(
           children: [
             Text('SAVINGS',
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: kPrimaryColor)),
+                    color: Theme.of(context).extension<AppColors>()!.primary)),
             SizedBox(height: 10),
             Center(
                 child: Text('Savings section not implemented yet.',
@@ -729,17 +914,19 @@ class _DashboardScreenState extends State<DashboardScreen>
             elevation: 4,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
-              side: BorderSide(color: kPrimaryColor.withOpacity(0.3), width: 1),
+              side: BorderSide(
+                  color: Theme.of(context)
+                      .extension<AppColors>()!
+                      .primary
+                      .withOpacity(0.3),
+                  width: 1),
             ),
             margin: EdgeInsets.symmetric(
-              horizontal: MediaQuery.of(context).size.width *
-                  0.05, // 5% of screen width
-              vertical: MediaQuery.of(context).size.height *
-                  0.01, // 1% of screen height
+              horizontal: MediaQuery.of(context).size.width * 0.05,
+              vertical: MediaQuery.of(context).size.height * 0.01,
             ),
             child: Padding(
-              padding: EdgeInsets.all(MediaQuery.of(context).size.width *
-                  0.02), // 2% of screen width
+              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -749,9 +936,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                     child: Text(
                       'Download Transaction List -',
                       style: TextStyle(
-                        fontSize: MediaQuery.of(context).size.width *
-                            0.04, // Responsive font size
-                        color: kPrimaryColor,
+                        fontSize: MediaQuery.of(context).size.width * 0.04,
+                        color:
+                            Theme.of(context).extension<AppColors>()!.primary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -764,9 +951,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                         IconButton(
                           icon: Icon(
                             Icons.download,
-                            color: kPrimaryColor,
-                            size: MediaQuery.of(context).size.width *
-                                0.06, // Responsive icon size
+                            color: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary,
+                            size: MediaQuery.of(context).size.width * 0.06,
                           ),
                           onPressed: () => _downloadExcel(context, provider),
                           tooltip: 'Download Excel',
@@ -775,7 +963,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                         IconButton(
                           icon: Icon(
                             Icons.picture_as_pdf,
-                            color: kPrimaryColor,
+                            color: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary,
                             size: MediaQuery.of(context).size.width * 0.06,
                           ),
                           onPressed: () => _downloadPDF(context, provider),
@@ -791,28 +981,27 @@ class _DashboardScreenState extends State<DashboardScreen>
           const SizedBox(height: 10),
           Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: MediaQuery.of(context).size.width *
-                  0.05, // 5% of screen width
-              vertical: MediaQuery.of(context).size.height *
-                  0.01, // 1% of screen height
+              horizontal: MediaQuery.of(context).size.width * 0.05,
+              vertical: MediaQuery.of(context).size.height * 0.01,
             ),
             child: Card(
               color: Colors.white.withOpacity(0.9),
               elevation: 4,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
-                side:
-                    BorderSide(color: kPrimaryColor.withOpacity(0.3), width: 1),
+                side: BorderSide(
+                    color: Theme.of(context)
+                        .extension<AppColors>()!
+                        .primary
+                        .withOpacity(0.3),
+                    width: 1),
               ),
               child: SizedBox(
-                height: MediaQuery.of(context).size.width *
-                    0.25, // Height scales with width (25% of screen width)
-                width:
-                    double.infinity, // Ensures card takes full available width
+                height: MediaQuery.of(context).size.width * 0.25,
+                width: double.infinity,
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    vertical: MediaQuery.of(context).size.height *
-                        0.01, // 1% of screen height
+                    vertical: MediaQuery.of(context).size.height * 0.01,
                   ),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
@@ -828,32 +1017,29 @@ class _DashboardScreenState extends State<DashboardScreen>
                               children: [
                                 Padding(
                                   padding: EdgeInsets.symmetric(
-                                    horizontal: constraints.maxWidth *
-                                        0.05, // 5% of card width
-                                    vertical: constraints.maxHeight *
-                                        0.1, // 10% of card height
+                                    horizontal: constraints.maxWidth * 0.05,
+                                    vertical: constraints.maxHeight * 0.1,
                                   ),
                                   child: Text(
                                     "Recent Transaction -",
                                     style: TextStyle(
-                                      color: kPrimaryColor,
-                                      fontSize: constraints.maxWidth *
-                                          0.045, // 4.5% of card width
+                                      color: Theme.of(context)
+                                          .extension<AppColors>()!
+                                          .primary,
+                                      fontSize: constraints.maxWidth * 0.045,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                                 Padding(
                                   padding: EdgeInsets.symmetric(
-                                    horizontal: constraints.maxWidth *
-                                        0.05, // 5% of card width
+                                    horizontal: constraints.maxWidth * 0.05,
                                   ),
                                   child: Text(
                                     'Showing recent transaction for the selected Card',
                                     style: TextStyle(
                                       color: Colors.grey,
-                                      fontSize: constraints.maxWidth *
-                                          0.03, // 3% of card width
+                                      fontSize: constraints.maxWidth * 0.03,
                                     ),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
@@ -862,21 +1048,18 @@ class _DashboardScreenState extends State<DashboardScreen>
                               ],
                             ),
                           ),
-                          Container(
-                            width: 1,
-                            height: constraints.maxHeight *
-                                0.6, // 60% of card height
-                            color: kBlackColor,
-                            margin: EdgeInsets.symmetric(
-                                horizontal: constraints.maxWidth *
-                                    0.02), // 2% of card width
-                          ),
+                          // Container(
+                          //   width: 1,
+                          //   height: constraints.maxHeight * 0.6,
+                          //   color: AppColors.light.hint,
+                          //   margin: EdgeInsets.symmetric(
+                          //       horizontal: constraints.maxWidth * 0.02),
+                          // ),
                           Flexible(
                             flex: 1,
                             child: Padding(
                               padding: EdgeInsets.only(
-                                  right: constraints.maxWidth *
-                                      0.02), // 2% of card width
+                                  right: constraints.maxWidth * 0.02),
                               child: InkWell(
                                 onTap: () => Navigator.push(
                                   context,
@@ -890,21 +1073,20 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 highlightColor: Colors.transparent,
                                 borderRadius: BorderRadius.circular(8),
                                 child: Card(
-                                  color: kPrimaryColor,
+                                  color: Theme.of(context)
+                                      .extension<AppColors>()!
+                                      .primary,
                                   child: Padding(
                                     padding: EdgeInsets.symmetric(
-                                      horizontal: constraints.maxWidth *
-                                          0.03, // 3% of card width
-                                      vertical: constraints.maxHeight *
-                                          0.2, // 20% of card height
+                                      horizontal: constraints.maxWidth * 0.03,
+                                      vertical: constraints.maxHeight * 0.2,
                                     ),
                                     child: Text(
                                       'View All',
                                       style: TextStyle(
-                                        fontSize: constraints.maxWidth *
-                                            0.035, // 3.5% of card width
+                                        fontSize: constraints.maxWidth * 0.035,
                                         fontWeight: FontWeight.bold,
-                                        color: kWhiteColor,
+                                        color: Colors.white,
                                       ),
                                     ),
                                   ),
@@ -921,14 +1103,14 @@ class _DashboardScreenState extends State<DashboardScreen>
             ),
           ),
           const SizedBox(height: smallPadding),
-          if (provider.selectedCardType == "crypto") ...[
-            if (provider.isTransactionLoading)
-              const Center(child: CircularProgressIndicator())
-            else if (provider.errorMessage != null && !provider.isTokenExpired)
+          if (provider.isTransactionLoading)
+            _buildSkeletonTransactionSection(context)
+          else if (provider.selectedCardType == "crypto") ...[
+            if (provider.errorMessage != null && !provider.isTokenExpired)
               SizedBox(
                 height: 190,
                 child: Card(
-                  color: kPrimaryColor,
+                  color: Theme.of(context).extension<AppColors>()!.primary,
                   elevation: 4,
                   child: Center(
                       child: Text(provider.errorMessage!,
@@ -944,16 +1126,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                   padding:
                       const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                   child: Card(
-                    color: kPrimaryColor,
+                    color: Theme.of(context).extension<AppColors>()!.primary,
                     elevation: 4,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Lottie.asset('assets/lottie/NoTransactions.json',
                                 height: 100),
-                            const SizedBox(height: 0),
+                            const SizedBox(width: 10),
                             const Text("You haven’t made any transactions yet",
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 13)),
@@ -973,9 +1156,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     .toList(),
               ),
           ] else ...[
-            if (provider.isTransactionLoading)
-              const Center(child: CircularProgressIndicator())
-            else if (provider.errorTransactionMessage != null &&
+            if (provider.errorTransactionMessage != null &&
                 !provider.isTokenExpired)
               SizedBox(
                 height: 140,
@@ -984,16 +1165,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                   padding:
                       const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                   child: Card(
-                    color: kPrimaryColor,
+                    color: Theme.of(context).extension<AppColors>()!.primary,
                     elevation: 4,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Lottie.asset('assets/lottie/NoTransactions.json',
                                 height: 87),
-                            const SizedBox(height: 0),
+                            const SizedBox(width: 10),
                             const Text("You haven’t made any transactions yet",
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 13)),
@@ -1012,16 +1194,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                   padding:
                       const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                   child: Card(
-                    color: kPrimaryColor,
+                    color: Theme.of(context).extension<AppColors>()!.primary,
                     elevation: 4,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Lottie.asset('assets/lottie/NoTransactions.json',
                                 height: 100),
-                            const SizedBox(height: 0),
+                            const SizedBox(width: 10),
                             const Text("You haven’t made any transactions yet",
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 14)),
@@ -1046,6 +1229,202 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
+  Widget _buildSkeletonTransactionSection(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            height: 100,
+            width: double.infinity,
+            color: Colors.white,
+          ),
+          Card(
+            color: Colors.white.withOpacity(0.9),
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+              side: BorderSide(
+                  color: Theme.of(context)
+                      .extension<AppColors>()!
+                      .primary
+                      .withOpacity(0.3),
+                  width: 1),
+            ),
+            margin: EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width * 0.05,
+              vertical: MediaQuery.of(context).size.height * 0.01,
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: 150,
+                    height: 20,
+                    color: Colors.white,
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        width: 30,
+                        height: 30,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 10),
+                      Container(
+                        width: 30,
+                        height: 30,
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width * 0.05,
+              vertical: MediaQuery.of(context).size.height * 0.01,
+            ),
+            child: Card(
+              color: Colors.white.withOpacity(0.9),
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: BorderSide(
+                    color: Theme.of(context)
+                        .extension<AppColors>()!
+                        .primary
+                        .withOpacity(0.3),
+                    width: 1),
+              ),
+              child: SizedBox(
+                height: MediaQuery.of(context).size.width * 0.25,
+                width: double.infinity,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: MediaQuery.of(context).size.height * 0.01,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        flex: 2,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 150,
+                              height: 20,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(height: 10),
+                            Container(
+                              width: 200,
+                              height: 20,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: 1,
+                        height: MediaQuery.of(context).size.width * 0.15,
+                        color: Colors.black,
+                      ),
+                      Flexible(
+                        flex: 1,
+                        child: Container(
+                          width: 80,
+                          height: 40,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: smallPadding),
+          Column(
+            children: List.generate(
+              3,
+              (index) => Card(
+                margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  side: BorderSide(color: Colors.grey.shade300, width: 1),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 150,
+                              height: 20,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              width: 100,
+                              height: 20,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 20,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            width: 80,
+                            height: 20,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildAddCurrencyCard(BuildContext context) {
     return GestureDetector(
       onTap: () => Navigator.push(context,
@@ -1058,19 +1437,22 @@ class _DashboardScreenState extends State<DashboardScreen>
         child: Container(
           width: 340,
           padding: const EdgeInsets.all(defaultPadding),
-          child: const Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Icon(Icons.add_circle_outline,
-                      size: 35, color: kPrimaryColor),
+                      size: 35,
+                      color: Theme.of(context).extension<AppColors>()!.primary),
                   Text('Add Currency',
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: kPrimaryColor)),
+                          color: Theme.of(context)
+                              .extension<AppColors>()!
+                              .primary)),
                 ],
               ),
               SizedBox(height: largePadding),
@@ -1078,7 +1460,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: kPrimaryColor)),
+                      color:
+                          Theme.of(context).extension<AppColors>()!.primary)),
             ],
           ),
         ),
@@ -1100,19 +1483,22 @@ class _DashboardScreenState extends State<DashboardScreen>
         child: Container(
           width: 340,
           padding: const EdgeInsets.all(defaultPadding),
-          child: const Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Icon(Icons.add_circle_outline,
-                      size: 35, color: kPrimaryColor),
+                      size: 35,
+                      color: Theme.of(context).extension<AppColors>()!.primary),
                   Text('Add Crypto',
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: kPrimaryColor)),
+                          color: Theme.of(context)
+                              .extension<AppColors>()!
+                              .primary)),
                 ],
               ),
               SizedBox(height: largePadding),
@@ -1120,7 +1506,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: kPrimaryColor)),
+                      color:
+                          Theme.of(context).extension<AppColors>()!.primary)),
             ],
           ),
         ),
@@ -1154,7 +1541,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         elevation: 5,
         color: provider.selectedCardType == "fiat" &&
                 provider.selectedFiatIndex == index
-            ? kPrimaryColor
+            ? Theme.of(context).extension<AppColors>()!.primary
             : Colors.white,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(defaultPadding)),
@@ -1181,7 +1568,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: isSelected ? Colors.white : kPrimaryColor),
+                        color: isSelected
+                            ? Colors.white
+                            : Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary),
                   ),
                 ],
               ),
@@ -1194,14 +1585,22 @@ class _DashboardScreenState extends State<DashboardScreen>
                     style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: isSelected ? Colors.white : kPrimaryColor),
+                        color: isSelected
+                            ? Colors.white
+                            : Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary),
                   ),
                   Text(
                     "${account.iban}",
                     style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: isSelected ? Colors.white : kPrimaryColor),
+                        color: isSelected
+                            ? Colors.white
+                            : Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary),
                   ),
                 ],
               ),
@@ -1214,7 +1613,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                     style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: isSelected ? Colors.white : kPrimaryColor),
+                        color: isSelected
+                            ? Colors.white
+                            : Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary),
                   ),
                   Row(
                     children: [
@@ -1223,7 +1626,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: isSelected ? Colors.white : kPrimaryColor),
+                            color: isSelected
+                                ? Colors.white
+                                : Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .primary),
                       ),
                       Text(
                         account.amount != null && account.amount! < 0
@@ -1232,7 +1639,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: isSelected ? Colors.white : kPrimaryColor),
+                            color: isSelected
+                                ? Colors.white
+                                : Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .primary),
                       ),
                     ],
                   ),
@@ -1253,7 +1664,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         elevation: 5,
         color: provider.selectedCardType == "crypto" &&
                 provider.selectedCryptoIndex == index
-            ? kCryptoSelectedColor
+            ? Color(0xFF9fce63)
             : Colors.white,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(defaultPadding)),
@@ -1268,13 +1679,14 @@ class _DashboardScreenState extends State<DashboardScreen>
                 children: [
                   ClipOval(
                     child: CachedNetworkImage(
-                      imageUrl: _getImageForCoin(wallet.coin!.split('_')[0]),
+                      imageUrl: ImageUtils.getImageForTransferType(
+                          wallet.coin!.split('_')[0]),
                       width: 40,
                       height: 40,
                       fit: BoxFit.cover,
-                      placeholder: (context, url) =>
-                          const CircularProgressIndicator(
-                        color: kPrimaryColor,
+                      placeholder: (context, url) => CircularProgressIndicator(
+                        color:
+                            Theme.of(context).extension<AppColors>()!.primary,
                       ),
                       errorWidget: (context, url, error) => const Icon(
                         Icons.error,
@@ -1282,27 +1694,45 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ),
                     ),
                   ),
-                  Text(wallet.coin!.split('_')[0],
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: isSelected ? Colors.white : kPrimaryColor)),
+                  Text(
+                    wallet.coin!.split('_')[0],
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: isSelected
+                            ? Colors.white
+                            : Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary),
+                  ),
                 ],
               ),
               const SizedBox(height: defaultPadding),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Balance",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: isSelected ? Colors.white : kPrimaryColor)),
-                  Text(wallet.noOfCoins!,
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: isSelected ? Colors.white : kPrimaryColor)),
+                  Text(
+                    "Balance",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isSelected
+                            ? Colors.white
+                            : Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary),
+                  ),
+                  Text(
+                    wallet.noOfCoins!,
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isSelected
+                            ? Colors.white
+                            : Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary),
+                  ),
                 ],
               ),
             ],
@@ -1321,30 +1751,35 @@ class _DashboardScreenState extends State<DashboardScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: screenWidth > 600 ? 160 : screenWidth * 0.30,
+              width: screenWidth > 600 ? 140 : screenWidth * 0.36,
               child: FloatingActionButton.extended(
                 heroTag: 'Crypto_buy_Sell',
                 onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => const CryptoBuyAnsSellScreen())),
-                label: const Text('Buy/SELL',
-                    style: TextStyle(color: Colors.white)),
+                label: const Text('Buy/SELL/Swap',
+                    style: TextStyle(color: Colors.white, fontSize: 12 )),
                 icon: const Icon(Icons.send, color: Colors.white),
-                backgroundColor: kPrimaryColor,
+                backgroundColor:
+                    Theme.of(context).extension<AppColors>()!.primary,
               ),
             ),
             const SizedBox(width: 15),
-            FloatingActionButton.extended(
-              heroTag: 'crypto_wallet_address',
-              onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const WalletAddressScreen())),
-              label: const Text('WALLET ADDRESS',
-                  style: TextStyle(color: Colors.white)),
-              icon: const Icon(Icons.send, color: Colors.white),
-              backgroundColor: kPrimaryColor,
+            SizedBox(
+              width: screenWidth > 600 ? 140 : screenWidth * 0.40,
+              child: FloatingActionButton.extended(
+                heroTag: 'crypto_wallet_address',
+                onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const WalletAddressScreen())),
+                label: const Text('WALLET ADDRESS',
+                    style: TextStyle(color: Colors.white, fontSize: 12)),
+                icon: const Icon(Icons.send, color: Colors.white),
+                backgroundColor:
+                    Theme.of(context).extension<AppColors>()!.primary,
+              ),
             ),
           ],
         ),
@@ -1370,13 +1805,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                 CustomSnackBar.showSnackBar(
                   context: context,
                   message: "Please select a currency from the FIAT section",
-                  color: kRedColor,
+                  color: Colors.red,
                 );
                 return;
               }
               Navigator.push(
                 context,
-                MaterialPageRoute(
+                CupertinoPageRoute(
                   builder: (context) => AddMoneyScreen(
                     accountName: provider.accountName ?? 'N/A',
                     accountId: provider.accountIdExchange ?? '',
@@ -1403,13 +1838,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                   context: context,
                   message:
                       "Exchange Money Can't Work Right Now Because Fiat Data Is Null",
-                  color: kRedColor,
+                  color: Colors.red,
                 );
                 return;
               }
               Navigator.push(
                 context,
-                MaterialPageRoute(
+                CupertinoPageRoute(
                   builder: (context) => ExchangeMoneyScreen(
                     accountId: provider.accountIdExchange,
                     country: provider.countryExchange,
@@ -1430,7 +1865,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             heroTag: 'Fiat_sendMoney',
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(
+              CupertinoPageRoute(
                 builder: (context) => const SendMoneyScreen(),
               ),
             ),
@@ -1443,7 +1878,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             heroTag: 'fiat_All_Accounts',
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(
+              CupertinoPageRoute(
                 builder: (context) => const AllAccountsScreen(),
               ),
             ),
@@ -1472,7 +1907,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               width: 45,
               height: 45,
               decoration: BoxDecoration(
-                color: kPrimaryColor,
+                color: Theme.of(context).extension<AppColors>()!.primary,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -1505,19 +1940,21 @@ class _DashboardScreenState extends State<DashboardScreen>
     Color amountColor = _getAmountColor(transaction);
     String formattedDate = _formatDate(transaction.transactionDate);
 
-    print(transaction.extraType);
     String? extraType = transaction.extraType?.toLowerCase();
     String transType = transaction.transactionType?.toLowerCase() ?? '';
     String fullType = "$extraType-$transType";
 
     IconData? transactionIcon;
-    Widget? iconWidget;
     Color iconColor = Colors.grey;
 
     switch (fullType) {
       case 'credit-add money':
         transactionIcon = Icons.arrow_forward;
         iconColor = Colors.green;
+        break;
+      case 'debit-wallet to card':
+        transactionIcon = Icons.arrow_back;
+        iconColor = Colors.red;
         break;
       case 'credit-exchange':
         transactionIcon = Icons.sync;
@@ -1630,6 +2067,49 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ),
                     ),
                   ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        transaction.transactionStatus == 'succeeded' ||
+                                transaction.transactionStatus == 'Complete' ||
+                                transaction.transactionStatus == 'Success'
+                            ? Icons.check_circle
+                            : transaction.transactionStatus == 'pending'
+                                ? Icons.info
+                                : Icons.cancel,
+                        color: transaction.transactionStatus == 'succeeded' ||
+                                transaction.transactionStatus == 'Complete' ||
+                                transaction.transactionStatus == 'Success'
+                            ? Colors.green
+                            : transaction.transactionStatus == 'pending'
+                                ? Colors.orange
+                                : Colors.red,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        transaction.transactionStatus == 'succeeded' ||
+                                transaction.transactionStatus == 'Complete' ||
+                                transaction.transactionStatus == 'Success'
+                            ? 'Success'
+                            : transaction.transactionStatus == 'pending'
+                                ? 'Pending'
+                                : 'Failed',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: transaction.transactionStatus == 'succeeded' ||
+                                  transaction.transactionStatus == 'Complete' ||
+                                  transaction.transactionStatus == 'Success'
+                              ? Colors.green
+                              : transaction.transactionStatus == 'pending'
+                                  ? Colors.orange
+                                  : Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ],
@@ -1664,14 +2144,15 @@ class _DashboardScreenState extends State<DashboardScreen>
                   children: [
                     ClipOval(
                       child: CachedNetworkImage(
-                        imageUrl: _getImageForCoin(
+                        imageUrl: ImageUtils.getImageForTransferType(
                             transaction.coinName!.split('_')[0]),
                         width: 35,
                         height: 35,
                         fit: BoxFit.cover,
                         placeholder: (context, url) =>
-                            const CircularProgressIndicator(
-                          color: kPrimaryColor,
+                            CircularProgressIndicator(
+                          color:
+                              Theme.of(context).extension<AppColors>()!.primary,
                         ),
                         errorWidget: (context, url, error) => const Icon(
                           Icons.error,
@@ -1710,11 +2191,11 @@ class _DashboardScreenState extends State<DashboardScreen>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text("No of Coins:",
+                 Text("No of Coins:",
                     style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).extension<AppColors>()!.black)),
                 Text(transaction.noOfCoin ?? "N/A",
-                    style: const TextStyle(fontSize: 16)),
+                    style:  TextStyle(fontSize: 16, color: Theme.of(context).extension<AppColors>()!.black,)),
               ],
             ),
           ],
@@ -1766,6 +2247,8 @@ class _DashboardScreenState extends State<DashboardScreen>
       return "-$currencySymbol${billAmount.toStringAsFixed(2)}";
     } else if (info == 'Crypto buy Transaction') {
       return "-$currencySymbol${billAmount.toStringAsFixed(2)}";
+    } else if (transType == 'wallet to card') {
+      return "-$currencySymbol${displayAmount.toStringAsFixed(2)}";
     }
     return "$currencySymbol${displayAmount.toStringAsFixed(2)}";
   }
@@ -1835,7 +2318,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       case 'pending':
         return Colors.orange;
       default:
-        return kPrimaryColor;
+        return Theme.of(context).extension<AppColors>()!.primary;
     }
   }
 
@@ -1882,13 +2365,14 @@ class GaugeWidget extends StatelessWidget {
   final Color color;
   final IconData icon;
 
-  const GaugeWidget(
-      {super.key,
-      required this.label,
-      required this.currentAmount,
-      required this.totalAmount,
-      required this.color,
-      required this.icon});
+  const GaugeWidget({
+    super.key,
+    required this.label,
+    required this.currentAmount,
+    required this.totalAmount,
+    required this.color,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {

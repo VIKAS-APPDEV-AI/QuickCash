@@ -114,7 +114,7 @@ class _InvoiceDashboardScreenState extends State<InvoiceDashboardScreen> {
         CustomSnackBar.showSnackBar(
             context: context,
             message: "Something went wrong!",
-            color: kPrimaryColor);
+            color: Theme.of(context).extension<AppColors>()!.primary);
       });
     }
   }
@@ -148,7 +148,7 @@ class _InvoiceDashboardScreenState extends State<InvoiceDashboardScreen> {
         CustomSnackBar.showSnackBar(
             context: context,
             message: "Something went wrong!",
-            color: kPrimaryColor);
+            color: Theme.of(context).extension<AppColors>()!.primary);
       });
     }
   }
@@ -165,9 +165,9 @@ class _InvoiceDashboardScreenState extends State<InvoiceDashboardScreen> {
         ),
       ),
       body: isLoading
-          ? const Center(
+          ?  Center(
               child: CircularProgressIndicator(
-                color: kPrimaryColor,
+                color: Theme.of(context).extension<AppColors>()!.primary,
               ),
             )
           : SingleChildScrollView(
@@ -193,8 +193,8 @@ class _InvoiceDashboardScreenState extends State<InvoiceDashboardScreen> {
                         Expanded(
                           child: Text(
                             light ? 'Invoice' : 'Quotes',
-                            style: const TextStyle(
-                                color: kPrimaryColor,
+                            style:  TextStyle(
+                                color: Theme.of(context).extension<AppColors>()!.primary,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18.0),
                           ),
@@ -229,7 +229,7 @@ class _InvoiceDashboardScreenState extends State<InvoiceDashboardScreen> {
                                   color: Colors.white, fontSize: 15),
                             ),
                             icon: const Icon(Icons.add, color: Colors.white),
-                            backgroundColor: kPrimaryColor,
+                            backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                           ),
                         ),
                       ],
@@ -259,7 +259,7 @@ class _InvoiceDashboardScreenState extends State<InvoiceDashboardScreen> {
               height: 160.0,
               padding: const EdgeInsets.all(smallPadding),
               decoration: BoxDecoration(
-                color: kPinkColor,
+                color: Color(0xFFEB62D0),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -321,7 +321,7 @@ class _InvoiceDashboardScreenState extends State<InvoiceDashboardScreen> {
               height: 160.0,
               padding: const EdgeInsets.all(smallPadding),
               decoration: BoxDecoration(
-                color: kSkyBlueColor,
+                color: Color(0xFF01A3FF),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -383,7 +383,7 @@ class _InvoiceDashboardScreenState extends State<InvoiceDashboardScreen> {
               height: 160.0,
               padding: const EdgeInsets.all(smallPadding),
               decoration: BoxDecoration(
-                color: kGreenColor,
+                color: Colors.green,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -446,7 +446,7 @@ class _InvoiceDashboardScreenState extends State<InvoiceDashboardScreen> {
               height: 160.0,
               padding: const EdgeInsets.all(smallPadding),
               decoration: BoxDecoration(
-                color: kPurpleColor,
+                color: Color(0xFF9568ff),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -596,10 +596,10 @@ class _InvoiceDashboardScreenState extends State<InvoiceDashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Text(
+                   Text(
                     "Payment Overview",
                     style: TextStyle(
-                        color: kPrimaryColor,
+                        color: Theme.of(context).extension<AppColors>()!.primary,
                         fontSize: 18,
                         fontWeight: FontWeight.bold),
                   ),
@@ -661,10 +661,10 @@ class _InvoiceDashboardScreenState extends State<InvoiceDashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Text(
+                   Text(
                     "Invoice Overview",
                     style: TextStyle(
-                        color: kPrimaryColor,
+                        color: Theme.of(context).extension<AppColors>()!.primary,
                         fontSize: 18,
                         fontWeight: FontWeight.bold),
                   ),
@@ -727,7 +727,7 @@ class _InvoiceDashboardScreenState extends State<InvoiceDashboardScreen> {
               height: 160.0,
               padding: const EdgeInsets.all(smallPadding),
               decoration: BoxDecoration(
-                color: kPinkColor,
+                color: Color(0xFFEB62D0),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -790,7 +790,7 @@ class _InvoiceDashboardScreenState extends State<InvoiceDashboardScreen> {
               height: 160.0,
               padding: const EdgeInsets.all(smallPadding),
               decoration: BoxDecoration(
-                color: kSkyBlueColor,
+                color: Color(0xFF01A3FF),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -867,7 +867,7 @@ class _InvoiceDashboardScreenState extends State<InvoiceDashboardScreen> {
               height: 160.0,
               padding: const EdgeInsets.all(smallPadding),
               decoration: BoxDecoration(
-                color: kGreenColor,
+                color: Colors.green,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -929,7 +929,7 @@ class _InvoiceDashboardScreenState extends State<InvoiceDashboardScreen> {
               height: 160.0,
               padding: const EdgeInsets.all(smallPadding),
               decoration: BoxDecoration(
-                color: kRedColor,
+                color: Colors.red,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(

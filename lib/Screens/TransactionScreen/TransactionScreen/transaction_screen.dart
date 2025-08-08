@@ -1,20 +1,19 @@
 import 'package:excel/excel.dart' as excel;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pdf/pdf.dart';
-import 'package:provider/provider.dart';
-import 'package:quickcash/Screens/DashboardScreen/Dashboard/AccountsList/accountsListApi.dart';
-import 'package:quickcash/Screens/DashboardScreen/Dashboard/TransactionList/transactionListApi.dart';
-import 'package:quickcash/Screens/TransactionScreen/TransactionDetailsScreen/transaction_details_screen.dart';
-import 'package:quickcash/constants.dart';
-import 'package:intl/intl.dart';
-import 'package:quickcash/util/AnimatedContainerWidget.dart';
-import '../../DashboardScreen/Dashboard/TransactionList/transactionListModel.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
+import 'package:provider/provider.dart';
+import 'package:quickcash/Screens/DashboardScreen/Dashboard/AccountsList/accountsListApi.dart';
+import 'package:quickcash/Screens/DashboardScreen/Dashboard/TransactionList/transactionListApi.dart';
+import 'package:quickcash/Screens/DashboardScreen/Dashboard/TransactionList/transactionListModel.dart';
+import 'package:quickcash/Screens/TransactionScreen/TransactionDetailsScreen/transaction_details_screen.dart';
+import 'package:quickcash/constants.dart';
+import 'package:shimmer/shimmer.dart';
 import 'dart:io';
 
 class TransactionScreen extends StatefulWidget {
@@ -43,8 +42,8 @@ class _TransactionScreenState extends State<TransactionScreen> {
   final List<String> _statuses = ['Pending', 'Complete', 'Denied'];
   List<String> _accounts = [];
 
-  bool _isDownloadingExcel = false; // State to track Excel download progress
-  bool _isGeneratingPDF = false; // State to track PDF generation progress
+  bool _isDownloadingExcel = false;
+  bool _isGeneratingPDF = false;
 
   @override
   void initState() {
@@ -64,9 +63,6 @@ class _TransactionScreenState extends State<TransactionScreen> {
             .toList();
         setState(() {
           _accounts = currencies;
-          // if (_accounts.isNotEmpty && _selectedAccount == null) {
-          //   _selectedAccount = _accounts[0];
-          // }
         });
       } else {
         setState(() {
@@ -89,20 +85,6 @@ class _TransactionScreenState extends State<TransactionScreen> {
     try {
       final response = await _transactionListApi.transactionListApi();
       provider.updateTransactionList(response);
-      if (response.transactionList == null ||
-          response.transactionList!.isEmpty) {
-        Center(
-          child: SizedBox(
-            width: 300,
-            height: 300,
-            child: Lottie.asset(
-              'assets/lottie/NoTransactions.json',
-              fit: BoxFit.contain,
-              repeat: true,
-            ),
-          ),
-        );
-      }
     } catch (error) {
       provider.setError(error.toString());
     } finally {
@@ -123,8 +105,8 @@ class _TransactionScreenState extends State<TransactionScreen> {
       builder: (context, child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: kPrimaryColor,
+            colorScheme: ColorScheme.light(
+              primary: Theme.of(context).extension<AppColors>()!.primary,
               onPrimary: Colors.white,
               surface: Colors.white,
             ),
@@ -207,10 +189,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
   }
 
   Future<void> _downloadExcel(List<TransactionListDetails> transactions) async {
-    setState(() {
-      _isDownloadingExcel = true;
-    });
-
+    setState(() => _isDownloadingExcel = true);
     try {
       var excelInstance = excel.Excel.createExcel();
       excel.Sheet sheet = excelInstance['Sheet1'];
@@ -290,7 +269,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
               ),
             ],
           ),
-          backgroundColor: kPrimaryColor,
+          backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -324,17 +303,12 @@ class _TransactionScreenState extends State<TransactionScreen> {
         ),
       );
     } finally {
-      setState(() {
-        _isDownloadingExcel = false;
-      });
+      setState(() => _isDownloadingExcel = false);
     }
   }
 
   Future<void> _generatePDF(List<TransactionListDetails> transactions) async {
-    setState(() {
-      _isGeneratingPDF = true;
-    });
-
+    setState(() => _isGeneratingPDF = true);
     try {
       final pdf = pw.Document();
       pdf.addPage(
@@ -414,7 +388,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
               ),
             ],
           ),
-          backgroundColor: kPrimaryColor,
+          backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -448,9 +422,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
         ),
       );
     } finally {
-      setState(() {
-        _isGeneratingPDF = false;
-      });
+      setState(() => _isGeneratingPDF = false);
     }
   }
 
@@ -466,7 +438,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
           gradient: LinearGradient(
             begin: Alignment.bottomRight,
             end: Alignment.topLeft,
-            colors: [kWhiteColor.withOpacity(0.0), Colors.black12],
+            colors: [Colors.white.withOpacity(0.0), Colors.black12],
           ),
         ),
         child: SingleChildScrollView(
@@ -488,7 +460,8 @@ class _TransactionScreenState extends State<TransactionScreen> {
                         style: TextStyle(
                           fontSize: isSmallScreen ? 20 : 24,
                           fontWeight: FontWeight.bold,
-                          color: kPrimaryColor,
+                          color:
+                              Theme.of(context).extension<AppColors>()!.primary,
                           shadows: [
                             Shadow(
                               color: Colors.black.withOpacity(0.1),
@@ -589,14 +562,19 @@ class _TransactionScreenState extends State<TransactionScreen> {
                             Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: kPrimaryColor,
+                            backgroundColor: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary,
                             foregroundColor: Colors.white,
                             padding: EdgeInsets.symmetric(
                                 vertical: isSmallScreen ? 12 : 14),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12)),
                             elevation: 5,
-                            shadowColor: kPrimaryColor.withOpacity(0.3),
+                            shadowColor: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary
+                                .withOpacity(0.3),
                           ),
                           child: Text(
                             'APPLY FILTERS',
@@ -617,8 +595,11 @@ class _TransactionScreenState extends State<TransactionScreen> {
                           style: OutlinedButton.styleFrom(
                             padding: EdgeInsets.symmetric(
                                 vertical: isSmallScreen ? 12 : 14),
-                            side: const BorderSide(
-                                color: kPrimaryColor, width: 2),
+                            side: BorderSide(
+                                color: Theme.of(context)
+                                    .extension<AppColors>()!
+                                    .primary,
+                                width: 2),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12)),
                           ),
@@ -627,7 +608,9 @@ class _TransactionScreenState extends State<TransactionScreen> {
                             style: TextStyle(
                               fontSize: isSmallScreen ? 12 : 13,
                               fontWeight: FontWeight.bold,
-                              color: kPrimaryColor,
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary,
                             ),
                           ),
                         ),
@@ -644,10 +627,12 @@ class _TransactionScreenState extends State<TransactionScreen> {
   }
 
   Widget _buildSectionTitle(String title, IconData icon,
-    {required bool isSmallScreen}) {
+      {required bool isSmallScreen}) {
     return Row(
       children: [
-        Icon(icon, size: isSmallScreen ? 18 : 20, color: kPrimaryColor),
+        Icon(icon,
+            size: isSmallScreen ? 18 : 20,
+            color: Theme.of(context).extension<AppColors>()!.primary),
         const SizedBox(width: 8),
         Text(
           title,
@@ -694,7 +679,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
           Icon(
             Icons.calendar_today,
             size: isSmallScreen ? 18 : 20,
-            color: kPrimaryColor,
+            color: Theme.of(context).extension<AppColors>()!.primary,
           ),
         ],
       ),
@@ -743,7 +728,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
         dropdownColor: Colors.white,
         icon: Icon(
           Icons.arrow_drop_down,
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
           size: isSmallScreen ? 20 : 24,
         ),
       ),
@@ -757,18 +742,22 @@ class _TransactionScreenState extends State<TransactionScreen> {
   }) {
     return GestureDetector(
       onTap: isDownloading ? null : onPressed,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      child: Container(
         padding: EdgeInsets.symmetric(
           horizontal: isSmallScreen ? 8 : 12,
           vertical: isSmallScreen ? 6 : 8,
         ),
         decoration: BoxDecoration(
-          color: isDownloading ? Colors.grey.shade300 : kPrimaryColor,
+          color: isDownloading
+              ? Colors.grey.shade300
+              : Theme.of(context).extension<AppColors>()!.primary,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: kPrimaryColor.withOpacity(0.3),
+              color: Theme.of(context)
+                  .extension<AppColors>()!
+                  .primary
+                  .withOpacity(0.3),
               spreadRadius: 1,
               blurRadius: 5,
               offset: const Offset(0, 3),
@@ -814,18 +803,22 @@ class _TransactionScreenState extends State<TransactionScreen> {
   }) {
     return GestureDetector(
       onTap: isGenerating ? null : onPressed,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      child: Container(
         padding: EdgeInsets.symmetric(
           horizontal: isSmallScreen ? 8 : 12,
           vertical: isSmallScreen ? 6 : 8,
         ),
         decoration: BoxDecoration(
-          color: isGenerating ? Colors.grey.shade300 : kPrimaryColor,
+          color: isGenerating
+              ? Colors.grey.shade300
+              : Theme.of(context).extension<AppColors>()!.primary,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: kPrimaryColor.withOpacity(0.3),
+              color: Theme.of(context)
+                  .extension<AppColors>()!
+                  .primary
+                  .withOpacity(0.3),
               spreadRadius: 1,
               blurRadius: 5,
               offset: const Offset(0, 3),
@@ -864,11 +857,135 @@ class _TransactionScreenState extends State<TransactionScreen> {
     );
   }
 
+  Widget _buildSkeletonLoading(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 600;
+
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Column(
+        children: [
+          SizedBox(height: isSmallScreen ? 8 : 16),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 20),
+            child: Divider(color: Colors.black38),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  width: 100,
+                  height: 20,
+                  color: Colors.white,
+                ),
+                Row(
+                  children: [
+                    Container(
+                      width: 60,
+                      height: 30,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 60,
+                      height: 30,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 30,
+                      height: 30,
+                      color: Colors.white,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 20),
+            child: Divider(color: Colors.black26),
+          ),
+          SizedBox(height: isSmallScreen ? 8 : defaultPadding),
+          Column(
+            children: List.generate(
+              15,
+              (index) => Card(
+                margin: EdgeInsets.symmetric(
+                  vertical: isSmallScreen ? 6 : 8,
+                  horizontal: isSmallScreen ? 12 : 16,
+                ),
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  side: BorderSide(color: Colors.grey.shade300, width: 1),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: isSmallScreen ? 30 : 35,
+                        height: isSmallScreen ? 30 : 35,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      SizedBox(width: isSmallScreen ? 8 : 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 100,
+                              height: isSmallScreen ? 14 : 16,
+                              color: Colors.white,
+                            ),
+                            SizedBox(height: isSmallScreen ? 2 : 4),
+                            Container(
+                              width: 150,
+                              height: isSmallScreen ? 12 : 14,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Container(
+                            width: 80,
+                            height: isSmallScreen ? 12 : 14,
+                            color: Colors.white,
+                          ),
+                          SizedBox(height: isSmallScreen ? 2 : 4),
+                          Container(
+                            width: 80,
+                            height: isSmallScreen ? 13 : 15,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isSmallScreen = size.width < 600;
-    final isTablet = size.width >= 600 && size.width < 1200;
 
     return ChangeNotifierProvider(
       create: (_) => TransactionListProvider(),
@@ -885,226 +1002,218 @@ class _TransactionScreenState extends State<TransactionScreen> {
         return Scaffold(
           key: _scaffoldKey,
           drawer: _buildFilterDrawer(),
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              return Consumer<TransactionListProvider>(
-                builder: (context, provider, child) {
-                  if (provider.isLoading) {
-                    return Center(
-                      child: SpinKitWaveSpinner(
-                        color: kPrimaryColor,
-                        size: isSmallScreen ? 50 : 75,
+          body: Consumer<TransactionListProvider>(
+            builder: (context, provider, child) {
+              if (provider.isLoading) {
+                return _buildSkeletonLoading(context);
+              }
+
+              final filteredTransactions =
+                  _filterTransactions(provider.transactionList);
+
+              return RefreshIndicator(
+                onRefresh: () => _refreshData(context),
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    children: [
+                      SizedBox(height: isSmallScreen ? 8 : 16),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isSmallScreen ? 12 : 20,
+                        ),
+                        child: Divider(color: Colors.black38),
                       ),
-                    );
-                  }
-
-                  final filteredTransactions =
-                      _filterTransactions(provider.transactionList);
-
-                  return RefreshIndicator(
-                    onRefresh: () => _refreshData(context),
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: Column(
-                        children: [
-                          SizedBox(height: isSmallScreen ? 8 : 16),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: isSmallScreen ? 12 : 20,
-                            ),
-                            child: Divider(color: Colors.black38),
-                          ),
-                          AnimatedContainerWidget(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: isSmallScreen ? 12 : 20,
-                                  ),
-                                  child: Text(
-                                    'Transactions',
-                                    style: TextStyle(
-                                      color: Colors.black87,
-                                      fontSize: isSmallScreen ? 16 : 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                const Spacer(),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    _buildExcelButton(
-                                      onPressed: () {
-                                        if (filteredTransactions.isNotEmpty) {
-                                          _downloadExcel(filteredTransactions);
-                                        } else {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: const Row(
-                                                children: [
-                                                  Icon(Icons.info,
-                                                      color: Colors.white,
-                                                      size: 20),
-                                                  SizedBox(width: 8),
-                                                  Expanded(
-                                                    child: Text(
-                                                      'No transactions to download',
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 14),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              backgroundColor: Colors.orange,
-                                              behavior:
-                                                  SnackBarBehavior.floating,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                              ),
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 16,
-                                                      vertical: 10),
-                                              elevation: 6,
-                                            ),
-                                          );
-                                        }
-                                      },
-                                      isSmallScreen: isSmallScreen,
-                                      isDownloading: _isDownloadingExcel,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    _buildPDFButton(
-                                      onPressed: () {
-                                        if (filteredTransactions.isNotEmpty) {
-                                          _generatePDF(filteredTransactions);
-                                        } else {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: const Row(
-                                                children: [
-                                                  Icon(Icons.info,
-                                                      color: Colors.white,
-                                                      size: 20),
-                                                  SizedBox(width: 8),
-                                                  Expanded(
-                                                    child: Text(
-                                                      'No transactions to generate PDF',
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 14),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              backgroundColor: Colors.orange,
-                                              behavior:
-                                                  SnackBarBehavior.floating,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                              ),
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 16,
-                                                      vertical: 10),
-                                              elevation: 6,
-                                            ),
-                                          );
-                                        }
-                                      },
-                                      isSmallScreen: isSmallScreen,
-                                      isGenerating: _isGeneratingPDF,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.filter_alt,
-                                        color: kPrimaryColor,
-                                        size: isSmallScreen ? 24 : 28,
-                                      ),
-                                      onPressed: () => _scaffoldKey.currentState
-                                          ?.openDrawer(),
-                                      tooltip: 'Open Filters',
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(width: isSmallScreen ? 4 : 8),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: isSmallScreen ? 12 : 20,
-                            ),
-                            child: Divider(color: Colors.black26),
-                          ),
-                          SizedBox(height: isSmallScreen ? 8 : defaultPadding),
-                          if (provider.errorMessage != null)
+                      Container(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
                             Padding(
-                              padding: const EdgeInsets.all(16.0),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isSmallScreen ? 12 : 20,
+                              ),
                               child: Text(
-                                provider.errorMessage!,
+                                'Transactions',
                                 style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: isSmallScreen ? 14 : 16,
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black87,
+                                  fontSize: isSmallScreen ? 16 : 20,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            )
-                          else if (filteredTransactions.isEmpty)
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                            ),
+                            const Spacer(),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                SizedBox(
-                                  width: isSmallScreen ? 200 : 300,
-                                  height: isSmallScreen ? 200 : 300,
-                                  child: Lottie.asset(
-                                    'assets/lottie/NoTransactions.json',
-                                    fit: BoxFit.contain,
-                                    repeat: true,
-                                  ),
+                                _buildExcelButton(
+                                  onPressed: () {
+                                    if (filteredTransactions.isNotEmpty) {
+                                      _downloadExcel(filteredTransactions);
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: const Row(
+                                            children: [
+                                              Icon(Icons.info,
+                                                  color: Colors.white,
+                                                  size: 20),
+                                              SizedBox(width: 8),
+                                              Expanded(
+                                                child: Text(
+                                                  'No transactions to download',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 14),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          backgroundColor: Colors.orange,
+                                          behavior: SnackBarBehavior.floating,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                          margin: const EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 10),
+                                          elevation: 6,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  isSmallScreen: isSmallScreen,
+                                  isDownloading: _isDownloadingExcel,
                                 ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'No Transactions Found',
-                                  style: TextStyle(
-                                    fontSize: isSmallScreen ? 16 : 18,
-                                    color: Colors.grey.shade600,
-                                    fontWeight: FontWeight.w500,
+                                const SizedBox(width: 8),
+                                _buildPDFButton(
+                                  onPressed: () {
+                                    if (filteredTransactions.isNotEmpty) {
+                                      _generatePDF(filteredTransactions);
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: const Row(
+                                            children: [
+                                              Icon(Icons.info,
+                                                  color: Colors.white,
+                                                  size: 20),
+                                              SizedBox(width: 8),
+                                              Expanded(
+                                                child: Text(
+                                                  'No transactions to generate PDF',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 14),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          backgroundColor: Colors.orange,
+                                          behavior: SnackBarBehavior.floating,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                          margin: const EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 10),
+                                          elevation: 6,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  isSmallScreen: isSmallScreen,
+                                  isGenerating: _isGeneratingPDF,
+                                ),
+                                const SizedBox(width: 8),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.filter_alt,
+                                    color: Theme.of(context)
+                                        .extension<AppColors>()!
+                                        .primary,
+                                    size: isSmallScreen ? 24 : 28,
                                   ),
+                                  onPressed: () =>
+                                      _scaffoldKey.currentState?.openDrawer(),
+                                  tooltip: 'Open Filters',
                                 ),
                               ],
-                            )
-                          else
-                            Column(
-                              children: filteredTransactions
-                                  .map((transaction) => TransactionCard(
-                                        transaction: transaction,
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            CupertinoPageRoute(
-                                              builder: (context) =>
-                                                  TransactionDetailPage(
-                                                      transactionId:
-                                                          transaction.trxId),
-                                            ),
-                                          );
-                                        },
-                                      ))
-                                  .toList(),
                             ),
-                        ],
+                            SizedBox(width: isSmallScreen ? 4 : 8),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isSmallScreen ? 12 : 20,
+                        ),
+                        child: Divider(color: Colors.black26),
+                      ),
+                      SizedBox(height: isSmallScreen ? 8 : defaultPadding),
+                      if (provider.errorMessage != null)
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            provider.errorMessage!,
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: isSmallScreen ? 14 : 16,
+                            ),
+                          ),
+                        )
+                      else if (filteredTransactions.isEmpty)
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: isSmallScreen ? 200 : 300,
+                              height: isSmallScreen ? 200 : 300,
+                              child: Lottie.asset(
+                                'assets/lottie/NoTransactions.json',
+                                fit: BoxFit.contain,
+                                repeat: true,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No Transactions Found',
+                              style: TextStyle(
+                                fontSize: isSmallScreen ? 16 : 18,
+                                color: Colors.grey.shade600,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: filteredTransactions.length,
+                          itemBuilder: (context, index) {
+                            return TransactionCard(
+                              transaction: filteredTransactions[index],
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) => TransactionDetailPage(
+                                        transactionId:
+                                            filteredTransactions[index].trxId),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                    ],
+                  ),
+                ),
               );
             },
           ),
@@ -1268,231 +1377,270 @@ class _TransactionCardState extends State<TransactionCard> {
     String title = transType;
     String subtitle = "Trans ID: ${widget.transaction.transactionId ?? 'N/A'}";
 
-    return AnimatedContainerWidget(
-      slideBegin: const Offset(-1.0, 1.0),
-      child: Card(
-        margin: EdgeInsets.symmetric(
-          vertical: isSmallScreen ? 6 : 8,
-          horizontal: isSmallScreen ? 12 : 16,
-        ),
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: BorderSide(color: Colors.grey.shade300, width: 1),
-        ),
-        child: InkWell(
-          onTap: widget.onTap,
-          child: Padding(
-            padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
-            child: Column(
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(isSmallScreen ? 6 : 8),
-                      decoration: BoxDecoration(
-                        color: _getIconColor(transType, extraType)
-                            .withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        _getTransactionIcon(transType, extraType),
-                        color: _getIconColor(transType, extraType),
-                        size: isSmallScreen ? 20 : 23,
-                      ),
+    return Card(
+      margin: EdgeInsets.symmetric(
+        vertical: isSmallScreen ? 6 : 8,
+        horizontal: isSmallScreen ? 12 : 16,
+      ),
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(color: Colors.grey.shade300, width: 1),
+      ),
+      child: InkWell(
+        onTap: widget.onTap,
+        child: Padding(
+          padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(isSmallScreen ? 6 : 8),
+                    decoration: BoxDecoration(
+                      color:
+                          _getIconColor(transType, extraType).withOpacity(0.1),
+                      shape: BoxShape.circle,
                     ),
-                    SizedBox(width: isSmallScreen ? 8 : 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: TextStyle(
-                              fontSize: isSmallScreen ? 12 : 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: isSmallScreen ? 2 : 4),
-                          Text(
-                            subtitle,
-                            style: TextStyle(
-                              fontSize: isSmallScreen ? 12 : 14,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
-                        ],
-                      ),
+                    child: Icon(
+                      _getTransactionIcon(transType, extraType),
+                      color: _getIconColor(transType, extraType),
+                      size: isSmallScreen ? 20 : 23,
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                  ),
+                  SizedBox(width: isSmallScreen ? 8 : 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _formatDate(widget.transaction.transactionDate),
+                          title,
+                          style: TextStyle(
+                              fontSize: isSmallScreen ? 12 : 14,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.black
+                                  : Colors.black
+                                  ),
+                        ),
+                        SizedBox(height: isSmallScreen ? 2 : 4),
+                        Text(
+                          subtitle,
                           style: TextStyle(
                             fontSize: isSmallScreen ? 12 : 14,
                             color: Colors.grey.shade600,
                           ),
                         ),
-                        SizedBox(height: isSmallScreen ? 2 : 4),
-                        Text(
-                          widget.getAmountDisplay(),
-                          style: TextStyle(
-                            fontSize: isSmallScreen ? 13 : 15,
-                            fontWeight: FontWeight.bold,
-                            color: _getAmountColor(transType, extraType),
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            _isExpanded ? Icons.expand_less : Icons.expand_more,
-                            color: Colors.grey,
-                            size: isSmallScreen ? 20 : 24,
-                          ),
-                          onPressed: () =>
-                              setState(() => _isExpanded = !_isExpanded),
-                        ),
                       ],
                     ),
-                  ],
-                ),
-                if (_isExpanded) ...[
-                  const Divider(),
-                  SizedBox(height: isSmallScreen ? 6 : 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(
-                        "Date:",
-                        style: TextStyle(
-                          fontSize: isSmallScreen ? 14 : 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
                       Text(
                         _formatDate(widget.transaction.transactionDate),
-                        style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: isSmallScreen ? 6 : 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Transaction ID:",
                         style: TextStyle(
-                          fontSize: isSmallScreen ? 14 : 16,
-                          fontWeight: FontWeight.bold,
+                          fontSize: isSmallScreen ? 12 : 14,
+                          color: Colors.grey.shade600,
                         ),
                       ),
-                      Text(
-                        widget.transaction.transactionId ?? 'N/A',
-                        style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: isSmallScreen ? 6 : 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Amount:",
-                        style: TextStyle(
-                          fontSize: isSmallScreen ? 14 : 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      SizedBox(height: isSmallScreen ? 2 : 4),
                       Text(
                         widget.getAmountDisplay(),
                         style: TextStyle(
+                          fontSize: isSmallScreen ? 13 : 15,
+                          fontWeight: FontWeight.bold,
                           color: _getAmountColor(transType, extraType),
-                          fontSize: isSmallScreen ? 14 : 16,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ],
-                  ),
-                  SizedBox(height: isSmallScreen ? 6 : 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Type:",
-                        style: TextStyle(
-                          fontSize: isSmallScreen ? 14 : 16,
-                          fontWeight: FontWeight.bold,
+                      IconButton(
+                        icon: Icon(
+                          _isExpanded ? Icons.expand_less : Icons.expand_more,
+                          color: Colors.grey,
+                          size: isSmallScreen ? 20 : 24,
                         ),
-                      ),
-                      Text(
-                        widget.transaction.transactionType ?? 'N/A',
-                        style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: isSmallScreen ? 6 : 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Balance:",
-                        style: TextStyle(
-                          fontSize: isSmallScreen ? 14 : 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        '${fullType.contains('credit-exchange') ? widget.getCurrencySymbol(widget.transaction.to_currency) : widget.getCurrencySymbol(widget.transaction.fromCurrency)}${widget.transaction.balance?.toStringAsFixed(2) ?? '0.00'}',
-                        style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: isSmallScreen ? 6 : 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Status:",
-                        style: TextStyle(
-                          fontSize: isSmallScreen ? 14 : 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isSmallScreen ? 8 : 12,
-                          vertical: isSmallScreen ? 4 : 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _getStatusColor(
-                              widget.transaction.transactionStatus),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          widget.transaction.transactionStatus?.isEmpty ?? true
-                              ? 'Unknown'
-                              : (widget.transaction.transactionStatus!
-                                          .toLowerCase() ==
-                                      'succeeded'
-                                  ? 'Success'
-                                  : widget.transaction.transactionStatus!
-                                          .substring(0, 1)
-                                          .toUpperCase() +
-                                      widget.transaction.transactionStatus!
-                                          .substring(1)
-                                          .toLowerCase()),
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: isSmallScreen ? 14 : 16,
-                          ),
-                        ),
+                        onPressed: () =>
+                            setState(() => _isExpanded = !_isExpanded),
                       ),
                     ],
                   ),
                 ],
+              ),
+              if (_isExpanded) ...[
+                const Divider(),
+                SizedBox(height: isSmallScreen ? 6 : 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Date:",
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black
+                            : Colors.black,
+                      ),
+                    ),
+                    Text(
+                      _formatDate(widget.transaction.transactionDate),
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black
+                            : Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: isSmallScreen ? 6 : 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Transaction ID:",
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black
+                            : Colors.black,
+                      ),
+                    ),
+                    Text(
+                      widget.transaction.transactionId ?? 'N/A',
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black
+                            : Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: isSmallScreen ? 6 : 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Amount:",
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black
+                            : Colors.black,
+                      ),
+                    ),
+                    Text(
+                      widget.getAmountDisplay(),
+                      style: TextStyle(
+                        color: _getAmountColor(transType, extraType),
+                        fontSize: isSmallScreen ? 14 : 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: isSmallScreen ? 6 : 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Type:",
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black
+                            : Colors.black,
+                      ),
+                    ),
+                    Text(
+                      widget.transaction.transactionType ?? 'N/A',
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black
+                            : Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: isSmallScreen ? 6 : 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Balance:",
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black
+                            : Colors.black,
+                      ),
+                    ),
+                    Text(
+                      '${fullType.contains('credit-exchange') ? widget.getCurrencySymbol(widget.transaction.to_currency) : widget.getCurrencySymbol(widget.transaction.fromCurrency)}${widget.transaction.balance?.toStringAsFixed(2) ?? '0.00'}',
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black
+                            : Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: isSmallScreen ? 6 : 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Status:",
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black
+                            : Colors.black,
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isSmallScreen ? 8 : 12,
+                        vertical: isSmallScreen ? 4 : 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(
+                            widget.transaction.transactionStatus),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        widget.transaction.transactionStatus?.isEmpty ?? true
+                            ? 'Unknown'
+                            : (widget.transaction.transactionStatus!
+                                        .toLowerCase() ==
+                                    'succeeded'
+                                ? 'Success'
+                                : widget.transaction.transactionStatus!
+                                        .substring(0, 1)
+                                        .toUpperCase() +
+                                    widget.transaction.transactionStatus!
+                                        .substring(1)
+                                        .toLowerCase()),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: isSmallScreen ? 14 : 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
-            ),
+            ],
           ),
         ),
       ),

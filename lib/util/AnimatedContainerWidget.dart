@@ -13,7 +13,7 @@ class AnimatedContainerWidget extends StatefulWidget {
   const AnimatedContainerWidget({
     super.key,
     required this.child,
-    this.duration = const Duration(milliseconds: 1500),
+    this.duration = const Duration(milliseconds: 650),
     this.fadeCurve = Curves.easeIn,
     this.slideCurve = Curves.easeOut,
     this.slideBegin = const Offset(-1.0, 0.0), // Default slide from left

@@ -9,9 +9,9 @@ class WelcomeImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Text(
+        Text(
           "Welcome To Quickcash",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28,color: kPrimaryColor),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28,color: Theme.of(context).extension<AppColors>()!.primary),
         ),
         const SizedBox(height: defaultPadding * 2),
         Row(

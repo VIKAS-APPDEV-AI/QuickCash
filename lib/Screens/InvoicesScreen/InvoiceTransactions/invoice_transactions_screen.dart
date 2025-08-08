@@ -53,7 +53,7 @@ class _InvoiceTransactionsScreenState extends State<InvoiceTransactionsScreen> {
         isLoading = false;
         errorMessage = error.toString();
         // Optionally keep the error snackbar for actual errors
-        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: kRedColor);
+        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: Colors.red);
       });
     }
   }
@@ -79,9 +79,9 @@ class _InvoiceTransactionsScreenState extends State<InvoiceTransactionsScreen> {
         ),
       ),
       body: isLoading
-          ? const Center(
+          ?  Center(
               child: CircularProgressIndicator(
-                color: kPrimaryColor,
+                color: Theme.of(context).extension<AppColors>()!.primary,
               ),
             )
           : invoiceTransactionList.isEmpty // Check if the list is empty
@@ -129,7 +129,7 @@ class _InvoiceTransactionsScreenState extends State<InvoiceTransactionsScreen> {
                                 width: double.infinity,
                                 padding: const EdgeInsets.all(defaultPadding),
                                 decoration: BoxDecoration(
-                                  color: kPrimaryColor,
+                                  color: Theme.of(context).extension<AppColors>()!.primary,
                                   borderRadius: BorderRadius.circular(12),
                                   boxShadow: [
                                     BoxShadow(
@@ -156,7 +156,7 @@ class _InvoiceTransactionsScreenState extends State<InvoiceTransactionsScreen> {
                                       ],
                                     ),
                                     const SizedBox(height: smallPadding),
-                                    const Divider(color: kPrimaryLightColor),
+                                    const Divider(color: Color(0xA66F35A5)),
                                     const SizedBox(height: smallPadding),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -169,7 +169,7 @@ class _InvoiceTransactionsScreenState extends State<InvoiceTransactionsScreen> {
                                       ],
                                     ),
                                     const SizedBox(height: smallPadding),
-                                    const Divider(color: kPrimaryLightColor),
+                                    const Divider(color: Color(0xA66F35A5)),
                                     const SizedBox(height: smallPadding),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -182,7 +182,7 @@ class _InvoiceTransactionsScreenState extends State<InvoiceTransactionsScreen> {
                                       ],
                                     ),
                                     const SizedBox(height: smallPadding),
-                                    const Divider(color: kPrimaryLightColor),
+                                    const Divider(color: Color(0xA66F35A5)),
                                     const SizedBox(height: smallPadding),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -197,7 +197,7 @@ class _InvoiceTransactionsScreenState extends State<InvoiceTransactionsScreen> {
                                       ],
                                     ),
                                     const SizedBox(height: smallPadding),
-                                    const Divider(color: kPrimaryLightColor),
+                                    const Divider(color: Color(0xA66F35A5)),
                                     const SizedBox(height: smallPadding),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

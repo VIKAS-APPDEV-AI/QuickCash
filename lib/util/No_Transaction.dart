@@ -13,7 +13,7 @@ class NoTransactions extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
         child: Card(
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
           elevation: 4,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

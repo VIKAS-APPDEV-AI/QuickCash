@@ -1,7 +1,9 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:quickcash/Screens/ForgotScreen/model/forgotPasswordApi.dart';
@@ -33,16 +35,18 @@ class _ForgotPasswordState extends State<ForgotPasswordForm> {
   bool isLoading = false;
   String? errorMessage;
 
-  Future<void> _sendOtpToEmail(String email, int otp) async {
-    // Your SMTP server credentials
-    String username = 'shivamg@itio.in'; // Replace with your email
-    String password =
-        '08F302E2946734E5198AC39C662EDFDA76BE'; // Replace with your email password or app-specific password
+// For Flutter projects
 
-    // SMTP server configuration
+  Future<void> _sendOtpToEmail(String email, int otp) async {
+    // Gmail credentials from .env
+    final String username = dotenv.env['SMTP_MAIL_USER']!;
+    final String password = dotenv.env['SMTP_MAIL_PASSWORD']!;
+
+    // Gmail SMTP server configuration
     final smtpServer = SmtpServer(
-      'smtp.elasticemail.com', // Use your SMTP server (e.g., Gmail's server)
-      port: 2525, // SMTP port
+      dotenv.env['SMTP_MAIL_HOST']!,
+      port: int.parse(dotenv.env['SMTP_MAIL_PORT']!),
+      ssl: dotenv.env['SMTP_MAIL_ENCRYPTION'] == 'ssl',
       username: username,
       password: password,
     );
@@ -50,27 +54,41 @@ class _ForgotPasswordState extends State<ForgotPasswordForm> {
     // Email content
     final message = Message()
       ..from = Address(username, 'quickcash')
-      ..recipients.add(email) // Recipient email
-      ..subject = 'quickcash OTP Verification' // Email subject
+      ..recipients.add(email)
+      ..subject = 'Quickcash Change Password OTP Verification'
       ..html = '''
-      <div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
-        <div style="margin:50px auto;width:70%;padding:20px 0">
-          <div style="border-bottom:1px solid #eee">
-            <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">$email</a>
-          </div>
-          <p style="font-size:1.1em">Hi,</p>
-          <p>Thank you for choosing quickcash. Use the following OTP to Verify Your Email ID. OTP is valid for 5 minutes:</p>
-          <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">
-            $otp
-          </h2>
-          <p style="font-size:0.9em;">Regards,<br/>quickcash</p>
-          <hr style="border:none;border-top:1px solid #eee" />
-        </div>
+  <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f9f9f9; padding: 30px;">
+    <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      <div style="background-color: #6F35A5; padding: 20px; text-align: center;">
+        <h1 style="color: #ffffff; margin: 0; font-size: 24px;">QuickCash</h1>
       </div>
-    ''';
+      <div style="padding: 30px;">
+        <p style="font-size: 16px; color: #333333;">Hi, $email</p>
+        <p style="font-size: 15px; color: #555555;">
+          Thank you for choosing <strong>QuickCash</strong>.<br>
+          Please use the following OTP to Change your Account Password. The OTP is valid for <strong>5 minutes</strong>.
+        </p>
+        <div style="text-align: center; margin: 30px 0;">
+          <span style="display: inline-block; background-color: #6F35A5; color: #ffffff; font-size: 24px; letter-spacing: 4px; padding: 12px 30px; border-radius: 8px; font-weight: bold;">
+            $otp
+          </span>
+        </div>
+        <p style="font-size: 14px; color: #888888;">
+          If you didn’t request this OTP, please ignore this email or contact support if you have concerns.
+        </p>
+        <p style="font-size: 14px; color: #555555; margin-top: 30px;">
+          Regards,<br>
+          <strong>QuickCash Team</strong>
+        </p>
+      </div>
+      <div style="background-color: #f0f0f0; padding: 15px; text-align: center; font-size: 12px; color: #999999;">
+        © ${DateTime.now().year} QuickCash. All rights reserved.
+      </div>
+    </div>
+  </div>
+  ''';
 
     try {
-      // Send the email
       final sendReport = await send(message, smtpServer);
       print('Email sent: ${sendReport.toString()}');
     } catch (e) {
@@ -114,14 +132,14 @@ class _ForgotPasswordState extends State<ForgotPasswordForm> {
           //   context: context,
           //   message:
           //       '',
-          //   color: kGreenColor, // Set the color of the SnackBar
+          //   color: Colors.green, // Set the color of the SnackBar
           // );
         } else {
           // Handle failure scenario
           CustomSnackBar.showSnackBar(
             context: context,
             message: 'We are facing some issue!',
-            color: kRedColor, // Set the color of the SnackBar
+            color: Colors.red, // Set the color of the SnackBar
           );
           print("Message from response: ${response.message}");
         }
@@ -149,8 +167,9 @@ class _ForgotPasswordState extends State<ForgotPasswordForm> {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return const Center(
-            child: CircularProgressIndicator(color: kPrimaryColor),
+          return Center(
+            child: CircularProgressIndicator(
+                color: Theme.of(context).extension<AppColors>()!.primary),
           );
         },
       );
@@ -162,7 +181,7 @@ class _ForgotPasswordState extends State<ForgotPasswordForm> {
       // CustomSnackBar.showSnackBar(
       //   context: context,
       //   message: 'OTP Sent Successfully to $email',
-      //   color: kGreenColor, // Set the color of the SnackBar
+      //   color: Colors.green, // Set the color of the SnackBar
       // );
 
       // Dismiss progress dialog
@@ -181,7 +200,7 @@ class _ForgotPasswordState extends State<ForgotPasswordForm> {
         CustomSnackBar.showSnackBar(
           context: context,
           message: "Failed to send OTP: $e",
-          color: kRedColor, // Set the color of the SnackBar
+          color: Colors.red, // Set the color of the SnackBar
         );
       });
     } finally {
@@ -196,23 +215,52 @@ class _ForgotPasswordState extends State<ForgotPasswordForm> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-          child: SizedBox(
-            height: 400,
-            width: 450,
-            child: Dialog(
-              backgroundColor: Colors.transparent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 6.0, sigmaY: 6.0),
+          child: Dialog(
+            backgroundColor: Colors.white.withOpacity(0.1),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25),
+            ),
+            insetPadding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+            child: Container(
+              constraints: const BoxConstraints(
+                maxWidth: 400,
+                maxHeight: 450,
               ),
-              child: OTPSCREEN(
-                email: email,
-                generatedOtp: generateOtp,
-                onVerified: _onOtpVerified,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25),
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withOpacity(0.3),
+                    Colors.white.withOpacity(0.1),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                border: Border.all(color: Colors.white.withOpacity(0.2)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.25),
+                    blurRadius: 15,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(25),
+                child: Material(
+                  color: Colors.transparent,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: OTPSCREEN(
+                      email: email,
+                      generatedOtp: generateOtp,
+                      onVerified: _onOtpVerified,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -248,7 +296,7 @@ class _ForgotPasswordState extends State<ForgotPasswordForm> {
         CustomSnackBar.showSnackBar(
           context: context,
           message: "Failed to fetch token: $e",
-          color: kRedColor,
+          color: Colors.red,
         );
       } finally {
         setState(() {
@@ -264,12 +312,11 @@ class _ForgotPasswordState extends State<ForgotPasswordForm> {
         key: _fromKey,
         child: Column(
           children: [
-            
-            const Center(
+            Center(
               child: Text(
                 'Please enter your email address. You will receive a OTP via email to create a new password.',
                 style: TextStyle(
-                  color: kPrimaryColor,
+                  color: Theme.of(context).extension<AppColors>()!.primary,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -281,7 +328,7 @@ class _ForgotPasswordState extends State<ForgotPasswordForm> {
               controller: _emailController, // Use the controller here
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
-              cursorColor: kPrimaryColor,
+              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
               onSaved: (value) {
                 email = value;
               },
@@ -291,7 +338,7 @@ class _ForgotPasswordState extends State<ForgotPasswordForm> {
                 }
                 // Regex for basic email validation
                 final regex =
-                  RegExp(r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$');
+                    RegExp(r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$');
                 if (!regex.hasMatch(value)) {
                   return 'Please enter a valid email address';
                 }
@@ -307,8 +354,8 @@ class _ForgotPasswordState extends State<ForgotPasswordForm> {
             ),
 
             if (isLoading)
-              const CircularProgressIndicator(
-                color: kPrimaryColor,
+              CircularProgressIndicator(
+                color: Theme.of(context).extension<AppColors>()!.primary,
               ), // Show loading indicator
             if (errorMessage != null) // Show error message if there's an error
               Text(errorMessage!, style: const TextStyle(color: Colors.red)),
@@ -338,10 +385,10 @@ class _ForgotPasswordState extends State<ForgotPasswordForm> {
                       ),
                     );
                   },
-                  child: const Text(
+                  child: Text(
                     'Remember Your Password?',
                     style: TextStyle(
-                      color: kPrimaryColor,
+                      color: Theme.of(context).extension<AppColors>()!.primary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

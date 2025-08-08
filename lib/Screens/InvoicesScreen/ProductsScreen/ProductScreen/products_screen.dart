@@ -81,19 +81,19 @@ class _ProductsScreenState extends State<ProductsScreen> {
         setState(() {
           mProduct();
           Navigator.of(context).pop();
-          CustomSnackBar.showSnackBar(context: context, message: "Product Data has been deleted successfully!", color: kGreenColor);
+          CustomSnackBar.showSnackBar(context: context, message: "Product Data has been deleted successfully!", color: Colors.green);
         });
       }else{
         setState(() {
           Navigator.of(context).pop();
-          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: kRedColor);
+          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: Colors.red);
         });
       }
 
     }catch (error) {
       setState(() {
         Navigator.of(context).pop();
-        CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: kRedColor);
+        CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: Colors.red);
       });
     }
   }
@@ -123,7 +123,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     child: TextFormField(
                       keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.next,
-                      cursorColor: kPrimaryColor,
+                      cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                       onSaved: (value) {
 
                       },
@@ -154,16 +154,16 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         MaterialPageRoute(builder: (context) => const AddProductScreen()),
                       );
                     },
-                    child: const Icon(Icons.add, color: kPrimaryColor,),
+                    child:  Icon(Icons.add, color: Theme.of(context).extension<AppColors>()!.primary,),
                   ),
                 ],
               ),
 
               const SizedBox(height: largePadding,),
 
-              isLoading ? const Center(
+              isLoading ?  Center(
                 child: CircularProgressIndicator(
-                  color: kPrimaryColor,
+                  color: Theme.of(context).extension<AppColors>()!.primary,
                 ),
               ) :ListView.builder(
                 shrinkWrap: true,
@@ -178,7 +178,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(defaultPadding),
                       decoration: BoxDecoration(
-                        color: kPrimaryColor,
+                        color: Theme.of(context).extension<AppColors>()!.primary,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
@@ -204,7 +204,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           ),
 
                           const SizedBox(height: smallPadding,),
-                          const Divider(color: kPrimaryLightColor,),
+                          const Divider(color: Color(0xA66F35A5),),
                           const SizedBox(height: smallPadding,),
 
                           Row(
@@ -219,7 +219,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           ),
 
                           const SizedBox(height: smallPadding,),
-                          const Divider(color: kPrimaryLightColor,),
+                          const Divider(color: Color(0xA66F35A5),),
                           const SizedBox(height: smallPadding,),
 
                           Row(
@@ -234,7 +234,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           ),
 
                           const SizedBox(height: smallPadding,),
-                          const Divider(color: kPrimaryLightColor,),
+                          const Divider(color: Color(0xA66F35A5),),
                           const SizedBox(height: smallPadding,),
 
                           Row(
@@ -249,7 +249,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           ),
 
                           const SizedBox(height: smallPadding,),
-                          const Divider(color: kPrimaryLightColor,),
+                          const Divider(color: Color(0xA66F35A5),),
 
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -402,9 +402,9 @@ class _ViewProductState extends State<ViewProduct> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(defaultPadding),
-      child: isLoading ? const Center(
+      child: isLoading ?  Center(
         child: CircularProgressIndicator(
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
         ),
       ) : SingleChildScrollView(
         child: Column(
@@ -413,16 +413,16 @@ class _ViewProductState extends State<ViewProduct> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                 Text(
                   'View Product',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: kPrimaryColor,
+                    color: Theme.of(context).extension<AppColors>()!.primary,
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: kPrimaryColor),
+                  icon:  Icon(Icons.close, color: Theme.of(context).extension<AppColors>()!.primary),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -435,14 +435,14 @@ class _ViewProductState extends State<ViewProduct> {
               controller: name,
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.next,
-              cursorColor: kPrimaryColor,
+              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
               onSaved: (value){},
               readOnly: true,
-              style: const TextStyle(color: kPrimaryColor),
+              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
               decoration: InputDecoration(
                 labelText: "Name",
-                labelStyle: const TextStyle(color: kPrimaryColor),
+                labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide()
@@ -457,14 +457,14 @@ class _ViewProductState extends State<ViewProduct> {
               controller: productCode,
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.next,
-              cursorColor: kPrimaryColor,
+              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
               onSaved: (value) {},
               readOnly: true,
-              style: const TextStyle(color: kPrimaryColor),
+              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
               decoration: InputDecoration(
                 labelText: "Product Code",
-                labelStyle: const TextStyle(color: kPrimaryColor),
+                labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide()
@@ -479,14 +479,14 @@ class _ViewProductState extends State<ViewProduct> {
               controller: category,
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.next,
-              cursorColor: kPrimaryColor,
+              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
               onSaved: (value) {},
               readOnly: true,
-              style: const TextStyle(color: kPrimaryColor),
+              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
               decoration: InputDecoration(
                 labelText: "Category",
-                labelStyle: const TextStyle(color: kPrimaryColor),
+                labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide()
@@ -501,14 +501,14 @@ class _ViewProductState extends State<ViewProduct> {
               controller: unitPrice,
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.next,
-              cursorColor: kPrimaryColor,
+              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
               onSaved: (value) {},
               readOnly: true,
-              style: const TextStyle(color: kPrimaryColor),
+              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
               decoration: InputDecoration(
                 labelText: "Unit Price",
-                labelStyle: const TextStyle(color: kPrimaryColor),
+                labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide()
@@ -523,15 +523,15 @@ class _ViewProductState extends State<ViewProduct> {
               controller: description,
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.next,
-              cursorColor: kPrimaryColor,
+              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
               onSaved: (value) {},
               readOnly: true,
               maxLines: 4,
               minLines: 1,
-              style: const TextStyle(color: kPrimaryColor),
+              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
               decoration: InputDecoration(
                 labelText: "Description",
-                labelStyle: const TextStyle(color: kPrimaryColor),
+                labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide()
@@ -547,14 +547,14 @@ class _ViewProductState extends State<ViewProduct> {
               controller: lastUpdate,
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.next,
-              cursorColor: kPrimaryColor,
+              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
               onSaved: (value) {},
               readOnly: true,
-              style: const TextStyle(color: kPrimaryColor),
+              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
               decoration: InputDecoration(
                 labelText: "Last Update",
-                labelStyle: const TextStyle(color: kPrimaryColor),
+                labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide()

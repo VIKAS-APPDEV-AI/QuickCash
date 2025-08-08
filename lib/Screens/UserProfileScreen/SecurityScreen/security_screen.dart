@@ -71,7 +71,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
   //         CustomSnackBar.showSnackBar(
   //           context: context,
   //           message: response.message!,
-  //           color: kPrimaryColor,
+  //           color: Theme.of(context).extension<AppColors>()!.primary,
   //         );
   //       } catch (error) {
   //         setState(() {
@@ -149,7 +149,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       // appBar: AppBar(
-      //   backgroundColor: kPrimaryColor,
+      //   backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
       //   leading: InkWell(
       //       onTap: () {
       //         Navigator.pushReplacement(
@@ -164,7 +164,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
       //       )),
       //   title: const Text(
       //     'Change Password',
-      //     style: TextStyle(color: kWhiteColor),
+      //     style: TextStyle(color: Colors.white),
       //   ),
       // ),
       body: SingleChildScrollView(
@@ -191,7 +191,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                     children: [
                       const SizedBox(height: defaultPadding),
                       if (isLoading)
-                        const CircularProgressIndicator(color: kPrimaryColor),
+                        CircularProgressIndicator(color: Theme.of(context).extension<AppColors>()!.primary),
                       if (errorMessage != null)
                         Text(errorMessage!,
                             style: const TextStyle(color: Colors.red)),
@@ -202,8 +202,8 @@ class _SecurityScreenState extends State<SecurityScreen> {
                         controller: _passwordController,
                         textInputAction: TextInputAction.next,
                         obscureText: !_isPasswordVisible,
-                        cursorColor: kPrimaryColor,
-                        style: const TextStyle(color: kPrimaryColor),
+                        cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                        style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your password';
@@ -215,7 +215,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                         },
                         decoration: InputDecoration(
                           labelText: "Password",
-                          labelStyle: const TextStyle(color: kPrimaryColor),
+                          labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(),
@@ -225,7 +225,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                               _isPasswordVisible
                                   ? Icons.visibility
                                   : Icons.visibility_off,
-                              color: kPrimaryColor,
+                              color: Theme.of(context).extension<AppColors>()!.primary,
                             ),
                             onPressed: () {
                               setState(() {
@@ -241,8 +241,8 @@ class _SecurityScreenState extends State<SecurityScreen> {
                       TextFormField(
                         controller: _confirmPasswordController,
                         obscureText: !_isConfirmPasswordVisible,
-                        cursorColor: kPrimaryColor,
-                        style: const TextStyle(color: kPrimaryColor),
+                        cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                        style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your confirm password';
@@ -254,7 +254,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                         },
                         decoration: InputDecoration(
                           labelText: "Confirm Password",
-                          labelStyle: const TextStyle(color: kPrimaryColor),
+                          labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(),
@@ -264,7 +264,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                               _isConfirmPasswordVisible
                                   ? Icons.visibility
                                   : Icons.visibility_off,
-                              color: kPrimaryColor,
+                              color: Theme.of(context).extension<AppColors>()!.primary,
                             ),
                             onPressed: () {
                               setState(() {
@@ -282,8 +282,8 @@ class _SecurityScreenState extends State<SecurityScreen> {
                       //   TextFormField(
                       //     controller: _otpController,
                       //     keyboardType: TextInputType.number,
-                      //     cursorColor: kPrimaryColor,
-                      //     style: const TextStyle(color: kPrimaryColor),
+                      //     cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                      //     style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       //     validator: (value) {
                       //       if (value == null || value.isEmpty) {
                       //         return 'Please enter OTP';
@@ -292,7 +292,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                       //     },
                       //     decoration: InputDecoration(
                       //       labelText: "OTP",
-                      //       labelStyle: const TextStyle(color: kPrimaryColor),
+                      //       labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       //       border: OutlineInputBorder(
                       //         borderRadius: BorderRadius.circular(12),
                       //         borderSide: const BorderSide(),

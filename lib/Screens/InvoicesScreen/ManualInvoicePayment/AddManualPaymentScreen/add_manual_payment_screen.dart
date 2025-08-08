@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // Import this for date formatting
 import 'package:quickcash/Screens/InvoicesScreen/ManualInvoicePayment/AddManualPaymentScreen/addManualPaymentModel/addManualPaymentApi.dart';
 import 'package:quickcash/Screens/InvoicesScreen/ManualInvoicePayment/AddManualPaymentScreen/addManualPaymentModel/addManualPaymentModel.dart';
 import 'package:quickcash/Screens/InvoicesScreen/ManualInvoicePayment/AddManualPaymentScreen/getManualPaymentDataModel/getManualPaymentApi.dart';
 import 'package:quickcash/Screens/InvoicesScreen/ManualInvoicePayment/AddManualPaymentScreen/getManualPaymentDataModel/getManualPaymentModel.dart';
+import 'package:quickcash/Screens/NotificationsScreen.dart/NotificationScreen.dart';
+import 'package:quickcash/Screens/TicketsScreen/TicketScreen/DashboardTicketScreen.dart';
 import 'package:quickcash/constants.dart';
 import 'package:quickcash/util/auth_manager.dart';
 import '../../../../util/customSnackBar.dart';
@@ -73,7 +76,7 @@ class _AddManualPaymentScreenState extends State<AddManualPaymentScreen> with Wi
       setState(() {
         isLoading = false;
         errorMessage = error.toString();
-        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: kRedColor);
+        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: Colors.red);
       });
     }
   }
@@ -96,20 +99,20 @@ class _AddManualPaymentScreenState extends State<AddManualPaymentScreen> with Wi
         setState(() {
           isLoading = false;
           errorMessage =null;
-          CustomSnackBar.showSnackBar(context: context, message: "Payment has been done Successfully", color: kGreenColor);
+          CustomSnackBar.showSnackBar(context: context, message: "Payment has been done Successfully", color: Colors.green);
           amountPay.clear();
           Navigator.pop(context);
         });
       }else if(response.message == "Please make sure enter amount should not be more than Invoice generated amount!"){
         setState(() {
-          CustomSnackBar.showSnackBar(context: context, message: "Please make sure enter amount should not be more than Invoice generated amount!", color: kRedColor);
+          CustomSnackBar.showSnackBar(context: context, message: "Please make sure enter amount should not be more than Invoice generated amount!", color: Colors.red);
           isLoading = false;
           errorMessage = null;
         });
       }else{
         setState(() {
           isLoading = false;
-          CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: kRedColor);
+          CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: Colors.red);
         });
       }
 
@@ -117,7 +120,7 @@ class _AddManualPaymentScreenState extends State<AddManualPaymentScreen> with Wi
       setState(() {
         isLoading = false;
         errorMessage = error.toString();
-        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: kRedColor);
+        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: Colors.red);
       });
     }
 
@@ -153,17 +156,52 @@ class _AddManualPaymentScreenState extends State<AddManualPaymentScreen> with Wi
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Add Manual Payment",
           style: TextStyle(color: Colors.white),
         ),
+        flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color.fromARGB(255, 6, 6, 6), // Dark neo-banking color
+                      Color(0xFF8A2BE2), // Gradient transition
+                      Color(0x00000000), // Transparent fade
+                    ],
+                    stops: [0.0, 0.7, 1.0],
+                  ),
+                ),
+              ),
+          actions: [
+          IconButton(
+            icon: const Icon(CupertinoIcons.bell_fill),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => NotificationScreen(),
+                  ));
+            },
+            tooltip: 'Notifications',
+          ),
+          IconButton(
+            icon: const Icon(CupertinoIcons.headphones),
+            onPressed: () {
+             Navigator.push(context, CupertinoPageRoute(builder: (context) => DashboardTicketScreen(),));
+            },
+            tooltip: 'Support',
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: isLoading
-          ? const Center(
+          ?  Center(
         child: CircularProgressIndicator(
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
         ),
       )
           : SingleChildScrollView(
@@ -175,10 +213,10 @@ class _AddManualPaymentScreenState extends State<AddManualPaymentScreen> with Wi
               const SizedBox(height: largePadding),
               DropdownButtonFormField<String?>(
                 value: selectedInvoice,
-                style: const TextStyle(color: kPrimaryColor),
+                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 decoration: InputDecoration(
                   labelText: 'Invoice',
-                  labelStyle: const TextStyle(color: kPrimaryColor),
+                  labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(),
@@ -193,7 +231,7 @@ class _AddManualPaymentScreenState extends State<AddManualPaymentScreen> with Wi
                 ].map((String? invoice) {
                   return DropdownMenuItem<String?>(
                     value: invoice,
-                    child: Text(invoice ?? '', style: const TextStyle(color: kPrimaryColor, fontSize: 16)),
+                    child: Text(invoice ?? '', style:  TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16)),
                   );
                 }).toList(),
                 onChanged: (newValue) {
@@ -213,14 +251,14 @@ class _AddManualPaymentScreenState extends State<AddManualPaymentScreen> with Wi
               TextFormField(
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
-                cursorColor: kPrimaryColor,
+                cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                 onSaved: (value) {},
                 readOnly: true,
                 controller: TextEditingController(text: '$currency ${dueAmount?.toString() ?? '0.0'}'),
-                style: const TextStyle(color: kPrimaryColor),
+                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 decoration: InputDecoration(
                   labelText: "Due Amount",
-                  labelStyle: const TextStyle(color: kPrimaryColor),
+                  labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide()),
@@ -232,14 +270,14 @@ class _AddManualPaymentScreenState extends State<AddManualPaymentScreen> with Wi
               TextFormField(
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
-                cursorColor: kPrimaryColor,
+                cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                 onSaved: (value) {},
                 readOnly: true,
                 controller: TextEditingController(text: '$currency ${paidAmount?.toString() ?? '0.0'}'),
-                style: const TextStyle(color: kPrimaryColor),
+                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 decoration: InputDecoration(
                   labelText: "Paid Amount",
-                  labelStyle: const TextStyle(color: kPrimaryColor),
+                  labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide()),
@@ -252,13 +290,13 @@ class _AddManualPaymentScreenState extends State<AddManualPaymentScreen> with Wi
                 controller: _dateController, // Use the controller here
                 keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.next,
-                cursorColor: kPrimaryColor,
+                cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                 onSaved: (value) {},
                 readOnly: true,
-                style: const TextStyle(color: kPrimaryColor),
+                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 decoration: InputDecoration(
                   labelText: "Payment Date",
-                  labelStyle: const TextStyle(color: kPrimaryColor),
+                  labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(),
@@ -272,13 +310,13 @@ class _AddManualPaymentScreenState extends State<AddManualPaymentScreen> with Wi
                 controller: amountPay,
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
-                cursorColor: kPrimaryColor,
+                cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                 onSaved: (value) {},
                 readOnly: false,
-                style: const TextStyle(color: kPrimaryColor),
+                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 decoration: InputDecoration(
                   labelText: "Amount",
-                  labelStyle: const TextStyle(color: kPrimaryColor),
+                  labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide()),
@@ -296,13 +334,13 @@ class _AddManualPaymentScreenState extends State<AddManualPaymentScreen> with Wi
               TextFormField(
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
-                cursorColor: kPrimaryColor,
+                cursorColor: Theme.of(context).extension<AppColors>()!.primary,
                 onSaved: (value) {},
                 readOnly: true,
-                style: const TextStyle(color: kPrimaryColor),
+                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 decoration: InputDecoration(
                   labelText: "Payment Mode",
-                  labelStyle: const TextStyle(color: kPrimaryColor),
+                  labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide()),
@@ -316,13 +354,13 @@ class _AddManualPaymentScreenState extends State<AddManualPaymentScreen> with Wi
                 controller: mNotes,
                 keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.next,
-                cursorColor: kPrimaryColor,
-                style: const TextStyle(color: kPrimaryColor),
+                cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 minLines: 6,
                 maxLines: 12,
                 decoration: InputDecoration(
                   labelText: "Notes",
-                  labelStyle: const TextStyle(color: kPrimaryColor, fontSize: 16),
+                  labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(),
@@ -343,7 +381,7 @@ class _AddManualPaymentScreenState extends State<AddManualPaymentScreen> with Wi
                 padding: const EdgeInsets.symmetric(horizontal: 50),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: kPrimaryColor,
+                    backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -360,10 +398,10 @@ class _AddManualPaymentScreenState extends State<AddManualPaymentScreen> with Wi
                       if(amountPay.text.isNotEmpty){
                         mAddManualPayment(selectedPayment.id,amountPay.text,mNotes.text);
                       }else{
-                        CustomSnackBar.showSnackBar(context: context, message: "Please enter a amount", color: kRedColor);
+                        CustomSnackBar.showSnackBar(context: context, message: "Please enter a amount", color: Colors.red);
                       }
                     }else{
-                      CustomSnackBar.showSnackBar(context: context, message: "Please select invoice", color: kRedColor);
+                      CustomSnackBar.showSnackBar(context: context, message: "Please select invoice", color: Colors.red);
 
                     }
                   }, // Call printInvoiceId when the button is pressed

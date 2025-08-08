@@ -37,7 +37,11 @@ class _StatementScreenState extends State<StatementScreen> {
   String? _selectedAccount;
 
   // Dropdown options
-  final List<String> _transactionTypes = ['Add Money', 'Exchange', 'Money Transfer'];
+  final List<String> _transactionTypes = [
+    'Add Money',
+    'Exchange',
+    'Money Transfer'
+  ];
   final List<String> _statuses = ['Pending', 'Complete', 'Denied'];
   List<String> _accounts = [];
 
@@ -85,7 +89,8 @@ class _StatementScreenState extends State<StatementScreen> {
 
     try {
       final response = await _statementListApi.statementListApi();
-      if (response.transactionList != null && response.transactionList!.isNotEmpty) {
+      if (response.transactionList != null &&
+          response.transactionList!.isNotEmpty) {
         setState(() {
           statementList = response.transactionList!;
           isLoading = false;
@@ -113,8 +118,8 @@ class _StatementScreenState extends State<StatementScreen> {
       builder: (context, child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: kPrimaryColor,
+            colorScheme: ColorScheme.light(
+              primary: Theme.of(context).extension<AppColors>()!.primary,
               onPrimary: Colors.white,
               surface: Colors.white,
             ),
@@ -145,35 +150,42 @@ class _StatementScreenState extends State<StatementScreen> {
     });
   }
 
-  List<TransactionListDetails> _filterStatements(List<TransactionListDetails> statements) {
+  List<TransactionListDetails> _filterStatements(
+      List<TransactionListDetails> statements) {
     return statements.where((statement) {
       bool matches = true;
       if (_startDate != null || _endDate != null) {
         DateTime? statementDate;
         try {
           statementDate = DateTime.parse(statement.transactionDate ?? '');
-          statementDate = DateTime(statementDate.year, statementDate.month, statementDate.day);
+          statementDate = DateTime(
+              statementDate.year, statementDate.month, statementDate.day);
         } catch (e) {
           return false;
         }
         if (_startDate != null) {
-          DateTime normalizedStartDate = DateTime(_startDate!.year, _startDate!.month, _startDate!.day);
+          DateTime normalizedStartDate =
+              DateTime(_startDate!.year, _startDate!.month, _startDate!.day);
           if (statementDate.isBefore(normalizedStartDate)) matches = false;
         }
         if (_endDate != null) {
-          DateTime normalizedEndDate = DateTime(_endDate!.year, _endDate!.month, _endDate!.day);
+          DateTime normalizedEndDate =
+              DateTime(_endDate!.year, _endDate!.month, _endDate!.day);
           if (statementDate.isAfter(normalizedEndDate)) matches = false;
         }
       }
       if (_selectedTransactionType != null &&
-          statement.transactionType?.toLowerCase() != _selectedTransactionType!.toLowerCase()) {
+          statement.transactionType?.toLowerCase() !=
+              _selectedTransactionType!.toLowerCase()) {
         matches = false;
       }
       if (_selectedStatus != null) {
-        String normalizedStatementStatus = statement.transactionStatus?.toLowerCase() ?? '';
+        String normalizedStatementStatus =
+            statement.transactionStatus?.toLowerCase() ?? '';
         String normalizedSelectedStatus = _selectedStatus!.toLowerCase();
         if (normalizedSelectedStatus == "complete") {
-          if (normalizedStatementStatus != "success" && normalizedStatementStatus != "succeeded") {
+          if (normalizedStatementStatus != "success" &&
+              normalizedStatementStatus != "succeeded") {
             matches = false;
           }
         } else if (normalizedStatementStatus != normalizedSelectedStatus) {
@@ -192,42 +204,64 @@ class _StatementScreenState extends State<StatementScreen> {
     try {
       var excelInstance = excel.Excel.createExcel();
       excel.Sheet sheet = excelInstance['Sheet1'];
-      sheet.cell(excel.CellIndex.indexByString("A1")).value = excel.TextCellValue("Date");
-      sheet.cell(excel.CellIndex.indexByString("B1")).value = excel.TextCellValue("Transaction ID");
-      sheet.cell(excel.CellIndex.indexByString("C1")).value = excel.TextCellValue("Type");
-      sheet.cell(excel.CellIndex.indexByString("D1")).value = excel.TextCellValue("Amount");
-      sheet.cell(excel.CellIndex.indexByString("E1")).value = excel.TextCellValue("Balance");
-      sheet.cell(excel.CellIndex.indexByString("F1")).value = excel.TextCellValue("Status");
+      sheet.cell(excel.CellIndex.indexByString("A1")).value =
+          excel.TextCellValue("Date");
+      sheet.cell(excel.CellIndex.indexByString("B1")).value =
+          excel.TextCellValue("Transaction ID");
+      sheet.cell(excel.CellIndex.indexByString("C1")).value =
+          excel.TextCellValue("Type");
+      sheet.cell(excel.CellIndex.indexByString("D1")).value =
+          excel.TextCellValue("Amount");
+      sheet.cell(excel.CellIndex.indexByString("E1")).value =
+          excel.TextCellValue("Balance");
+      sheet.cell(excel.CellIndex.indexByString("F1")).value =
+          excel.TextCellValue("Status");
 
       for (int i = 0; i < statements.length; i++) {
         var statement = statements[i];
-        String amountDisplay = TransactionCard(transaction: statement, onTap: () {}).getAmountDisplay();
-        String fullType = "${statement.extraType?.toLowerCase() ?? ''}-${statement.transactionType?.toLowerCase() ?? ''}";
-        sheet.cell(excel.CellIndex.indexByString("A${i + 2}")).value = excel.TextCellValue(
-            statement.transactionDate != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(statement.transactionDate!)) : 'N/A');
-        sheet.cell(excel.CellIndex.indexByString("B${i + 2}")).value = excel.TextCellValue(statement.transactionId ?? 'N/A');
-        sheet.cell(excel.CellIndex.indexByString("C${i + 2}")).value = excel.TextCellValue(statement.transactionType ?? 'N/A');
-        sheet.cell(excel.CellIndex.indexByString("D${i + 2}")).value = excel.TextCellValue(amountDisplay);
-        sheet.cell(excel.CellIndex.indexByString("E${i + 2}")).value = excel.TextCellValue(
-            '${fullType.contains('credit-exchange') ? TransactionCard(transaction: statement, onTap: () {}).getCurrencySymbol(statement.to_currency) : TransactionCard(transaction: statement, onTap: () {}).getCurrencySymbol(statement.fromCurrency)}${statement.balance?.toStringAsFixed(2) ?? '0.00'}');
-        sheet.cell(excel.CellIndex.indexByString("F${i + 2}")).value = excel.TextCellValue(
-            statement.transactionStatus?.isEmpty ?? true
-                ? 'Unknown'
-                : (statement.transactionStatus!.toLowerCase() == 'succeeded'
-                    ? 'Success'
-                    : statement.transactionStatus!.substring(0, 1).toUpperCase() + statement.transactionStatus!.substring(1).toLowerCase()));
+        String amountDisplay =
+            TransactionCard(transaction: statement, onTap: () {})
+                .getAmountDisplay();
+        String fullType =
+            "${statement.extraType?.toLowerCase() ?? ''}-${statement.transactionType?.toLowerCase() ?? ''}";
+        sheet.cell(excel.CellIndex.indexByString("A${i + 2}")).value =
+            excel.TextCellValue(statement.transactionDate != null
+                ? DateFormat('yyyy-MM-dd')
+                    .format(DateTime.parse(statement.transactionDate!))
+                : 'N/A');
+        sheet.cell(excel.CellIndex.indexByString("B${i + 2}")).value =
+            excel.TextCellValue(statement.transactionId ?? 'N/A');
+        sheet.cell(excel.CellIndex.indexByString("C${i + 2}")).value =
+            excel.TextCellValue(statement.transactionType ?? 'N/A');
+        sheet.cell(excel.CellIndex.indexByString("D${i + 2}")).value =
+            excel.TextCellValue(amountDisplay);
+        sheet.cell(excel.CellIndex.indexByString("E${i + 2}")).value =
+            excel.TextCellValue(
+                '${fullType.contains('credit-exchange') ? TransactionCard(transaction: statement, onTap: () {}).getCurrencySymbol(statement.to_currency) : TransactionCard(transaction: statement, onTap: () {}).getCurrencySymbol(statement.fromCurrency)}${statement.balance?.toStringAsFixed(2) ?? '0.00'}');
+        sheet
+            .cell(excel.CellIndex.indexByString("F${i + 2}"))
+            .value = excel.TextCellValue(statement.transactionStatus?.isEmpty ??
+                true
+            ? 'Unknown'
+            : (statement.transactionStatus!.toLowerCase() == 'succeeded'
+                ? 'Success'
+                : statement.transactionStatus!.substring(0, 1).toUpperCase() +
+                    statement.transactionStatus!.substring(1).toLowerCase()));
       }
 
       final directory = await getApplicationDocumentsDirectory();
-      final path = "${directory.path}/statements_${DateTime.now().millisecondsSinceEpoch}.xlsx";
+      final path =
+          "${directory.path}/statements_${DateTime.now().millisecondsSinceEpoch}.xlsx";
       File(path)
         ..createSync(recursive: true)
         ..writeAsBytesSync(excelInstance.encode()!);
 
       await OpenFile.open(path);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Excel file downloaded successfully!')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Excel file downloaded successfully!')));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error downloading Excel: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error downloading Excel: $e')));
     }
   }
 
@@ -241,21 +275,40 @@ class _StatementScreenState extends State<StatementScreen> {
             return [
               pw.Header(level: 0, child: pw.Text("Statement List")),
               pw.Table.fromTextArray(
-                headers: ['Date', 'Transaction ID', 'Type', 'Amount', 'Balance', 'Status'],
+                headers: [
+                  'Date',
+                  'Transaction ID',
+                  'Type',
+                  'Amount',
+                  'Balance',
+                  'Status'
+                ],
                 data: statements.map((statement) {
-                  String amountDisplay = TransactionCard(transaction: statement, onTap: () {}).getAmountDisplay();
-                  String fullType = "${statement.extraType?.toLowerCase() ?? ''}-${statement.transactionType?.toLowerCase() ?? ''}";
+                  String amountDisplay =
+                      TransactionCard(transaction: statement, onTap: () {})
+                          .getAmountDisplay();
+                  String fullType =
+                      "${statement.extraType?.toLowerCase() ?? ''}-${statement.transactionType?.toLowerCase() ?? ''}";
                   return [
-                    statement.transactionDate != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(statement.transactionDate!)) : 'N/A',
+                    statement.transactionDate != null
+                        ? DateFormat('yyyy-MM-dd')
+                            .format(DateTime.parse(statement.transactionDate!))
+                        : 'N/A',
                     statement.transactionId ?? 'N/A',
                     statement.transactionType ?? 'N/A',
                     amountDisplay,
                     '${fullType.contains('credit-exchange') ? TransactionCard(transaction: statement, onTap: () {}).getCurrencySymbol(statement.to_currency) : TransactionCard(transaction: statement, onTap: () {}).getCurrencySymbol(statement.fromCurrency)}${statement.balance?.toStringAsFixed(2) ?? '0.00'}',
                     statement.transactionStatus?.isEmpty ?? true
                         ? 'Unknown'
-                        : (statement.transactionStatus!.toLowerCase() == 'succeeded'
+                        : (statement.transactionStatus!.toLowerCase() ==
+                                'succeeded'
                             ? 'Success'
-                            : statement.transactionStatus!.substring(0, 1).toUpperCase() + statement.transactionStatus!.substring(1).toLowerCase()),
+                            : statement.transactionStatus!
+                                    .substring(0, 1)
+                                    .toUpperCase() +
+                                statement.transactionStatus!
+                                    .substring(1)
+                                    .toLowerCase()),
                   ];
                 }).toList(),
               ),
@@ -265,14 +318,17 @@ class _StatementScreenState extends State<StatementScreen> {
       );
 
       final directory = await getApplicationDocumentsDirectory();
-      final path = "${directory.path}/statements_${DateTime.now().millisecondsSinceEpoch}.pdf";
+      final path =
+          "${directory.path}/statements_${DateTime.now().millisecondsSinceEpoch}.pdf";
       final file = File(path);
       await file.writeAsBytes(await pdf.save());
 
       await OpenFile.open(path);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('PDF generated successfully!')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('PDF generated successfully!')));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error generating PDF: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error generating PDF: $e')));
     }
   }
 
@@ -284,12 +340,13 @@ class _StatementScreenState extends State<StatementScreen> {
           gradient: LinearGradient(
             begin: Alignment.bottomRight,
             end: Alignment.topLeft,
-            colors: [kWhiteColor.withOpacity(0.0), Colors.black12],
+            colors: [Colors.white.withOpacity(0.0), Colors.black12],
           ),
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -301,7 +358,8 @@ class _StatementScreenState extends State<StatementScreen> {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: kPrimaryColor,
+                        color:
+                            Theme.of(context).extension<AppColors>()!.primary,
                         shadows: [
                           Shadow(
                             color: Colors.black.withOpacity(0.1),
@@ -312,7 +370,8 @@ class _StatementScreenState extends State<StatementScreen> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.grey, size: 28),
+                      icon:
+                          const Icon(Icons.close, color: Colors.grey, size: 28),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -328,7 +387,9 @@ class _StatementScreenState extends State<StatementScreen> {
                       child: GestureDetector(
                         onTap: () => _selectDate(context, true),
                         child: _buildDateField(
-                          _startDate == null ? 'Start Date' : DateFormat('dd MMM yyyy').format(_startDate!),
+                          _startDate == null
+                              ? 'Start Date'
+                              : DateFormat('dd MMM yyyy').format(_startDate!),
                           _startDate == null ? Colors.grey : Colors.black87,
                         ),
                       ),
@@ -338,7 +399,9 @@ class _StatementScreenState extends State<StatementScreen> {
                       child: GestureDetector(
                         onTap: () => _selectDate(context, false),
                         child: _buildDateField(
-                          _endDate == null ? 'End Date' : DateFormat('dd MMM yyyy').format(_endDate!),
+                          _endDate == null
+                              ? 'End Date'
+                              : DateFormat('dd MMM yyyy').format(_endDate!),
                           _endDate == null ? Colors.grey : Colors.black87,
                         ),
                       ),
@@ -352,7 +415,8 @@ class _StatementScreenState extends State<StatementScreen> {
                   value: _selectedTransactionType,
                   items: _transactionTypes,
                   hint: 'Select Type',
-                  onChanged: (value) => setState(() => _selectedTransactionType = value),
+                  onChanged: (value) =>
+                      setState(() => _selectedTransactionType = value),
                 ),
                 const SizedBox(height: 35),
                 _buildSectionTitle('Status', Icons.check_circle_outline),
@@ -370,7 +434,8 @@ class _StatementScreenState extends State<StatementScreen> {
                   value: _selectedAccount,
                   items: _accounts,
                   hint: 'Select Account',
-                  onChanged: (value) => setState(() => _selectedAccount = value),
+                  onChanged: (value) =>
+                      setState(() => _selectedAccount = value),
                 ),
                 const SizedBox(height: 50),
                 Row(
@@ -382,16 +447,22 @@ class _StatementScreenState extends State<StatementScreen> {
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: kPrimaryColor,
+                          backgroundColor:
+                              Theme.of(context).extension<AppColors>()!.primary,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                           elevation: 5,
-                          shadowColor: kPrimaryColor.withOpacity(0.3),
+                          shadowColor: Theme.of(context)
+                              .extension<AppColors>()!
+                              .primary
+                              .withOpacity(0.3),
                         ),
                         child: const Text(
                           'APPLY FILTERS',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -404,15 +475,22 @@ class _StatementScreenState extends State<StatementScreen> {
                         },
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          side: const BorderSide(color: kPrimaryColor, width: 2),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          side: BorderSide(
+                              color: Theme.of(context)
+                                  .extension<AppColors>()!
+                                  .primary,
+                              width: 2),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: const Text(
+                        child: Text(
                           'RESET',
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: kPrimaryColor,
+                            color: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary,
                           ),
                         ),
                       ),
@@ -430,7 +508,8 @@ class _StatementScreenState extends State<StatementScreen> {
   Widget _buildSectionTitle(String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: kPrimaryColor),
+        Icon(icon,
+            size: 20, color: Theme.of(context).extension<AppColors>()!.primary),
         const SizedBox(width: 8),
         Text(
           title,
@@ -467,7 +546,9 @@ class _StatementScreenState extends State<StatementScreen> {
             text,
             style: TextStyle(fontSize: 16, color: textColor),
           ),
-          const Icon(Icons.calendar_today, size: 20, color: kPrimaryColor),
+          Icon(Icons.calendar_today,
+              size: 20,
+              color: Theme.of(context).extension<AppColors>()!.primary),
         ],
       ),
     );
@@ -496,7 +577,9 @@ class _StatementScreenState extends State<StatementScreen> {
       child: DropdownButtonFormField<String>(
         value: value,
         hint: Text(hint, style: const TextStyle(color: Colors.grey)),
-        items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
+        items: items
+            .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+            .toList(),
         onChanged: onChanged,
         decoration: const InputDecoration(
           fillColor: Colors.transparent,
@@ -505,7 +588,8 @@ class _StatementScreenState extends State<StatementScreen> {
         ),
         style: const TextStyle(fontSize: 16, color: Colors.black87),
         dropdownColor: Colors.white,
-        icon: const Icon(Icons.arrow_drop_down, color: kPrimaryColor),
+        icon: Icon(Icons.arrow_drop_down,
+            color: Theme.of(context).extension<AppColors>()!.primary),
       ),
     );
   }
@@ -521,9 +605,14 @@ class _StatementScreenState extends State<StatementScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         automaticallyImplyLeading: false, // Prevents default drawer icon
-        title: const Text(
+        title: Text(
           'Statements',
-          style: TextStyle(color: Colors.black87, fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black,
+              fontSize: 20,
+              fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
         actions: [
@@ -533,7 +622,8 @@ class _StatementScreenState extends State<StatementScreen> {
               if (filteredStatements.isNotEmpty) {
                 _downloadExcel(filteredStatements);
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No statements to download')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('No statements to download')));
               }
             },
             tooltip: 'Download as Excel',
@@ -544,13 +634,16 @@ class _StatementScreenState extends State<StatementScreen> {
               if (filteredStatements.isNotEmpty) {
                 _generatePDF(filteredStatements);
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No statements to generate PDF')));
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('No statements to generate PDF')));
               }
             },
             tooltip: 'View as PDF',
           ),
           IconButton(
-            icon: const Icon(Icons.filter_alt, color: kPrimaryColor, size: 28),
+            icon: Icon(Icons.filter_alt,
+                color: Theme.of(context).extension<AppColors>()!.primary,
+                size: 28),
             onPressed: () {
               _scaffoldKey.currentState?.openDrawer(); // Opens the drawer
             },
@@ -563,14 +656,22 @@ class _StatementScreenState extends State<StatementScreen> {
       body: Column(
         children: [
           const SizedBox(height: 0),
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Divider(color: Colors.black54),
+            child: Divider(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.grey,
+            ),
           ),
           const SizedBox(height: defaultPadding),
           Expanded(
             child: isLoading
-                ? const Center(child: SpinKitWaveSpinner(color: kPrimaryColor, size: 75))
+                ? Center(
+                    child: SpinKitWaveSpinner(
+                        color:
+                            Theme.of(context).extension<AppColors>()!.primary,
+                        size: 75))
                 : RefreshIndicator(
                     onRefresh: mStatementList,
                     child: SingleChildScrollView(
@@ -580,25 +681,30 @@ class _StatementScreenState extends State<StatementScreen> {
                           if (errorMessage != null)
                             Padding(
                               padding: const EdgeInsets.all(16.0),
-                              child: Text(errorMessage!, style: const TextStyle(color: Colors.red)),
+                              child: Text(errorMessage!,
+                                  style: const TextStyle(color: Colors.red)),
                             )
                           else if (filteredStatements.isEmpty)
                             const Center(child: Text('No Statements Available'))
                           else
                             Column(
-                              children: filteredStatements.map((transaction) => TransactionCard(
-                                transaction: transaction,
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => StatementDetailsScreen(
-                                        transactionId: transaction.trxId,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              )).toList(),
+                              children: filteredStatements
+                                  .map((transaction) => TransactionCard(
+                                        transaction: transaction,
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  StatementDetailsScreen(
+                                                transactionId:
+                                                    transaction.trxId,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ))
+                                  .toList(),
                             ),
                         ],
                       ),
@@ -615,25 +721,37 @@ class TransactionCard extends StatefulWidget {
   final TransactionListDetails transaction;
   final VoidCallback onTap;
 
-  const TransactionCard({super.key, required this.transaction, required this.onTap});
+  const TransactionCard(
+      {super.key, required this.transaction, required this.onTap});
 
   String getAmountDisplay() {
     String transType = transaction.transactionType?.toLowerCase() ?? '';
     String? extraType = transaction.extraType?.toLowerCase();
     String fullType = "$extraType-$transType";
-    String currencySymbol = fullType.contains('credit-exchange') ? getCurrencySymbol(transaction.to_currency) : getCurrencySymbol(transaction.fromCurrency);
+    String currencySymbol = fullType.contains('credit-exchange')
+        ? getCurrencySymbol(transaction.to_currency)
+        : getCurrencySymbol(transaction.fromCurrency);
 
     double displayAmount = transaction.amount ?? 0.0;
     double fees = transaction.fees ?? 0.0;
     double cryptobillAmount = fees + displayAmount;
-    double? conversionAmount = transaction.conversionAmount != null ? double.tryParse(transaction.conversionAmount!) ?? 0.0 : null;
+    double? conversionAmount = transaction.conversionAmount != null
+        ? double.tryParse(transaction.conversionAmount!) ?? 0.0
+        : null;
 
-    if (fullType == 'credit-exchange' && conversionAmount != null) return "+$currencySymbol${conversionAmount.toStringAsFixed(2)}";
-    if (fullType == 'credit-add money' && conversionAmount != null) return "+$currencySymbol${conversionAmount.toStringAsFixed(2)}";
-    if (transType == 'add money') return "+$currencySymbol${displayAmount.toStringAsFixed(2)}";
-    if (fullType == 'credit-crypto' && conversionAmount != null) return "+$currencySymbol${displayAmount.toStringAsFixed(2)}";
-    if (fullType == 'debit-crypto' && conversionAmount != null) return "-$currencySymbol${cryptobillAmount.toStringAsFixed(2)}";
-    if (transType == 'external transfer' || transType == 'beneficiary transfer money' || transType == 'exchange') {
+    if (fullType == 'credit-exchange' && conversionAmount != null)
+      return "+$currencySymbol${conversionAmount.toStringAsFixed(2)}";
+    if (fullType == 'credit-add money' && conversionAmount != null)
+      return "+$currencySymbol${conversionAmount.toStringAsFixed(2)}";
+    if (transType == 'add money')
+      return "+$currencySymbol${displayAmount.toStringAsFixed(2)}";
+    if (fullType == 'credit-crypto' && conversionAmount != null)
+      return "+$currencySymbol${displayAmount.toStringAsFixed(2)}";
+    if (fullType == 'debit-crypto' && conversionAmount != null)
+      return "-$currencySymbol${cryptobillAmount.toStringAsFixed(2)}";
+    if (transType == 'external transfer' ||
+        transType == 'beneficiary transfer money' ||
+        transType == 'exchange') {
       return "-$currencySymbol${(fees + displayAmount).toStringAsFixed(2)}";
     }
     return "$currencySymbol${displayAmount.toStringAsFixed(2)}";
@@ -678,19 +796,29 @@ class _TransactionCardState extends State<TransactionCard> {
   }
 
   Color _getAmountColor(String transType, String? extraType) {
-    String fullType = "${extraType?.toLowerCase() ?? ''}-$transType".toLowerCase();
-    if (fullType == 'credit-exchange' || fullType == 'credit-add money' || transType == 'add money' || fullType == 'credit-crypto') {
+    String fullType =
+        "${extraType?.toLowerCase() ?? ''}-$transType".toLowerCase();
+    if (fullType == 'credit-exchange' ||
+        fullType == 'credit-add money' ||
+        transType == 'add money' ||
+        fullType == 'credit-crypto') {
       return Colors.green;
     }
-    if (fullType == 'debit-crypto' || transType == 'external transfer' || fullType == 'debit-beneficiary transfer money' || transType == 'exchange') {
+    if (fullType == 'debit-crypto' ||
+        transType == 'external transfer' ||
+        fullType == 'debit-beneficiary transfer money' ||
+        transType == 'exchange') {
       return Colors.red;
     }
     return Colors.black;
   }
 
   IconData _getTransactionIcon(String transType, String? extraType) {
-    String fullType = "${extraType?.toLowerCase() ?? ''}-$transType".toLowerCase();
-    if (fullType == 'credit-exchange' || fullType == 'debit-exchange' || fullType == 'debit-beneficiary transfer money') {
+    String fullType =
+        "${extraType?.toLowerCase() ?? ''}-$transType".toLowerCase();
+    if (fullType == 'credit-exchange' ||
+        fullType == 'debit-exchange' ||
+        fullType == 'debit-beneficiary transfer money') {
       return Icons.sync;
     }
     if (fullType == 'credit-add money') {
@@ -706,11 +834,19 @@ class _TransactionCardState extends State<TransactionCard> {
   }
 
   Color _getIconColor(String transType, String? extraType) {
-    String fullType = "${extraType?.toLowerCase() ?? ''}-$transType".toLowerCase();
-    if (fullType == 'credit-exchange' || fullType == 'credit-add money' || transType == 'add money' || fullType == 'credit-crypto') {
+    String fullType =
+        "${extraType?.toLowerCase() ?? ''}-$transType".toLowerCase();
+    if (fullType == 'credit-exchange' ||
+        fullType == 'credit-add money' ||
+        transType == 'add money' ||
+        fullType == 'credit-crypto') {
       return Colors.green;
     }
-    if (fullType == 'debit-exchange' || fullType == 'debit-crypto' || transType == 'external transfer' || fullType == 'debit-beneficiary transfer money' || transType == 'exchange') {
+    if (fullType == 'debit-exchange' ||
+        fullType == 'debit-crypto' ||
+        transType == 'external transfer' ||
+        fullType == 'debit-beneficiary transfer money' ||
+        transType == 'exchange') {
       return Colors.red;
     }
     return Colors.black;
@@ -743,7 +879,8 @@ class _TransactionCardState extends State<TransactionCard> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: _getIconColor(transType, extraType).withOpacity(0.1),
+                      color:
+                          _getIconColor(transType, extraType).withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -759,9 +896,12 @@ class _TransactionCardState extends State<TransactionCard> {
                       children: [
                         Text(
                           title,
-                          style: const TextStyle(
+                          style:  TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
+                            color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.black
+                              : Colors.black,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -799,7 +939,8 @@ class _TransactionCardState extends State<TransactionCard> {
                           _isExpanded ? Icons.expand_less : Icons.expand_more,
                           color: Colors.grey,
                         ),
-                        onPressed: () => setState(() => _isExpanded = !_isExpanded),
+                        onPressed: () =>
+                            setState(() => _isExpanded = !_isExpanded),
                       ),
                     ],
                   ),
@@ -811,29 +952,49 @@ class _TransactionCardState extends State<TransactionCard> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Date:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    Text(_formatDate(widget.transaction.transactionDate), style: const TextStyle(fontSize: 16)),
+                    Text("Date:",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.black
+                              : Colors.black,
+                        )),
+                    Text(_formatDate(widget.transaction.transactionDate),
+                        style: const TextStyle(fontSize: 16)),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Transaction ID:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    Text(widget.transaction.transactionId ?? 'N/A', style: const TextStyle(fontSize: 16)),
+                     Text("Transaction ID:",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold,   color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.black
+                              : Colors.black,)),
+                    Text(widget.transaction.transactionId ?? 'N/A',
+                        style:  TextStyle(fontSize: 16,   color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.black
+                              : Colors.black,)),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Amount:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                     Text("Amount:",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.black
+                              : Colors.black,)),
                     Text(
                       widget.getAmountDisplay(),
                       style: TextStyle(
                         color: _getAmountColor(transType, extraType),
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        
                       ),
                     ),
                   ],
@@ -842,18 +1003,31 @@ class _TransactionCardState extends State<TransactionCard> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Type:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    Text(widget.transaction.transactionType ?? 'N/A', style: const TextStyle(fontSize: 16)),
+                     Text("Type:",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.black
+                              : Colors.black,)),
+                    Text(widget.transaction.transactionType ?? 'N/A',
+                        style:  TextStyle(fontSize: 16, color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.black
+                              : Colors.black,)),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Balance:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                     Text("Balance:",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.black
+                              : Colors.black,)),
                     Text(
                       '${fullType.contains('credit-exchange') ? widget.getCurrencySymbol(widget.transaction.to_currency) : widget.getCurrencySymbol(widget.transaction.fromCurrency)}${widget.transaction.balance?.toStringAsFixed(2) ?? '0.00'}',
-                      style: const TextStyle(fontSize: 16),
+                      style:  TextStyle(fontSize: 16, color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.black
+                              : Colors.black,),
                     ),
                   ],
                 ),
@@ -861,20 +1035,34 @@ class _TransactionCardState extends State<TransactionCard> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Status:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                     Text("Status:",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.black
+                              : Colors.black,)),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: _getStatusColor(widget.transaction.transactionStatus),
+                        color: _getStatusColor(
+                            widget.transaction.transactionStatus),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
                         widget.transaction.transactionStatus?.isEmpty ?? true
                             ? 'Unknown'
-                            : (widget.transaction.transactionStatus!.toLowerCase() == 'succeeded'
+                            : (widget.transaction.transactionStatus!
+                                        .toLowerCase() ==
+                                    'succeeded'
                                 ? 'Success'
-                                : widget.transaction.transactionStatus!.substring(0, 1).toUpperCase() + widget.transaction.transactionStatus!.substring(1).toLowerCase()),
-                        style: const TextStyle(color: Colors.white, fontSize: 16),
+                                : widget.transaction.transactionStatus!
+                                        .substring(0, 1)
+                                        .toUpperCase() +
+                                    widget.transaction.transactionStatus!
+                                        .substring(1)
+                                        .toLowerCase()),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 16),
                       ),
                     ),
                   ],

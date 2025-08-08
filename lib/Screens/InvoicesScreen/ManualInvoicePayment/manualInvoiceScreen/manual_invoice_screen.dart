@@ -74,14 +74,14 @@ class _ManualInvoiceScreenState extends State<ManualInvoiceScreen> with WidgetsB
         setState(() {
           isLoading = false;
           errorMessage = 'No Manual Invoices List';
-          CustomSnackBar.showSnackBar(context: context, message: "No Invoices List", color: kPrimaryColor);
+          CustomSnackBar.showSnackBar(context: context, message: "No Invoices List", color: Theme.of(context).extension<AppColors>()!.primary);
         });
       }
     } catch (error) {
       setState(() {
         isLoading = false;
         errorMessage = error.toString();
-        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: kRedColor);
+        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: Colors.red);
       });
     }
   }
@@ -95,19 +95,19 @@ class _ManualInvoiceScreenState extends State<ManualInvoiceScreen> with WidgetsB
         setState(() {
           Navigator.of(context).pop(true);
           mManualInvoice("No");
-          CustomSnackBar.showSnackBar(context: context, message: "Payment deleted successfully!", color: kGreenColor);
+          CustomSnackBar.showSnackBar(context: context, message: "Payment deleted successfully!", color: Colors.green);
         });
       } else {
         setState(() {
           Navigator.of(context).pop(true); // Yes
-          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: kGreenColor);
+          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: Colors.green);
         });
       }
     } catch (error) {
       setState(() {
         isLoading = false;
         errorMessage = error.toString();
-        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: kRedColor);
+        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: Colors.red);
       });
     }
   }
@@ -149,15 +149,15 @@ class _ManualInvoiceScreenState extends State<ManualInvoiceScreen> with WidgetsB
                         MaterialPageRoute(builder: (context) => const AddManualPaymentScreen()),
                       );
                     },
-                    child: const Icon(Icons.add, color: kPrimaryColor),
+                    child:  Icon(Icons.add, color: Theme.of(context).extension<AppColors>()!.primary),
                   ),
                 ],
               ),
               const SizedBox(height: largePadding),
               isLoading
-                  ? const Center(
+                  ?  Center(
                 child: CircularProgressIndicator(
-                  color: kPrimaryColor,
+                  color: Theme.of(context).extension<AppColors>()!.primary,
                 ),
               )
                   : ListView.builder(
@@ -183,7 +183,7 @@ class _ManualInvoiceScreenState extends State<ManualInvoiceScreen> with WidgetsB
                       width: double.infinity,
                       padding: const EdgeInsets.all(defaultPadding),
                       decoration: BoxDecoration(
-                        color: kPrimaryColor,
+                        color: Theme.of(context).extension<AppColors>()!.primary,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
@@ -205,7 +205,7 @@ class _ManualInvoiceScreenState extends State<ManualInvoiceScreen> with WidgetsB
                             ],
                           ),
                           const SizedBox(height: smallPadding),
-                          const Divider(color: kPrimaryLightColor),
+                          const Divider(color: Color(0xA66F35A5)),
                           const SizedBox(height: smallPadding),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -215,7 +215,7 @@ class _ManualInvoiceScreenState extends State<ManualInvoiceScreen> with WidgetsB
                             ],
                           ),
                           const SizedBox(height: smallPadding),
-                          const Divider(color: kPrimaryLightColor),
+                          const Divider(color: Color(0xA66F35A5)),
                           const SizedBox(height: smallPadding),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -225,7 +225,7 @@ class _ManualInvoiceScreenState extends State<ManualInvoiceScreen> with WidgetsB
                             ],
                           ),
                           const SizedBox(height: smallPadding),
-                          const Divider(color: kPrimaryLightColor),
+                          const Divider(color: Color(0xA66F35A5)),
                           const SizedBox(height: smallPadding),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -296,16 +296,16 @@ class _ViewPaymentsState extends State<ViewPayments> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                 Text(
                   'Transaction Details',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: kPrimaryColor,
+                    color: Theme.of(context).extension<AppColors>()!.primary,
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: kPrimaryColor),
+                  icon:  Icon(Icons.close, color: Theme.of(context).extension<AppColors>()!.primary),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -317,13 +317,13 @@ class _ViewPaymentsState extends State<ViewPayments> {
             TextFormField(
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.next,
-              cursorColor: kPrimaryColor,
+              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
               readOnly: true,
-              style: const TextStyle(color: kPrimaryColor),
+              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
               initialValue: manualInvoice.clientInfo?.first.name ?? 'N/A',
               decoration: InputDecoration(
                 labelText: "Name",
-                labelStyle: const TextStyle(color: kPrimaryColor),
+                labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide()
@@ -337,13 +337,13 @@ class _ViewPaymentsState extends State<ViewPayments> {
             TextFormField(
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.next,
-              cursorColor: kPrimaryColor,
+              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
               readOnly: true,
-              style: const TextStyle(color: kPrimaryColor),
+              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
               initialValue: manualInvoice.clientInfo?.first.email ?? 'N/A',
               decoration: InputDecoration(
                 labelText: "Email",
-                labelStyle: const TextStyle(color: kPrimaryColor),
+                labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide()
@@ -357,13 +357,13 @@ class _ViewPaymentsState extends State<ViewPayments> {
             TextFormField(
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.next,
-              cursorColor: kPrimaryColor,
+              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
               readOnly: true,
-              style: const TextStyle(color: kPrimaryColor),
+              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
               initialValue: '${manualInvoice.amountCurrencyText} ${manualInvoice.amount ?? 'N/A'}',
               decoration: InputDecoration(
                 labelText: "Amount",
-                labelStyle: const TextStyle(color: kPrimaryColor),
+                labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide()
@@ -377,13 +377,13 @@ class _ViewPaymentsState extends State<ViewPayments> {
             TextFormField(
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.next,
-              cursorColor: kPrimaryColor,
+              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
               readOnly: true,
-              style: const TextStyle(color: kPrimaryColor),
+              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
               initialValue: formatDate(manualInvoice.paymentDate),
               decoration: InputDecoration(
                 labelText: "Payment Date",
-                labelStyle: const TextStyle(color: kPrimaryColor),
+                labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide()
@@ -397,15 +397,15 @@ class _ViewPaymentsState extends State<ViewPayments> {
             TextFormField(
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.next,
-              cursorColor: kPrimaryColor,
+              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
               readOnly: true,
               maxLines: 12,
               minLines: 6,
-              style: const TextStyle(color: kPrimaryColor),
+              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
               initialValue: manualInvoice.notes ?? 'N/A',
               decoration: InputDecoration(
                 labelText: "Notes",
-                labelStyle: const TextStyle(color: kPrimaryColor),
+                labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide()

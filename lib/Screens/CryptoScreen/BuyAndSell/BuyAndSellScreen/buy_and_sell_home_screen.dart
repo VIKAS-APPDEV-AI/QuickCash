@@ -58,28 +58,31 @@ class _BuyAndSellScreenState extends State<BuyAndSellScreen> {
   }
 
   Color _getStatusColor(String status) {
-    switch (status) {
-      case 'Completed':
+    switch (status.toLowerCase()) {
       case 'completed':
         return Colors.green;
-      case 'Rejected':
+      case 'rejected':
       case 'declined':
         return Colors.red;
-      case 'Pending':
       case 'pending':
         return Colors.orange;
       default:
-        return kPrimaryColor; // Default color if status is unknown
+        return Theme.of(context).brightness == Brightness.dark
+            ? Colors.white70
+            : Colors.grey.shade600;
     }
   }
 
-  // Function to format the date
   String formatDate(String? dateTime) {
     if (dateTime == null) {
-      return 'Date not available'; // Fallback text if dateTime is null
+      return 'Date not available';
     }
-    DateTime date = DateTime.parse(dateTime);
-    return DateFormat('yyyy-MM-dd').format(date);
+    try {
+      DateTime date = DateTime.parse(dateTime);
+      return DateFormat('yyyy-MM-dd').format(date);
+    } catch (e) {
+      return 'Invalid Date';
+    }
   }
 
   String getCurrencySymbol(String currencyCode) {
@@ -90,63 +93,98 @@ class _BuyAndSellScreenState extends State<BuyAndSellScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 600;
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey.shade900
+          : Colors.white,
       // appBar: AppBar(
-      //   backgroundColor: Colors.transparent,
-      //   iconTheme: const IconThemeData(color: Colors.transparent),
-      //   title: const Text(
-      //     "Buy / Sell Exchange",
-      //     style: TextStyle(color: Colors.transparent),
+      //   backgroundColor: Theme.of(context).brightness == Brightness.dark
+      //       ? Colors.grey.shade800
+      //       : Colors.white,
+      //   iconTheme: IconThemeData(
+      //     color: Theme.of(context).brightness == Brightness.dark
+      //         ? Colors.white
+      //         : Colors.black,
       //   ),
+      //   title: Text(
+      //     "Buy / Sell Exchange",
+      //     style: TextStyle(
+      //       color: Theme.of(context).brightness == Brightness.dark
+      //           ? Colors.white
+      //           : Colors.black,
+      //       fontSize: isSmallScreen ? 16 : 20,
+      //       fontWeight: FontWeight.bold,
+      //     ),
+      //   ),
+      //   elevation: 0,
       // ),
       body: Column(
         children: [
-          const SizedBox(height: defaultPadding),
+          SizedBox(height: isSmallScreen ? defaultPadding / 2 : defaultPadding),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 SizedBox(
-                  width: 130,
-                  height: 50,
+                  width: isSmallScreen ? 140 : 170,
+                  height: isSmallScreen ? 40 : 50,
                   child: ElevatedButton(
                     onPressed: () {
                       if (AuthManager.getKycStatus() == "completed") {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  const CryptoBuyAnsSellScreen()),
+                            builder: (context) => const CryptoBuyAnsSellScreen(),
+                          ),
                         );
                       } else {
                         CustomSnackBar.showSnackBar(
-                            context: context,
-                            message: "Your KYC is not completed",
-                            color: kPrimaryColor);
+                          context: context,
+                          message: "Your KYC is not completed",
+                          color: Theme.of(context).extension<AppColors>()!.primary,
+                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: kPrimaryColor,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                        vertical: isSmallScreen ? 12 : 16,
+                        horizontal: isSmallScreen ? 8 : 16,
+                      ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)
-                      )
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: 3,
                     ),
-                    child: const Text('Buy / Sell',
-                        style: TextStyle(color: Colors.white, fontSize: 15)),
+                    child: Text(
+                      'Buy / Sell / Swap',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: isSmallScreen ? 13 : 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(width: defaultPadding),
+                SizedBox(width: isSmallScreen ? defaultPadding / 2 : defaultPadding),
               ],
             ),
           ),
-          const SizedBox(height: defaultPadding),
+          SizedBox(height: isSmallScreen ? defaultPadding / 2 : defaultPadding),
           Expanded(
             child: isLoading
-                ? const Center(
-                    child: SpinKitWaveSpinner(color: kPrimaryColor, size: 75))
+                ? Center(
+                    child: SpinKitWaveSpinner(
+                      color: Theme.of(context).extension<AppColors>()!.primary,
+                      size: isSmallScreen ? 60 : 75,
+                    ),
+                  )
                 : cryptoTransactions.isNotEmpty
                     ? ListView.builder(
                         itemCount: cryptoTransactions.length,
@@ -154,146 +192,245 @@ class _BuyAndSellScreenState extends State<BuyAndSellScreen> {
                           final transaction = cryptoTransactions[index];
                           return Card(
                             elevation: 4.0,
-                            color: Colors.white,
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 20),
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey.shade800
+                                : Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(
+                                color: Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.grey.shade600
+                                    : Colors.grey.shade300,
+                                width: 1,
+                              ),
+                            ),
+                            margin: EdgeInsets.symmetric(
+                              vertical: isSmallScreen ? 6 : 8,
+                              horizontal: isSmallScreen ? 12 : 20,
+                            ),
                             child: Padding(
-                              padding: const EdgeInsets.all(defaultPadding),
+                              padding: EdgeInsets.all(isSmallScreen ? defaultPadding / 1.5 : defaultPadding),
                               child: Column(
                                 children: [
                                   Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        "Coin: ${transaction.coinName!.split('_')[0]}",
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
+                                        "Coin: ${transaction.coinName?.split('_')[0] ?? 'N/A'}",
+                                        style: TextStyle(
+                                          fontSize: isSmallScreen ? 14 : 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
                                       ),
                                       ClipOval(
                                         child: Image.network(
-                                          _getImageForCoin(transaction.coinName!
-                                              .split('_')[0]),
-                                          width: 40,
-                                          height: 40,
-                                          fit: BoxFit
-                                              .cover, // Ensure the image fills the circle
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  const SizedBox(height: defaultPadding),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const Text("Date:",
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold)),
-                                      Text(
-                                          formatDate(transaction.date ?? "N/A"),
-                                          style: const TextStyle(fontSize: 16)),
-                                    ],
-                                  ),
-                                  const SizedBox(height: defaultPadding),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const Text("Payment Type:",
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold)),
-                                      Text(transaction.paymentType ?? "N/A",
-                                          style: const TextStyle(fontSize: 16)),
-                                    ],
-                                  ),
-                                  const SizedBox(height: defaultPadding),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const Text("No Of Coins:",
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold)),
-                                      Text(transaction.noOfCoin ?? "N/A",
-                                          style: const TextStyle(fontSize: 16)),
-                                    ],
-                                  ),
-                                  const SizedBox(height: defaultPadding),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const Text("Side:",
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold)),
-                                      Text(
-                                          transaction.side![0].toUpperCase() +
-                                              transaction.side!.substring(1),
-                                          style: const TextStyle(fontSize: 16)),
-                                    ],
-                                  ),
-                                  const SizedBox(height: defaultPadding),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const Text("Amount:",
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold)),
-                                      Text(
-                                        transaction.noOfCoin != null
-                                            ? '${getCurrencySymbol(transaction.currencyType!)} ${(double.tryParse(transaction.amount?.toString() ?? '0.00')?.toStringAsFixed(2) ?? '0.00')}'
-                                            : '0.00',
-                                        style: const TextStyle(fontSize: 16),
-                                      )
-                                    ],
-                                  ),
-                                  const SizedBox(height: defaultPadding),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const Text("Status:",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16)),
-                                      FilledButton.tonal(
-                                        onPressed: () {},
-                                        style: ButtonStyle(
-                                          backgroundColor:
-                                              WidgetStateProperty.all(
-                                                  _getStatusColor(
-                                                      transaction.status!)),
-                                        ),
-                                        child: Text(
-                                          (transaction.status?.isNotEmpty ??
-                                                  false)
-                                              ? transaction.status![0]
-                                                      .toUpperCase() +
-                                                  transaction.status!
-                                                      .substring(1)
-                                              : "N/A",
-                                          style: const TextStyle(
-                                              color: Colors.white),
+                                          _getImageForCoin(transaction.coinName?.split('_')[0] ?? ''),
+                                          width: isSmallScreen ? 32 : 40,
+                                          height: isSmallScreen ? 32 : 40,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) => Image.asset(
+                                            'assets/icons/default.png',
+                                            width: isSmallScreen ? 32 : 40,
+                                            height: isSmallScreen ? 32 : 40,
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 8),
+                                  SizedBox(height: isSmallScreen ? defaultPadding / 2 : defaultPadding),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Date:",
+                                        style: TextStyle(
+                                          fontSize: isSmallScreen ? 14 : 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                      Text(
+                                        formatDate(transaction.date),
+                                        style: TextStyle(
+                                          fontSize: isSmallScreen ? 14 : 16,
+                                          color: Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.white70
+                                              : Colors.grey.shade600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: isSmallScreen ? defaultPadding / 2 : defaultPadding),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Payment Type:",
+                                        style: TextStyle(
+                                          fontSize: isSmallScreen ? 14 : 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                      Text(
+                                        transaction.paymentType ?? "N/A",
+                                        style: TextStyle(
+                                          fontSize: isSmallScreen ? 14 : 16,
+                                          color: Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.white70
+                                              : Colors.grey.shade600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: isSmallScreen ? defaultPadding / 2 : defaultPadding),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "No Of Coins:",
+                                        style: TextStyle(
+                                          fontSize: isSmallScreen ? 14 : 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                      Text(
+                                        transaction.noOfCoin ?? "N/A",
+                                        style: TextStyle(
+                                          fontSize: isSmallScreen ? 14 : 16,
+                                          color: Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.white70
+                                              : Colors.grey.shade600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: isSmallScreen ? defaultPadding / 2 : defaultPadding),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Side:",
+                                        style: TextStyle(
+                                          fontSize: isSmallScreen ? 14 : 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                      Text(
+                                        transaction.side != null
+                                            ? transaction.side![0].toUpperCase() + transaction.side!.substring(1)
+                                            : "N/A",
+                                        style: TextStyle(
+                                          fontSize: isSmallScreen ? 14 : 16,
+                                          color: Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.white70
+                                              : Colors.grey.shade600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: isSmallScreen ? defaultPadding / 2 : defaultPadding),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Amount:",
+                                        style: TextStyle(
+                                          fontSize: isSmallScreen ? 14 : 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                      Text(
+                                        transaction.noOfCoin != null
+                                            ? '${getCurrencySymbol(transaction.currencyType ?? 'USD')} ${(double.tryParse(transaction.amount?.toString() ?? '0.00')?.toStringAsFixed(2) ?? '0.00')}'
+                                            : '0.00',
+                                        style: TextStyle(
+                                          fontSize: isSmallScreen ? 14 : 16,
+                                          color: Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.white70
+                                              : Colors.grey.shade600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: isSmallScreen ? defaultPadding / 2 : defaultPadding),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Status:",
+                                        style: TextStyle(
+                                          fontSize: isSmallScreen ? 14 : 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                      FilledButton.tonal(
+                                        onPressed: () {},
+                                        style: ButtonStyle(
+                                          backgroundColor: WidgetStateProperty.all(_getStatusColor(transaction.status ?? 'unknown')),
+                                          shape: WidgetStateProperty.all(
+                                            RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                          padding: WidgetStateProperty.all(
+                                            EdgeInsets.symmetric(
+                                              horizontal: isSmallScreen ? 8 : 12,
+                                              vertical: isSmallScreen ? 4 : 6,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          (transaction.status?.isNotEmpty ?? false)
+                                              ? transaction.status![0].toUpperCase() + transaction.status!.substring(1).toLowerCase()
+                                              : "N/A",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: isSmallScreen ? 14 : 16,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: isSmallScreen ? 4 : 8),
                                 ],
                               ),
                             ),
                           );
                         },
                       )
-                    : const Center(child: Text("No Crypto Available.")),
+                    : Center(
+                        child: Text(
+                          "No Crypto Available.",
+                          style: TextStyle(
+                            fontSize: isSmallScreen ? 16 : 18,
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white70
+                                : Colors.grey.shade600,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
           ),
         ],
       ),
@@ -322,6 +459,6 @@ String _getImageForCoin(String coin) {
     case "SHIB":
       return 'https://assets.coincap.io/assets/icons/shib@2x.png';
     default:
-      return 'assets/icons/default.png'; // Default image if needed
+      return 'assets/icons/default.png';
   }
 }

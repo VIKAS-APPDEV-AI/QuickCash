@@ -56,7 +56,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
         setState(() {
           isLoading = false;
           errorMessage = 'No Quote List';
-          CustomSnackBar.showSnackBar(context: context, message: "No Quote List", color: kPrimaryColor);
+          CustomSnackBar.showSnackBar(context: context, message: "No Quote List", color: Theme.of(context).extension<AppColors>()!.primary);
         });
       }
 
@@ -65,7 +65,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
         isLoading = false;
         errorMessage = error.toString();
         print('Error: $error');
-        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: kRedColor);
+        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: Colors.red);
       });
     }
   }
@@ -82,14 +82,14 @@ class _QuotesScreenState extends State<QuotesScreen> {
       final response = await _quoteReminderApi.quoteReminderApi(quoteId!);
 
       if(response.message == "Reminder has been sent"){
-        CustomSnackBar.showSnackBar(context: context, message: "Reminder has been start", color: kGreenColor);
+        CustomSnackBar.showSnackBar(context: context, message: "Reminder has been start", color: Colors.green);
 
       }else{
         setState(() {
           setState(() {
             isLoading = false;
             errorMessage = null;
-            CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: kPrimaryColor);
+            CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: Theme.of(context).extension<AppColors>()!.primary);
           });
         });
       }
@@ -98,7 +98,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
       setState(() {
         isLoading = false;
         errorMessage = error.toString();
-        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: kRedColor);
+        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: Colors.red);
       });
     }
   }
@@ -119,14 +119,14 @@ class _QuotesScreenState extends State<QuotesScreen> {
           errorMessage = null;
           Navigator.of(context).pop(false);
           mQuote("No");
-          CustomSnackBar.showSnackBar(context: context, message: "Quote data has been deleted successfully", color: kPrimaryColor);
+          CustomSnackBar.showSnackBar(context: context, message: "Quote data has been deleted successfully", color: Theme.of(context).extension<AppColors>()!.primary);
         });
       }else{
         setState(() {
           isLoading = false;
           errorMessage = null;
           Navigator.of(context).pop(false);
-          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: kPrimaryColor);
+          CustomSnackBar.showSnackBar(context: context, message: "We are facing some issue!", color: Theme.of(context).extension<AppColors>()!.primary);
         });
       }
 
@@ -135,7 +135,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
         isLoading = false;
         errorMessage = error.toString();
         Navigator.of(context).pop(false);
-        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: kRedColor);
+        CustomSnackBar.showSnackBar(context: context, message: errorMessage!, color: Colors.red);
       });
     }
 
@@ -163,9 +163,9 @@ class _QuotesScreenState extends State<QuotesScreen> {
         ),
       ),
       body: isLoading
-          ? const Center(
+          ?  Center(
         child: CircularProgressIndicator(
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
         ),
       )
           : SingleChildScrollView(
@@ -187,19 +187,15 @@ class _QuotesScreenState extends State<QuotesScreen> {
                               builder: (context) =>
                               const AddQuoteScreen()),
                         );
-                       /* Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const TestCodeScreen()),
-                        );*/
+                     
                       },
-                      backgroundColor: kPrimaryColor,
+                      backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                       label: const Text(
                         'Add Quotes',
                         style:
-                        TextStyle(color: kWhiteColor, fontSize: 15),
+                        TextStyle(color: Colors.white, fontSize: 15),
                       ),
-                      icon: const Icon(Icons.add, color: kWhiteColor),
+                      icon: const Icon(Icons.add, color: Colors.white),
                     ),
                   ),
                 ],
@@ -219,7 +215,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(defaultPadding),
                       decoration: BoxDecoration(
-                        color: kPrimaryColor,
+                        color: Theme.of(context).extension<AppColors>()!.primary,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
@@ -253,7 +249,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
                             height: smallPadding,
                           ),
                           const Divider(
-                            color: kPrimaryLightColor,
+                            color: Color(0xA66F35A5),
                           ),
                           const SizedBox(
                             height: smallPadding,
@@ -278,7 +274,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
                             height: smallPadding,
                           ),
                           const Divider(
-                            color: kPrimaryLightColor,
+                            color: Color(0xA66F35A5),
                           ),
                           const SizedBox(
                             height: smallPadding,
@@ -303,7 +299,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
                             height: smallPadding,
                           ),
                           const Divider(
-                            color: kPrimaryLightColor,
+                            color: Color(0xA66F35A5),
                           ),
                           const SizedBox(
                             height: smallPadding,
@@ -328,7 +324,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
                             height: smallPadding,
                           ),
                           const Divider(
-                            color: kPrimaryLightColor,
+                            color: Color(0xA66F35A5),
                           ),
                           const SizedBox(
                             height: smallPadding,
@@ -357,7 +353,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
                             height: smallPadding,
                           ),
                           const Divider(
-                            color: kPrimaryLightColor,
+                            color: Color(0xA66F35A5),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -507,7 +503,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
         CustomSnackBar.showSnackBar(
           context: context,
           message: 'Quote URL Copied!',
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
         );
       });
     } else {

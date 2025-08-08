@@ -112,15 +112,15 @@ class _PhysicalCardScreenState extends State<PhysicalCardScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                   Text(
                     'Pin Change',
                     style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: kPrimaryColor),
+                        color: Theme.of(context).extension<AppColors>()!.primary),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: kPrimaryColor),
+                    icon:  Icon(Icons.close, color: Theme.of(context).extension<AppColors>()!.primary),
                     onPressed: () {
                       Navigator.pop(context);
                     },
@@ -133,7 +133,7 @@ class _PhysicalCardScreenState extends State<PhysicalCardScreen> {
                 children: [
                   Text('Card Name: $cardName',
                       style:
-                          const TextStyle(fontSize: 16, color: kPrimaryColor)),
+                           TextStyle(fontSize: 16, color: Theme.of(context).extension<AppColors>()!.primary)),
                 ],
               ),
               const SizedBox(height: defaultPadding),
@@ -142,7 +142,7 @@ class _PhysicalCardScreenState extends State<PhysicalCardScreen> {
                 children: [
                   Text('Card Number: $cardNumber',
                       style:
-                          const TextStyle(fontSize: 16, color: kPrimaryColor)),
+                           TextStyle(fontSize: 16, color: Theme.of(context).extension<AppColors>()!.primary)),
                 ],
               ),
               const SizedBox(height: defaultPadding),
@@ -151,7 +151,7 @@ class _PhysicalCardScreenState extends State<PhysicalCardScreen> {
                 children: [
                   Text('Old Password: $oldPassword',
                       style:
-                          const TextStyle(fontSize: 16, color: kPrimaryColor)),
+                           TextStyle(fontSize: 16, color: Theme.of(context).extension<AppColors>()!.primary)),
                 ],
               ),
               const SizedBox(height: 35),
@@ -219,7 +219,7 @@ class _PhysicalCardScreenState extends State<PhysicalCardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Physical Cards",
@@ -227,8 +227,8 @@ class _PhysicalCardScreenState extends State<PhysicalCardScreen> {
         ),
       ),
       body: isLoading
-          ? const Center(
-              child: SpinKitWaveSpinner(color: kPrimaryColor, size: 75),
+          ?  Center(
+              child: SpinKitWaveSpinner(color: Theme.of(context).extension<AppColors>()!.primary, size: 75),
             )
           : SingleChildScrollView(
               scrollDirection: Axis.vertical,
@@ -240,7 +240,7 @@ class _PhysicalCardScreenState extends State<PhysicalCardScreen> {
                         height: 160,
                         width: MediaQuery.of(context).size.width,
                         decoration: BoxDecoration(
-                          color: kPrimaryColor,
+                          color: Theme.of(context).extension<AppColors>()!.primary,
                           borderRadius: BorderRadius.only(
                             bottomLeft: Radius.circular(20),
                             bottomRight: Radius.circular(20),
@@ -256,11 +256,11 @@ class _PhysicalCardScreenState extends State<PhysicalCardScreen> {
                               const SizedBox(height: defaultPadding),
                               const SizedBox(height: 0.0),
                               cardsListData.isEmpty
-                                  ? const Center(
+                                  ?  Center(
                                       child: Text(
                                         'No Cards Available',
                                         style: TextStyle(
-                                            fontSize: 18, color: kPrimaryColor),
+                                            fontSize: 18, color: Theme.of(context).extension<AppColors>()!.primary),
                                       ),
                                     )
                                   : AnimatedContainerWidget(
@@ -363,7 +363,7 @@ class _PhysicalCardScreenState extends State<PhysicalCardScreen> {
                             MaterialPageRoute(builder: (context) => const CardsListScreen()),
                           );
                         }else{
-                          CustomSnackBar.showSnackBar(context: context, message: "Your KYC is not completed", color: kPrimaryColor);
+                          CustomSnackBar.showSnackBar(context: context, message: "Your KYC is not completed", color: Theme.of(context).extension<AppColors>()!.primary);
                         }
                             },
                           ),
@@ -454,7 +454,7 @@ class _PhysicalCardScreenState extends State<PhysicalCardScreen> {
                                           );
                                         },
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: kPrimaryColor,
+                                          backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 16.0),
                                           shape: RoundedRectangleBorder(
@@ -540,7 +540,7 @@ class _PhysicalCardScreenState extends State<PhysicalCardScreen> {
             padding: EdgeInsets.all(12.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              color: kPrimaryColor,
+              color: Theme.of(context).extension<AppColors>()!.primary,
             ),
             child: Icon(
               icon,
@@ -662,16 +662,16 @@ class _AddCardBottomSheetState extends State<AddCardBottomSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                 Text(
                   'Add Card',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: kPrimaryColor,
+                    color: Theme.of(context).extension<AppColors>()!.primary,
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: kPrimaryColor),
+                  icon:  Icon(Icons.close, color: Theme.of(context).extension<AppColors>()!.primary),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -679,12 +679,12 @@ class _AddCardBottomSheetState extends State<AddCardBottomSheet> {
               ],
             ),
             const SizedBox(height: 20),
-            const Text(
+             Text(
               "Add card details here in order to save your card",
               style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: kPrimaryColor),
+                  color: Theme.of(context).extension<AppColors>()!.primary),
             ),
             Card(
               child: Container(
@@ -769,13 +769,13 @@ class _AddCardBottomSheetState extends State<AddCardBottomSheet> {
               controller: name,
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.next,
-              cursorColor: kPrimaryColor,
+              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
               onSaved: (value) {},
               readOnly: false,
-              style: const TextStyle(color: kPrimaryColor),
+              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
               decoration: InputDecoration(
                 labelText: "Your Name",
-                labelStyle: const TextStyle(color: kPrimaryColor, fontSize: 16),
+                labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: const BorderSide(),
@@ -824,15 +824,15 @@ class _AddCardBottomSheetState extends State<AddCardBottomSheet> {
                       horizontal: 12.0, vertical: 15.0),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: kPrimaryColor),
+                    border: Border.all(color: Theme.of(context).extension<AppColors>()!.primary),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(selectedCurrency ?? "Select Currency",
-                          style: const TextStyle(
-                              color: kPrimaryColor, fontSize: 16)),
-                      const Icon(Icons.arrow_drop_down, color: kPrimaryColor),
+                          style:  TextStyle(
+                              color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16)),
+                       Icon(Icons.arrow_drop_down, color: Theme.of(context).extension<AppColors>()!.primary),
                     ],
                   ),
                 ),
@@ -841,7 +841,7 @@ class _AddCardBottomSheetState extends State<AddCardBottomSheet> {
             const SizedBox(height: 45),
             const SizedBox(height: defaultPadding),
             if (isLoading)
-              const SpinKitWaveSpinner(color: kPrimaryColor, size: 75),
+               SpinKitWaveSpinner(color: Theme.of(context).extension<AppColors>()!.primary, size: 75),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 55),
               child: ElevatedButton(
@@ -890,7 +890,7 @@ class _CardItemState extends State<CardItem> {
       height: 250.0,
       padding: const EdgeInsets.all(smallPadding),
       decoration: BoxDecoration(
-        color: kPrimaryColor,
+        color: Theme.of(context).extension<AppColors>()!.primary,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(

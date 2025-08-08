@@ -117,7 +117,7 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
       CustomSnackBar.showSnackBar(
         context: context,
         message: 'You cannot add more products.',
-        color: kPrimaryColor,
+        color: Theme.of(context).extension<AppColors>()!.primary,
       );
     }
   }
@@ -139,12 +139,26 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Add Quote",
           style: TextStyle(color: Colors.white),
         ),
+        flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color.fromARGB(255, 20, 20, 20), // Primary color
+                  Color(0xFF8A2BE2), // Slightly lighter for gradient effect
+                  Color(0x00000000), // Transparent at the bottom
+                ],
+                stops: [0.0, 0.7, 1.0],
+              ),
+            ),
+          ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -202,10 +216,10 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
                                   // Product Dropdown
                                   DropdownButtonFormField<ProductData?>(
                                     value: productList[index]['selectedProduct'],
-                                    style: const TextStyle(color: kPrimaryColor),
+                                    style:  TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                     decoration: InputDecoration(
                                       labelText: 'Product',
-                                      labelStyle: const TextStyle(color: kPrimaryColor),
+                                      labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         borderSide: const BorderSide(),
@@ -216,7 +230,7 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
                                         value: product,
                                         child: Text(
                                           product.productName!,
-                                          style: const TextStyle(color: kPrimaryColor, fontSize: 16),
+                                          style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),
                                         ),
                                       );
                                     }).toList(),
@@ -253,10 +267,10 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
                                       text: productList[index]['quantity'], // Default to '1' if null or empty
                                     ),
                                     keyboardType: TextInputType.number,
-                                    style: const TextStyle(color: kPrimaryColor),
+                                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                     decoration: InputDecoration(
                                       labelText: "Quantity",
-                                      labelStyle: const TextStyle(color: kPrimaryColor),
+                                      labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                       ),
@@ -279,10 +293,10 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
                                       text: productList[index]['price'], // Display the price here
                                     ),
                                     keyboardType: TextInputType.number,
-                                    style: const TextStyle(color: kPrimaryColor),
+                                    style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                     decoration: InputDecoration(
                                       labelText: "Price",
-                                      labelStyle: const TextStyle(color: kPrimaryColor),
+                                      labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                       ),
@@ -309,8 +323,8 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
                                         padding: const EdgeInsets.symmetric(horizontal: 14),
                                         child: Text(
                                           productList[index]['amount'] ?? "0.00", // Display the amount here
-                                          style: const TextStyle(
-                                              color: kPrimaryColor, fontWeight: FontWeight.bold, fontSize: 16),
+                                          style: TextStyle(
+                                              color: Theme.of(context).extension<AppColors>()!.primary, fontWeight: FontWeight.bold, fontSize: 16),
                                         ),
                                       ),
                                     ],
@@ -346,7 +360,7 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
                             onPressed: () {
                               addProduct();
                             },
-                            child: const Icon(Icons.add, color: kPrimaryColor),
+                            child: Icon(Icons.add, color: Theme.of(context).extension<AppColors>()!.primary),
                           ),
                         ],
                       ),
@@ -362,8 +376,8 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
                               controller: discount,
                               keyboardType: TextInputType.number,
                               textInputAction: TextInputAction.next,
-                              cursorColor: kPrimaryColor,
-                              style: const TextStyle(color: kPrimaryColor),
+                              cursorColor: Theme.of(context).extension<AppColors>()!.primary,
+                              style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                               onChanged: (value) {
                                 setState(() {
                                   mDiscount();
@@ -378,7 +392,7 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
                                   borderSide: const BorderSide(),
                                 ),
                                 hintText: "0",
-                                hintStyle: const TextStyle(color: kPrimaryColor),
+                                hintStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                               ),
                             ),
                           ),
@@ -387,11 +401,11 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
                           const SizedBox(width: defaultPadding,),
                           Expanded(child: DropdownButtonFormField<String>(
                             value: selectedDiscount,
-                            style: const TextStyle(color: kPrimaryColor),
+                            style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
 
                             decoration: InputDecoration(
                               labelText: 'Discount',
-                              labelStyle: const TextStyle(color: kPrimaryColor),
+                              labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(),
@@ -402,8 +416,8 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
                                 .map((String role) {
                               return DropdownMenuItem(
                                 value: role,
-                                child: Text(role, style: const TextStyle(
-                                    color: kPrimaryColor, fontSize: 16),),
+                                child: Text(role, style: TextStyle(
+                                    color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16),),
                               );
                             }).toList(),
                             onChanged: (newValue) {
@@ -424,18 +438,18 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
                         child: InputDecorator(
                           decoration: InputDecoration(
                             labelText: 'Select Taxes',
-                            labelStyle: const TextStyle(color: kPrimaryColor),
+                            labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: const BorderSide(),
                             ),
-                            suffixIcon: const Icon(Icons.arrow_drop_down, color: kPrimaryColor),
+                            suffixIcon: Icon(Icons.arrow_drop_down, color: Theme.of(context).extension<AppColors>()!.primary),
                           ),
                           child: Text(
                             selectedTaxes.isEmpty
                                 ? 'Select Taxes'
                                 : selectedTaxes.join(', '),
-                            style: const TextStyle(color: kPrimaryColor),
+                            style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                           ),
                         ),
                       ),
@@ -444,10 +458,10 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             "Sub Total:",
                             style: TextStyle(
-                              color: kPrimaryColor,
+                              color: Theme.of(context).extension<AppColors>()!.primary,
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
@@ -456,8 +470,8 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
                             child: Text(
                               subTotal, // Dynamically updated value
-                              style: const TextStyle(
-                                color: kPrimaryColor,
+                              style: TextStyle(
+                                color: Theme.of(context).extension<AppColors>()!.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -471,15 +485,15 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text("Discount:", style: TextStyle(color: kPrimaryColor,
+                          Text("Discount:", style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary,
                               fontSize: 14,
                               fontWeight: FontWeight.bold),),
                           Padding(padding: const EdgeInsets.symmetric(
                               horizontal: defaultPadding),
                             child: Text(
                               showDiscount,
-                              style: const TextStyle(
-                                  color: kPrimaryColor,
+                              style: TextStyle(
+                                  color: Theme.of(context).extension<AppColors>()!.primary,
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold),),),
                         ],
@@ -489,13 +503,13 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text("Tax:", style: TextStyle(color: kPrimaryColor,
+                          Text("Tax:", style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary,
                               fontSize: 14,
                               fontWeight: FontWeight.bold),),
                           Padding(padding: const EdgeInsets.symmetric(
                               horizontal: defaultPadding),
-                            child: Text(showTaxes, style: const TextStyle(
-                                color: kPrimaryColor,
+                            child: Text(showTaxes, style: TextStyle(
+                                color: Theme.of(context).extension<AppColors>()!.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold),),),
                         ],
@@ -505,13 +519,13 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text("Total:", style: TextStyle(color: kPrimaryColor,
+                          Text("Total:", style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary,
                               fontSize: 14,
                               fontWeight: FontWeight.bold),),
                           Padding(padding: const EdgeInsets.symmetric(
                               horizontal: defaultPadding),
-                            child: Text(showTotalAmount, style: const TextStyle(
-                                color: kPrimaryColor,
+                            child: Text(showTotalAmount, style:  TextStyle(
+                                color: Theme.of(context).extension<AppColors>()!.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold),),),
                         ],
@@ -648,7 +662,7 @@ class _AddQuoteScreenState extends State<AddsssCodeScreen> {
                     return CheckboxListTile(
                       title: Text(
                         '${tax.name ?? ''} - ${tax.taxValue ?? ''}',
-                        style: const TextStyle(color: kPrimaryColor),
+                        style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                       ),
                       value: selectedTaxes.contains('${tax.name ?? ''} - ${tax.taxValue ?? ''}'),
                       onChanged: (bool? isSelected) {

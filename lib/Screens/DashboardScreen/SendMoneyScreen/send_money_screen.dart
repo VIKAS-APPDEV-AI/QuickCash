@@ -1,6 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quickcash/Screens/DashboardScreen/BeneficiaryScreen/show_beneficiary.dart';
 import 'package:quickcash/Screens/DashboardScreen/SendMoneyScreen/PayRecipientsScree/pay_recipients_screen.dart';
+import 'package:quickcash/Screens/NotificationsScreen.dart/NotificationScreen.dart';
+import 'package:quickcash/Screens/TicketsScreen/TicketScreen/DashboardTicketScreen.dart';
 import 'package:quickcash/constants.dart';
 
 class SendMoneyScreen extends StatefulWidget {
@@ -15,11 +18,46 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Send Money",
           style: TextStyle(color: Colors.white),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(CupertinoIcons.bell_fill),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => NotificationScreen(),
+                  ));
+            },
+            tooltip: 'Notifications',
+          ),
+          IconButton(
+            icon: const Icon(CupertinoIcons.headphones),
+            onPressed: () {
+             Navigator.push(context, CupertinoPageRoute(builder: (context) => DashboardTicketScreen(),));
+            },
+            tooltip: 'Support',
+          ),
+          const SizedBox(width: 8),
+        ],
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color.fromARGB(255, 20, 20, 20), // Primary color
+                Color(0xFF8A2BE2), // Slightly lighter for gradient effect
+                Color(0x00000000), // Transparent at the bottom
+              ],
+              stops: [0.0, 0.7, 1.0],
+            ),
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -34,10 +72,11 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                   // Navigate to PayRecipientsScreen when tapped
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const PayRecipientsScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const PayRecipientsScreen()),
                   );
                 },
-                child: const Card(
+                child: Card(
                   elevation: 4.0,
                   color: Colors.white,
                   margin: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
@@ -48,7 +87,8 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                         Icon(
                           Icons.add_box,
                           size: 60,
-                          color: kPrimaryColor,
+                          color:
+                              Theme.of(context).extension<AppColors>()!.primary,
                         ),
                         SizedBox(width: 16),
                         Expanded(
@@ -57,16 +97,20 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                             children: [
                               Text(
                                 'Someone New',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16, color: Theme.of(context).extension<AppColors>()!.black,),
                               ),
                               Text(
                                 'Pay a recipient\'s bank account',
-                                style: TextStyle(color: Colors.grey),
+                                style: TextStyle(color: Colors.grey,),
                               ),
                             ],
                           ),
                         ),
-                        Icon(Icons.navigate_next_rounded, color: kPrimaryColor),
+                        Icon(Icons.navigate_next_rounded,
+                            color: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary),
                       ],
                     ),
                   ),
@@ -80,10 +124,11 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                   // Navigate to PayRecipientsScreen when tapped
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ShowBeneficiaryScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const ShowBeneficiaryScreen()),
                   );
                 },
-                child: const Card(
+                child: Card(
                   elevation: 4.0,
                   color: Colors.white,
                   margin: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
@@ -94,7 +139,8 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                         Icon(
                           Icons.person,
                           size: 60,
-                          color: kPrimaryColor,
+                          color:
+                              Theme.of(context).extension<AppColors>()!.primary,
                         ),
                         SizedBox(width: 16),
                         Expanded(
@@ -103,7 +149,8 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                             children: [
                               Text(
                                 'Recipient',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16, color: Theme.of(context).extension<AppColors>()!.black),
                               ),
                               Text(
                                 'Pay a recipient\'s bank account',
@@ -112,7 +159,10 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                             ],
                           ),
                         ),
-                        Icon(Icons.navigate_next_rounded, color: kPrimaryColor),
+                        Icon(Icons.navigate_next_rounded,
+                            color: Theme.of(context)
+                                .extension<AppColors>()!
+                                .primary),
                       ],
                     ),
                   ),
@@ -121,10 +171,9 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
 
               // Second Card
 
-
               const SizedBox(height: defaultPadding),
 
-            /*  GestureDetector(
+              /*  GestureDetector(
                 onTap: () {
                   // Navigate to PayRecipientsScreen when tapped
                   Navigator.push(
@@ -143,7 +192,7 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                         Icon(
                           Icons.account_balance,
                           size: 60,
-                          color: kPrimaryColor,
+                          color: Theme.of(context).extension<AppColors>()!.primary,
                         ),
                         SizedBox(width: 16),
                         Expanded(
@@ -161,7 +210,7 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                             ],
                           ),
                         ),
-                        Icon(Icons.navigate_next_rounded, color: kPrimaryColor),
+                        Icon(Icons.navigate_next_rounded, color: Theme.of(context).extension<AppColors>()!.primary),
                       ],
                     ),
                   ),
@@ -191,7 +240,7 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                         Icon(
                           Icons.swap_horiz,
                           size: 60,
-                          color: kPrimaryColor,
+                          color: Theme.of(context).extension<AppColors>()!.primary,
                         ),
                         SizedBox(width: 16),
                         Expanded(
@@ -209,7 +258,7 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                             ],
                           ),
                         ),
-                        Icon(Icons.navigate_next_rounded, color: kPrimaryColor),
+                        Icon(Icons.navigate_next_rounded, color: Theme.of(context).extension<AppColors>()!.primary),
                       ],
                     ),
                   ),

@@ -69,6 +69,7 @@ class AddMoneyScreenLogic {
   }
 
   void setupPaymentErrorHandler(Function(PaymentFailureResponse) handler) {
+    
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handler);
   }
 
@@ -138,7 +139,7 @@ class AddMoneyScreenLogic {
       CustomSnackBar.showSnackBar(
         context: context,
         message: "Please select a currency.",
-        color: kPrimaryColor,
+        color: Theme.of(context).extension<AppColors>()!.primary,
       );
       return;
     }
@@ -161,7 +162,7 @@ class AddMoneyScreenLogic {
           CustomSnackBar.showSnackBar(
             context: context,
             message: "Please enter a valid amount.",
-            color: kPrimaryColor,
+            color: Theme.of(context).extension<AppColors>()!.primary,
           );
         }
         return;
@@ -192,7 +193,7 @@ class AddMoneyScreenLogic {
           CustomSnackBar.showSnackBar(
             context: context,
             message: "We are facing some issues!",
-            color: kPrimaryColor,
+            color: Theme.of(context).extension<AppColors>()!.primary,
           );
         }
       }
@@ -202,7 +203,7 @@ class AddMoneyScreenLogic {
         CustomSnackBar.showSnackBar(
           context: context,
           message: error.toString(),
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
         );
       }
     }
@@ -216,6 +217,7 @@ class AddMoneyScreenLogic {
     if (!_validatePaymentPrerequisites(context, formKey, provider)) return;
 
     isAddLoading = true;
+    
     try {
       final dio = Dio();
       final token = AuthManager.getToken();
@@ -254,6 +256,7 @@ class AddMoneyScreenLogic {
 
         await _completeStripePayment(context, dio, token, response.data["data"]["id"], "succeeded");
         if (context.mounted) {
+          isAddLoading = false;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: AwesomeSnackbarContent(
@@ -277,13 +280,16 @@ class AddMoneyScreenLogic {
           );
         }
       } else {
+        isAddLoading = false;
         throw Exception("Failed to create payment intent");
       }
     } on StripeException catch (e) {
       if (context.mounted) {
+         isAddLoading = false;
         CustomSnackBar.showSnackBar(context: context, message: "Stripe Error: ${e.error.localizedMessage}", color: Colors.red);
       }
     } catch (e) {
+       isAddLoading = false;
       if (context.mounted) {
         CustomSnackBar.showSnackBar(context: context, message: "Payment Failed: $e", color: Colors.red);
       }
@@ -323,7 +329,7 @@ class AddMoneyScreenLogic {
   Future<void> openRazorpay(BuildContext context) async {
     final provider = Provider.of<AddMoneyProvider>(context, listen: false);
     if (provider.selectedSendCurrency != "INR") {
-      CustomSnackBar.showSnackBar(context: context, message: "Only INR supported for UPI", color: kRedColor);
+      CustomSnackBar.showSnackBar(context: context, message: "Only INR supported for UPI", color: Colors.red);
       return;
     }
 
@@ -339,8 +345,9 @@ class AddMoneyScreenLogic {
       };
       _razorpay.open(options);
     } catch (e) {
+       isAddLoading = false;
       if (context.mounted) {
-        CustomSnackBar.showSnackBar(context: context, message: "Failed to open Razorpay: $e", color: kRedColor);
+        CustomSnackBar.showSnackBar(context: context, message: "Failed to open Razorpay: $e", color: Colors.red);
       }
     } finally {
       isAddLoading = false;
@@ -390,8 +397,9 @@ class AddMoneyScreenLogic {
         );
       }
     } catch (error) {
+       isAddLoading = false;
       if (context.mounted) {
-        CustomSnackBar.showSnackBar(context: context, message: "Something went wrong: $error", color: kRedColor);
+        CustomSnackBar.showSnackBar(context: context, message: "Something went wrong: $error", color: Colors.red);
       }
     } finally {
       isAddLoading = false;
@@ -401,11 +409,11 @@ class AddMoneyScreenLogic {
   bool _validatePaymentPrerequisites(BuildContext context, GlobalKey<FormState> formKey, AddMoneyProvider provider) {
     if (!formKey.currentState!.validate()) return false;
     if (provider.selectedSendCurrency == null) {
-      CustomSnackBar.showSnackBar(context: context, message: "Please select a currency", color: kPrimaryColor);
+      CustomSnackBar.showSnackBar(context: context, message: "Please select a currency", color: Theme.of(context).extension<AppColors>()!.primary);
       return false;
     }
     if (provider.selectedTransferType == null) {
-      CustomSnackBar.showSnackBar(context: context, message: "Please select a transfer type", color: kPrimaryColor);
+      CustomSnackBar.showSnackBar(context: context, message: "Please select a transfer type", color: Theme.of(context).extension<AppColors>()!.primary);
       return false;
     }
     return true;

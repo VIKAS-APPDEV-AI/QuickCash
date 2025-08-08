@@ -38,15 +38,15 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
     switch (status) {
       case 'Paid':
       case 'paid':
-        return kGreenColor;
+        return Colors.green;
       case 'Unpaid':
       case 'unpaid':
-        return kRedColor;
+        return Colors.red;
       case 'Partial':
       case 'partial':
         return Colors.purpleAccent;
       default:
-        return kPrimaryColor;
+        return Theme.of(context).extension<AppColors>()!.primary;
     }
   }
 
@@ -81,7 +81,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
           CustomSnackBar.showSnackBar(
               context: context,
               message: "No Invoices List",
-              color: kPrimaryColor);
+              color: Theme.of(context).extension<AppColors>()!.primary);
         });
       }
     } catch (error) {
@@ -90,7 +90,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
         errorMessage = error.toString();
         print('Error: $error');
         CustomSnackBar.showSnackBar(
-            context: context, message: errorMessage!, color: kRedColor);
+            context: context, message: errorMessage!, color: Colors.red);
       });
     }
   }
@@ -111,7 +111,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
         CustomSnackBar.showSnackBar(
             context: context,
             message: "Invoice data has been deleted successfully",
-            color: kGreenColor);
+            color: Colors.green);
       } else {
         setState(() {
           isLoading = false;
@@ -120,7 +120,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
           CustomSnackBar.showSnackBar(
               context: context,
               message: "We are facing some issue!",
-              color: kRedColor);
+              color: Colors.red);
         });
       }
     } catch (error) {
@@ -129,7 +129,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
         errorMessage = error.toString();
         Navigator.of(context).pop();
         CustomSnackBar.showSnackBar(
-            context: context, message: errorMessage!, color: kRedColor);
+            context: context, message: errorMessage!, color: Colors.red);
       });
     }
   }
@@ -151,7 +151,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
           CustomSnackBar.showSnackBar(
               context: context,
               message: "Reminder has been sent on email address",
-              color: kGreenColor);
+              color: Colors.green);
         });
       } else {
         setState(() {
@@ -161,7 +161,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
           CustomSnackBar.showSnackBar(
               context: context,
               message: "We are facing some issue!",
-              color: kRedColor);
+              color: Colors.red);
         });
       }
     } catch (error) {
@@ -170,7 +170,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
         errorMessage = error.toString();
         Navigator.of(context).pop();
         CustomSnackBar.showSnackBar(
-            context: context, message: errorMessage!, color: kRedColor);
+            context: context, message: errorMessage!, color: Colors.red);
       });
     }
   }
@@ -217,7 +217,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
           CustomSnackBar.showSnackBar(
               context: context,
               message: "Recurring Status Saved Successfully!",
-              color: kGreenColor);
+              color: Colors.green);
           Navigator.of(context).pop();
           mInvoicesApi("No");
         });
@@ -226,7 +226,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
           CustomSnackBar.showSnackBar(
               context: context,
               message: "We are facing some issue!",
-              color: kRedColor);
+              color: Colors.red);
           Navigator.of(context).pop();
         });
       }
@@ -236,7 +236,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
         errorMessage = error.toString();
         Navigator.of(context).pop();
         CustomSnackBar.showSnackBar(
-            context: context, message: errorMessage!, color: kRedColor);
+            context: context, message: errorMessage!, color: Colors.red);
       });
     }
   }
@@ -256,7 +256,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
         CustomSnackBar.showSnackBar(
           context: context,
           message: 'Invoice URL Copied!',
-          color: kPrimaryColor,
+          color: Theme.of(context).extension<AppColors>()!.primary,
         );
       });
     } else {
@@ -305,9 +305,9 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
         ),
       ),
       body: isLoading
-          ? const Center(
+          ?  Center(
               child: CircularProgressIndicator(
-                color: kPrimaryColor,
+                color: Theme.of(context).extension<AppColors>()!.primary,
               ),
             )
           : SingleChildScrollView(
@@ -333,19 +333,19 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                                   );
 
                                 }else{
-                                  CustomSnackBar.showSnackBar(context: context, message: "Please got to Invoice/Setting and fill all details.", color: kPrimaryColor);
+                                  CustomSnackBar.showSnackBar(context: context, message: "Please got to Invoice/Setting and fill all details.", color: Theme.of(context).extension<AppColors>()!.primary);
                                 }
                               }else{
-                                CustomSnackBar.showSnackBar(context: context, message: "Your KYC is not completed", color: kPrimaryColor);
+                                CustomSnackBar.showSnackBar(context: context, message: "Your KYC is not completed", color: Theme.of(context).extension<AppColors>()!.primary);
                               }
                             },
-                            backgroundColor: kPrimaryColor,
+                            backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
                             label: const Text(
                               'Add Invoice',
                               style:
-                                  TextStyle(color: kWhiteColor, fontSize: 15),
+                                  TextStyle(color: Colors.white, fontSize: 15),
                             ),
-                            icon: const Icon(Icons.add, color: kWhiteColor),
+                            icon: const Icon(Icons.add, color: Colors.white),
                           ),
                         ),
                       ],
@@ -367,7 +367,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                             width: double.infinity,
                             padding: const EdgeInsets.all(defaultPadding),
                             decoration: BoxDecoration(
-                              color: kPrimaryColor,
+                              color: Theme.of(context).extension<AppColors>()!.primary,
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: [
                                 BoxShadow(
@@ -409,7 +409,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                                   height: smallPadding,
                                 ),
                                 const Divider(
-                                  color: kPrimaryLightColor,
+                                  color: Color(0xA66F35A5),
                                 ),
                                 const SizedBox(
                                   height: smallPadding,
@@ -434,7 +434,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                                   height: smallPadding,
                                 ),
                                 const Divider(
-                                  color: kPrimaryLightColor,
+                                  color: Color(0xA66F35A5),
                                 ),
                                 const SizedBox(
                                   height: smallPadding,
@@ -459,7 +459,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                                   height: smallPadding,
                                 ),
                                 const Divider(
-                                  color: kPrimaryLightColor,
+                                  color: Color(0xA66F35A5),
                                 ),
                                 const SizedBox(
                                   height: smallPadding,
@@ -484,7 +484,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                                   height: smallPadding,
                                 ),
                                 const Divider(
-                                  color: kPrimaryLightColor,
+                                  color: Color(0xA66F35A5),
                                 ),
                                 const SizedBox(
                                   height: smallPadding,
@@ -509,7 +509,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                                   height: smallPadding,
                                 ),
                                 const Divider(
-                                  color: kPrimaryLightColor,
+                                  color: Color(0xA66F35A5),
                                 ),
                                 const SizedBox(
                                   height: smallPadding,
@@ -551,7 +551,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                                   height: smallPadding,
                                 ),
                                 const Divider(
-                                  color: kPrimaryLightColor,
+                                  color: Color(0xA66F35A5),
                                 ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
@@ -672,7 +672,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                                               onPressed: () {
                                                 if (invoiceLists.recurring ==
                                                     "yes") {
-                                                  //CustomSnackBar.showSnackBar(context: context, message: "Recurring Status Saved Successfully!", color: kGreenColor);
+                                                  //CustomSnackBar.showSnackBar(context: context, message: "Recurring Status Saved Successfully!", color: Colors.green);
                                                   stopRecurringDialog(
                                                       invoiceLists.id, "no");
                                                 } else {
@@ -729,10 +729,10 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                 const SizedBox(height: largePadding),
                 DropdownButtonFormField<String>(
                   value: selectedRecurring,
-                  style: const TextStyle(color: kPrimaryColor),
+                  style: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                   decoration: InputDecoration(
                     labelText: 'Recurring',
-                    labelStyle: const TextStyle(color: kPrimaryColor),
+                    labelStyle: TextStyle(color: Theme.of(context).extension<AppColors>()!.primary),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(),
@@ -751,8 +751,8 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                     return DropdownMenuItem(
                       value: category,
                       child: Text(category,
-                          style: const TextStyle(
-                              color: kPrimaryColor, fontSize: 16)),
+                          style:  TextStyle(
+                              color: Theme.of(context).extension<AppColors>()!.primary, fontSize: 16)),
                     );
                   }).toList(),
                   onChanged: (newValue) {
