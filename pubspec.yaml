@@ -3,7 +3,7 @@ description: "Quickcash App"
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 15.1.0
+version: 15.2.0
 
 environment:
   sdk: ^3.5.3
@@ -63,6 +63,8 @@ dependencies:
   shimmer: ^3.0.0
   smooth_page_indicator: ^1.2.0+3
   syncfusion_flutter_charts: ^29.2.7
+  syncfusion_flutter_xlsio: ^29.2.7
+  syncfusion_flutter_pdf: ^29.2.7
   url_launcher: ^6.3.1
   web_socket_channel: ^3.0.1
   webview_flutter: ^4.10.0

@@ -32,6 +32,7 @@ import 'package:quickcash/components/background.dart';
 import 'package:quickcash/constants.dart';
 import 'package:quickcash/util/auth_manager.dart';
 import 'package:quickcash/util/customSnackBar.dart';
+import 'package:quickcash/util/file_export_utils.dart';
 import 'package:quickcash/utils/themeProvider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -177,67 +178,37 @@ class _DashboardScreenState extends State<DashboardScreen>
   Future<void> _downloadExcel(
       BuildContext context, DashboardProvider provider) async {
     try {
-      final excel = excel_.Excel.createExcel();
-      final sheet = excel['Transactions'];
-
-      sheet.appendRow([
-        excel_.TextCellValue('Transaction ID'),
-        excel_.TextCellValue('Date'),
-        excel_.TextCellValue('Type'),
-        excel_.TextCellValue('Amount'),
-        excel_.TextCellValue('Balance'),
-        excel_.TextCellValue('Status'),
-      ]);
-
+      List<TransactionListDetails> transactions = [];
+      
       if (provider.selectedCardType == "fiat") {
-        for (var transaction in provider.transactionList.take(4)) {
-          sheet.appendRow([
-            excel_.TextCellValue(transaction.transactionId ?? 'N/A'),
-            excel_.TextCellValue(_formatDate(transaction.transactionDate)),
-            excel_.TextCellValue(transaction.transactionType ?? 'N/A'),
-            excel_.TextCellValue(_getAmountDisplay(transaction)),
-            excel_.TextCellValue(
-                '${_getCurrencySymbolForBalance(transaction)} ${transaction.balance?.toStringAsFixed(2) ?? '0.00'}'),
-            excel_.TextCellValue(transaction.transactionStatus![0]
-                    .toUpperCase() +
-                (transaction.transactionStatus?.substring(1).toLowerCase() ??
-                    'Unknown')),
-          ]);
-        }
+        transactions = provider.transactionList.take(4).toList();
       } else if (provider.selectedCardType == "crypto") {
-        for (var transaction in provider.cryptoListData.take(4)) {
-          sheet.appendRow([
-            excel_.TextCellValue(transaction.coinName!.split('_')[0]),
-            excel_.TextCellValue(_formatDate(transaction.date)),
-            excel_.TextCellValue(transaction.paymentType ?? 'N/A'),
-            excel_.TextCellValue(
-                '${_getCurrencySymbol(transaction.currencyType)}${double.tryParse(transaction.amount?.toString() ?? '0.00')?.toStringAsFixed(2) ?? '0.00'}'),
-            excel_.TextCellValue(transaction.noOfCoin ?? 'N/A'),
-            excel_.TextCellValue(transaction.status![0].toUpperCase() +
-                (transaction.status?.substring(1).toLowerCase() ?? 'Unknown')),
-          ]);
-        }
+        // Convert crypto transactions to TransactionListDetails format
+        transactions = provider.cryptoListData.take(4).map((crypto) {
+          return TransactionListDetails(
+            transactionId: crypto.coinName?.split('_')[0],
+            transactionDate: crypto.date,
+            transactionType: crypto.paymentType,
+            amount: double.tryParse(crypto.amount?.toString() ?? '0.0'),
+            balance: double.tryParse(crypto.noOfCoin ?? '0.0'),
+            transactionStatus: crypto.status,
+            fromCurrency: crypto.currencyType,
+          );
+        }).toList();
       }
 
-      final directory = await getApplicationDocumentsDirectory();
-      final file = File(
-          '${directory.path}/transactions_${DateTime.now().millisecondsSinceEpoch}.xlsx');
-      final bytes = excel.encode();
-      await file.writeAsBytes(bytes!);
-
-      try {
-        await OpenFile.open(file.path);
-        CustomSnackBar.showSnackBar(
-            context: context,
-            message: "Excel downloaded and opened successfully",
-            color: Colors.green);
-      } catch (e) {
-        CustomSnackBar.showSnackBar(
-            context: context,
-            message:
-                "Excel downloaded successfully, but failed to open: $e. File saved at ${file.path}",
-            color: Colors.orange);
-      }
+      final fileName = "dashboard_transactions_${DateTime.now().millisecondsSinceEpoch}.xlsx";
+      final filePath = await FileExportUtils.createEnhancedExcelFile(
+        transactions: transactions,
+        fileName: fileName,
+        title: "Dashboard Transaction Report",
+      );
+      
+      await OpenFile.open(filePath);
+      CustomSnackBar.showSnackBar(
+          context: context,
+          message: "Excel downloaded and opened successfully",
+          color: Colors.green);
     } catch (e) {
       CustomSnackBar.showSnackBar(
           context: context,
@@ -249,70 +220,37 @@ class _DashboardScreenState extends State<DashboardScreen>
   Future<void> _downloadPDF(
       BuildContext context, DashboardProvider provider) async {
     try {
-      final pdf = pw.Document();
-
-      pdf.addPage(
-        pw.Page(
-          build: (pw.Context context) => pw.Table.fromTextArray(
-            headers: [
-              'Transaction ID',
-              'Date',
-              'Type',
-              'Amount',
-              'Balance',
-              'Status'
-            ],
-            data: provider.selectedCardType == "fiat"
-                ? provider.transactionList
-                    .take(4)
-                    .map((transaction) => [
-                          transaction.transactionId ?? 'N/A',
-                          _formatDate(transaction.transactionDate),
-                          transaction.transactionType ?? 'N/A',
-                          _getAmountDisplay(transaction),
-                          '${_getCurrencySymbolForBalance(transaction)} ${transaction.balance?.toStringAsFixed(2) ?? '0.00'}',
-                          transaction.transactionStatus![0].toUpperCase() +
-                              (transaction.transactionStatus
-                                      ?.substring(1)
-                                      .toLowerCase() ??
-                                  'Unknown'),
-                        ])
-                    .toList()
-                : provider.cryptoListData
-                    .take(4)
-                    .map((transaction) => [
-                          transaction.coinName!.split('_')[0],
-                          _formatDate(transaction.date),
-                          transaction.paymentType ?? 'N/A',
-                          '${_getCurrencySymbol(transaction.currencyType)}${double.tryParse(transaction.amount?.toString() ?? '0.00')?.toStringAsFixed(2) ?? '0.00'}',
-                          transaction.noOfCoin ?? 'N/A',
-                          transaction.status![0].toUpperCase() +
-                              (transaction.status?.substring(1).toLowerCase() ??
-                                  'Unknown'),
-                        ])
-                    .toList(),
-          ),
-        ),
-      );
-
-      final directory = await getApplicationDocumentsDirectory();
-      final file = File(
-          '${directory.path}/transactions_${DateTime.now().millisecondsSinceEpoch}.pdf');
-      await file.writeAsBytes(await pdf.save());
-
-      try {
-        await OpenFile.open(file.path);
-        CustomSnackBar.showSnackBar(
-            context: context,
-            message: "PDF downloaded and opened successfully",
-            color: Colors.green);
-      } catch (e) {
-        CustomSnackBar.showSnackBar(
-            context: context,
-            message:
-                "PDF downloaded successfully, but failed to open: $e. File saved at ${file.path}",
-            color: Colors.orange);
+      List<TransactionListDetails> transactions = [];
+      
+      if (provider.selectedCardType == "fiat") {
+        transactions = provider.transactionList.take(4).toList();
+      } else if (provider.selectedCardType == "crypto") {
+        // Convert crypto transactions to TransactionListDetails format
+        transactions = provider.cryptoListData.take(4).map((crypto) {
+          return TransactionListDetails(
+            transactionId: crypto.coinName?.split('_')[0],
+            transactionDate: crypto.date,
+            transactionType: crypto.paymentType,
+            amount: double.tryParse(crypto.amount?.toString() ?? '0.0'),
+            balance: double.tryParse(crypto.noOfCoin ?? '0.0'),
+            transactionStatus: crypto.status,
+            fromCurrency: crypto.currencyType,
+          );
+        }).toList();
       }
+
+      final fileName = "dashboard_transactions_${DateTime.now().millisecondsSinceEpoch}.pdf";
+      final filePath = await FileExportUtils.createEnhancedPDFFile(
+        transactions: transactions,
+        fileName: fileName,
+        title: "Dashboard Transaction Report",
+      );
+      
+      await OpenFile.open(filePath);
+      CustomSnackBar.showSnackBar(
+          context: context,
+          message: "PDF downloaded and opened successfully",
+          color: Colors.green);
     } catch (e) {
       CustomSnackBar.showSnackBar(
           context: context,

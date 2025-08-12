@@ -13,6 +13,9 @@ import 'package:quickcash/Screens/DashboardScreen/Dashboard/TransactionList/tran
 import 'package:quickcash/Screens/DashboardScreen/Dashboard/TransactionList/transactionListModel.dart';
 import 'package:quickcash/Screens/TransactionScreen/TransactionDetailsScreen/transaction_details_screen.dart';
 import 'package:quickcash/constants.dart';
+import 'package:quickcash/util/file_export_utils.dart';
+import 'package:quickcash/util/enhanced_export_utils.dart';
+import 'package:quickcash/util/advanced_export_utils.dart';
 import 'package:shimmer/shimmer.dart';
 import 'dart:io';
 
@@ -191,116 +194,23 @@ class _TransactionScreenState extends State<TransactionScreen> {
   Future<void> _downloadExcel(List<TransactionListDetails> transactions) async {
     setState(() => _isDownloadingExcel = true);
     try {
-      var excelInstance = excel.Excel.createExcel();
-      excel.Sheet sheet = excelInstance['Sheet1'];
-      sheet.cell(excel.CellIndex.indexByString("A1")).value =
-          excel.TextCellValue("Date");
-      sheet.cell(excel.CellIndex.indexByString("B1")).value =
-          excel.TextCellValue("Transaction ID");
-      sheet.cell(excel.CellIndex.indexByString("C1")).value =
-          excel.TextCellValue("Type");
-      sheet.cell(excel.CellIndex.indexByString("D1")).value =
-          excel.TextCellValue("Amount");
-      sheet.cell(excel.CellIndex.indexByString("E1")).value =
-          excel.TextCellValue("Balance");
-      sheet.cell(excel.CellIndex.indexByString("F1")).value =
-          excel.TextCellValue("Status");
-
-      for (int i = 0; i < transactions.length; i++) {
-        var transaction = transactions[i];
-        String amountDisplay =
-            TransactionCard(transaction: transaction, onTap: () {})
-                .getAmountDisplay();
-        String fullType =
-            "${transaction.extraType?.toLowerCase() ?? ''}-${transaction.transactionType?.toLowerCase() ?? ''}";
-        sheet.cell(excel.CellIndex.indexByString("A${i + 2}")).value =
-            excel.TextCellValue(transaction.transactionDate != null
-                ? DateFormat('yyyy-MM-dd')
-                    .format(DateTime.parse(transaction.transactionDate!))
-                : 'N/A');
-        sheet.cell(excel.CellIndex.indexByString("B${i + 2}")).value =
-            excel.TextCellValue(transaction.transactionId ?? 'N/A');
-        sheet.cell(excel.CellIndex.indexByString("C${i + 2}")).value =
-            excel.TextCellValue(transaction.transactionType ?? 'N/A');
-        sheet.cell(excel.CellIndex.indexByString("D${i + 2}")).value =
-            excel.TextCellValue(amountDisplay);
-        sheet.cell(excel.CellIndex.indexByString("E${i + 2}")).value =
-            excel.TextCellValue(
-                '${fullType.contains('credit-exchange') ? TransactionCard(transaction: transaction, onTap: () {}).getCurrencySymbol(transaction.to_currency) : TransactionCard(transaction: transaction, onTap: () {}).getCurrencySymbol(transaction.fromCurrency)}${transaction.balance?.toStringAsFixed(2) ?? '0.00'}');
-        sheet.cell(excel.CellIndex.indexByString("F${i + 2}")).value =
-            excel.TextCellValue(transaction.transactionStatus?.isEmpty ?? true
-                ? 'Unknown'
-                : (transaction.transactionStatus!.toLowerCase() == 'succeeded'
-                    ? 'Success'
-                    : transaction.transactionStatus!
-                            .substring(0, 1)
-                            .toUpperCase() +
-                        transaction.transactionStatus!
-                            .substring(1)
-                            .toLowerCase()));
-      }
-
-      final directory = await getApplicationDocumentsDirectory();
-      final path =
-          "${directory.path}/transactions_${DateTime.now().millisecondsSinceEpoch}.xlsx";
-      File(path)
-        ..createSync(recursive: true)
-        ..writeAsBytesSync(excelInstance.encode()!);
-
-      await OpenFile.open(path);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle, color: Colors.white, size: 20),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: Text(
-                  'Excel file downloaded successfully!',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
-              TextButton(
-                onPressed: () => OpenFile.open(path),
-                child: const Text(
-                  'Open',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          elevation: 6,
-        ),
+      final fileName = "transactions_${DateTime.now().millisecondsSinceEpoch}.xlsx";
+      final filePath = await AdvancedExportUtils.createAdvancedExcelFile(
+        transactions: transactions,
+        fileName: fileName,
+        title: "Transaction Report",
+      );
+      
+      await OpenFile.open(filePath);
+      AdvancedExportUtils.showAdvancedSuccessSnackBar(
+        context,
+        'Excel file downloaded successfully!',
+        filePath,
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.error, color: Colors.white, size: 20),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Error downloading Excel: $e',
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          elevation: 6,
-        ),
+      AdvancedExportUtils.showAdvancedErrorSnackBar(
+        context,
+        'Error downloading Excel: $e',
       );
     } finally {
       setState(() => _isDownloadingExcel = false);
@@ -310,116 +220,23 @@ class _TransactionScreenState extends State<TransactionScreen> {
   Future<void> _generatePDF(List<TransactionListDetails> transactions) async {
     setState(() => _isGeneratingPDF = true);
     try {
-      final pdf = pw.Document();
-      pdf.addPage(
-        pw.MultiPage(
-          pageFormat: PdfPageFormat.a4,
-          build: (pw.Context context) {
-            return [
-              pw.Header(level: 0, child: pw.Text("Transaction List")),
-              pw.Table.fromTextArray(
-                headers: [
-                  'Date',
-                  'Transaction ID',
-                  'Type',
-                  'Amount',
-                  'Balance',
-                  'Status'
-                ],
-                data: transactions.map((transaction) {
-                  String amountDisplay =
-                      TransactionCard(transaction: transaction, onTap: () {})
-                          .getAmountDisplay();
-                  String fullType =
-                      "${transaction.extraType?.toLowerCase() ?? ''}-${transaction.transactionType?.toLowerCase() ?? ''}";
-                  return [
-                    transaction.transactionDate != null
-                        ? DateFormat('yyyy-MM-dd').format(
-                            DateTime.parse(transaction.transactionDate!))
-                        : 'N/A',
-                    transaction.transactionId ?? 'N/A',
-                    transaction.transactionType ?? 'N/A',
-                    amountDisplay,
-                    '${fullType.contains('credit-exchange') ? TransactionCard(transaction: transaction, onTap: () {}).getCurrencySymbol(transaction.to_currency) : TransactionCard(transaction: transaction, onTap: () {}).getCurrencySymbol(transaction.fromCurrency)}${transaction.balance?.toStringAsFixed(2) ?? '0.00'}',
-                    transaction.transactionStatus?.isEmpty ?? true
-                        ? 'Unknown'
-                        : (transaction.transactionStatus!.toLowerCase() ==
-                                'succeeded'
-                            ? 'Success'
-                            : transaction.transactionStatus!
-                                    .substring(0, 1)
-                                    .toUpperCase() +
-                                transaction.transactionStatus!
-                                    .substring(1)
-                                    .toLowerCase()),
-                  ];
-                }).toList(),
-              ),
-            ];
-          },
-        ),
+      final fileName = "transactions_${DateTime.now().millisecondsSinceEpoch}.pdf";
+      final filePath = await AdvancedExportUtils.createAdvancedPDFFile(
+        transactions: transactions,
+        fileName: fileName,
+        title: "Transaction Report",
       );
-
-      final directory = await getApplicationDocumentsDirectory();
-      final path =
-          "${directory.path}/transactions_${DateTime.now().millisecondsSinceEpoch}.pdf";
-      final file = File(path);
-      await file.writeAsBytes(await pdf.save());
-
-      await OpenFile.open(path);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle, color: Colors.white, size: 20),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: Text(
-                  'PDF generated successfully!',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
-              TextButton(
-                onPressed: () => OpenFile.open(path),
-                child: const Text(
-                  'Open',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          elevation: 6,
-        ),
+      
+      await OpenFile.open(filePath);
+      AdvancedExportUtils.showAdvancedSuccessSnackBar(
+        context,
+        'PDF generated successfully!',
+        filePath,
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.error, color: Colors.white, size: 20),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Error generating PDF: $e',
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          elevation: 6,
-        ),
+      AdvancedExportUtils.showAdvancedErrorSnackBar(
+        context,
+        'Error generating PDF: $e',
       );
     } finally {
       setState(() => _isGeneratingPDF = false);
@@ -1234,42 +1051,13 @@ class TransactionCard extends StatefulWidget {
   });
 
   String getAmountDisplay() {
-    String transType = transaction.transactionType?.toLowerCase() ?? '';
-    String? extraType = transaction.extraType?.toLowerCase();
-    String fullType = "$extraType-$transType";
-    String currencySymbol = fullType.contains('credit-exchange')
-        ? getCurrencySymbol(transaction.to_currency)
-        : getCurrencySymbol(transaction.fromCurrency);
-
-    double displayAmount = transaction.amount ?? 0.0;
-    double fees = transaction.fees ?? 0.0;
-    double cryptobillAmount = fees + displayAmount;
-    double? conversionAmount = transaction.conversionAmount != null
-        ? double.tryParse(transaction.conversionAmount!) ?? 0.0
-        : null;
-
-    if (fullType == 'credit-exchange' && conversionAmount != null)
-      return "+$currencySymbol${conversionAmount.toStringAsFixed(2)}";
-    if (fullType == 'credit-add money' && conversionAmount != null)
-      return "+$currencySymbol${conversionAmount.toStringAsFixed(2)}";
-    if (transType == 'add money')
-      return "+$currencySymbol${displayAmount.toStringAsFixed(2)}";
-    if (fullType == 'credit-crypto' && conversionAmount != null)
-      return "+$currencySymbol${displayAmount.toStringAsFixed(2)}";
-    if (fullType == 'debit-crypto' && conversionAmount != null)
-      return "-$currencySymbol${cryptobillAmount.toStringAsFixed(2)}";
-    if (transType == 'external transfer' ||
-        transType == 'beneficiary transfer money' ||
-        transType == 'exchange') {
-      return "-$currencySymbol${(fees + displayAmount).toStringAsFixed(2)}";
-    }
-    return "$currencySymbol${displayAmount.toStringAsFixed(2)}";
+    // Use the enhanced utility method for consistent formatting with proper encoding
+    return EnhancedExportUtils.getAmountDisplayWithEncoding(transaction);
   }
 
   String getCurrencySymbol(String? currencyCode) {
-    if (currencyCode == null) return '';
-    if (currencyCode == "AWG") return 'ƒ';
-    return NumberFormat.simpleCurrency(name: currencyCode).currencySymbol;
+    // Use the enhanced utility method for consistent currency symbols with proper encoding
+    return EnhancedExportUtils.getCurrencySymbolWithEncoding(currencyCode);
   }
 
   @override

@@ -9,6 +9,7 @@ import 'package:quickcash/constants.dart';
 import 'package:intl/intl.dart';
 import 'package:quickcash/util/AnimatedContainerWidget.dart';
 import 'package:quickcash/util/No_Transaction.dart';
+import 'package:quickcash/util/file_export_utils.dart';
 import 'package:excel/excel.dart' as excel;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -196,210 +197,46 @@ class _ViewAllTransactionState extends State<ViewAllTransaction> {
 
   Future<void> _downloadExcel(List<TransactionListDetails> transactions) async {
     try {
-      var excelInstance = excel.Excel.createExcel();
-      excel.Sheet sheet = excelInstance['Sheet1'];
-
-      sheet.cell(excel.CellIndex.indexByString("A1")).value = excel.TextCellValue("Date");
-      sheet.cell(excel.CellIndex.indexByString("B1")).value = excel.TextCellValue("Transaction ID");
-      sheet.cell(excel.CellIndex.indexByString("C1")).value = excel.TextCellValue("Type");
-      sheet.cell(excel.CellIndex.indexByString("D1")).value = excel.TextCellValue("Amount");
-      sheet.cell(excel.CellIndex.indexByString("E1")).value = excel.TextCellValue("Balance");
-      sheet.cell(excel.CellIndex.indexByString("F1")).value = excel.TextCellValue("Status");
-
-      for (int i = 0; i < transactions.length; i++) {
-        final transaction = transactions[i];
-        final amountDisplay = _getAmountDisplay(transaction);
-        final fullType = "${transaction.extraType?.toLowerCase() ?? ''}-${transaction.transactionType?.toLowerCase() ?? ''}";
-
-        final currencySymbol = fullType.contains('credit-exchange')
-            ? _getCurrencySymbol(transaction.to_currency)
-            : _getCurrencySymbol(transaction.fromCurrency);
-
-        final balanceValue = transaction.balance?.toStringAsFixed(2) ?? '0.00';
-        String balanceText = '$currencySymbol$balanceValue';
-
-        if (!balanceText.runes.every((r) => r < 128)) {
-          balanceText = '${transaction.fromCurrency?.toUpperCase() ?? 'N/A'} $balanceValue';
-        }
-
-        final status = (transaction.transactionStatus?.isEmpty ?? true)
-            ? 'Unknown'
-            : (transaction.transactionStatus!.toLowerCase() == 'succeeded'
-                ? 'Success'
-                : transaction.transactionStatus![0].toUpperCase() +
-                    transaction.transactionStatus!.substring(1).toLowerCase());
-
-        sheet.cell(excel.CellIndex.indexByString("A${i + 2}")).value = excel.TextCellValue(
-          transaction.transactionDate != null
-              ? DateFormat('yyyy-MM-dd').format(DateTime.parse(transaction.transactionDate!))
-              : 'N/A',
-        );
-        sheet.cell(excel.CellIndex.indexByString("B${i + 2}")).value =
-            excel.TextCellValue(transaction.transactionId ?? 'N/A');
-        sheet.cell(excel.CellIndex.indexByString("C${i + 2}")).value =
-            excel.TextCellValue(transaction.transactionType ?? 'N/A');
-        sheet.cell(excel.CellIndex.indexByString("D${i + 2}")).value = excel.TextCellValue(amountDisplay);
-        sheet.cell(excel.CellIndex.indexByString("E${i + 2}")).value = excel.TextCellValue(balanceText);
-        sheet.cell(excel.CellIndex.indexByString("F${i + 2}")).value = excel.TextCellValue(status);
-      }
-
-      final directory = await getApplicationDocumentsDirectory();
-      final path = "${directory.path}/transactions_${DateTime.now().millisecondsSinceEpoch}.xlsx";
-
-      File(path)
-        ..createSync(recursive: true)
-        ..writeAsBytesSync(excelInstance.encode()!);
-
-      await OpenFile.open(path);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle, color: Colors.white, size: 20),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: Text(
-                  'Excel file downloaded successfully!',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
-              TextButton(
-                onPressed: () => OpenFile.open(path),
-                child: const Text(
-                  'Open',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          elevation: 6,
-        ),
+      final fileName = "all_transactions_${DateTime.now().millisecondsSinceEpoch}.xlsx";
+      final filePath = await FileExportUtils.createEnhancedExcelFile(
+        transactions: transactions,
+        fileName: fileName,
+        title: "All Transactions Report",
+      );
+      
+      await OpenFile.open(filePath);
+      FileExportUtils.showSuccessSnackBar(
+        context,
+        'Excel file downloaded successfully!',
+        filePath,
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.error, color: Colors.white, size: 20),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Error downloading Excel: $e',
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          elevation: 6,
-        ),
+      FileExportUtils.showErrorSnackBar(
+        context,
+        'Error downloading Excel: $e',
       );
     }
   }
 
   Future<void> _generatePDF(List<TransactionListDetails> transactions) async {
     try {
-      final pdf = pw.Document();
-      pdf.addPage(
-        pw.MultiPage(
-          pageFormat: PdfPageFormat.a4,
-          build: (pw.Context context) {
-            return [
-              pw.Header(level: 0, child: pw.Text("Transaction List")),
-              pw.Table.fromTextArray(
-                headers: ['Date', 'Transaction ID', 'Type', 'Amount', 'Balance', 'Status'],
-                data: transactions.map((transaction) {
-                  String amountDisplay = _getAmountDisplay(transaction);
-                  String fullType = "${transaction.extraType?.toLowerCase() ?? ''}-${transaction.transactionType?.toLowerCase() ?? ''}";
-                  return [
-                    transaction.transactionDate != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(transaction.transactionDate!)) : 'N/A',
-                    transaction.transactionId ?? 'N/A',
-                    transaction.transactionType ?? 'N/A',
-                    amountDisplay,
-                    '${fullType.contains('credit-exchange') ? _getCurrencySymbol(transaction.to_currency) : _getCurrencySymbol(transaction.fromCurrency)}${transaction.balance?.toStringAsFixed(2) ?? '0.00'}',
-                    transaction.transactionStatus?.isEmpty ?? true
-                        ? 'Unknown'
-                        : (transaction.transactionStatus!.toLowerCase() == 'succeeded'
-                            ? 'Success'
-                            : transaction.transactionStatus!.substring(0, 1).toUpperCase() + transaction.transactionStatus!.substring(1).toLowerCase()),
-                  ];
-                }).toList(),
-              ),
-            ];
-          },
-        ),
+      final fileName = "all_transactions_${DateTime.now().millisecondsSinceEpoch}.pdf";
+      final filePath = await FileExportUtils.createEnhancedPDFFile(
+        transactions: transactions,
+        fileName: fileName,
+        title: "All Transactions Report",
       );
-
-      final directory = await getApplicationDocumentsDirectory();
-      final path = "${directory.path}/transactions_${DateTime.now().millisecondsSinceEpoch}.pdf";
-      final file = File(path);
-      await file.writeAsBytes(await pdf.save());
-
-      await OpenFile.open(path);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle, color: Colors.white, size: 20),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: Text(
-                  'PDF generated successfully!',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
-              TextButton(
-                onPressed: () => OpenFile.open(path),
-                child: const Text(
-                  'Open',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Theme.of(context).extension<AppColors>()!.primary,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          elevation: 6,
-        ),
+      
+      await OpenFile.open(filePath);
+      FileExportUtils.showSuccessSnackBar(
+        context,
+        'PDF generated successfully!',
+        filePath,
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.error, color: Colors.white, size: 20),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Error generating PDF: $e',
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          elevation: 6,
-        ),
+      FileExportUtils.showErrorSnackBar(
+        context,
+        'Error generating PDF: $e',
       );
     }
   }

@@ -765,6 +765,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.0"
+  jiffy:
+    dependency: transitive
+    description:
+      name: jiffy
+      sha256: "9bafbfe6d97587048bf449165e050029e716a12438f54a3d39e7e3a256decdac"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.4.3"
   jovial_misc:
     dependency: transitive
     description:
@@ -1471,6 +1479,30 @@ packages:
     description:
       name: syncfusion_flutter_core
       sha256: "6898c5dc81f73ac4e1156a075e4dd4591ea8927f26dcc77f6ba0e9b1b1d6c8c5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "29.2.7"
+  syncfusion_flutter_pdf:
+    dependency: "direct main"
+    description:
+      name: syncfusion_flutter_pdf
+      sha256: "8f21ee8f3da89bf47ecf901fb33176deac452bff20b34b554340cfdf91214669"
+      url: "https://pub.dev"
+    source: hosted
+    version: "29.2.7+1"
+  syncfusion_flutter_xlsio:
+    dependency: "direct main"
+    description:
+      name: syncfusion_flutter_xlsio
+      sha256: "1ea8715d41ddb5570aa6a9376a3013df45ae5d135a09979bf8a97a2b5ae9d1d4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "29.2.7"
+  syncfusion_officecore:
+    dependency: transitive
+    description:
+      name: syncfusion_officecore
+      sha256: "07c66cf1655205e24f0c476e31e4a8c985bb929a60c19bcbbc608644127c7854"
       url: "https://pub.dev"
     source: hosted
     version: "29.2.7"

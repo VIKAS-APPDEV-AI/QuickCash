@@ -6,6 +6,8 @@ import 'package:quickcash/Screens/StatemetScreen/StatementDetailsScreen/statemen
 import 'package:quickcash/Screens/StatemetScreen/StatementScreen/model/statementApi.dart';
 import 'package:quickcash/constants.dart';
 import 'package:quickcash/Screens/DashboardScreen/Dashboard/AccountsList/accountsListApi.dart';
+import 'package:quickcash/util/file_export_utils.dart';
+import 'package:quickcash/util/enhanced_export_utils.dart';
 import '../../DashboardScreen/Dashboard/TransactionList/transactionListModel.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -202,133 +204,47 @@ class _StatementScreenState extends State<StatementScreen> {
 
   Future<void> _downloadExcel(List<TransactionListDetails> statements) async {
     try {
-      var excelInstance = excel.Excel.createExcel();
-      excel.Sheet sheet = excelInstance['Sheet1'];
-      sheet.cell(excel.CellIndex.indexByString("A1")).value =
-          excel.TextCellValue("Date");
-      sheet.cell(excel.CellIndex.indexByString("B1")).value =
-          excel.TextCellValue("Transaction ID");
-      sheet.cell(excel.CellIndex.indexByString("C1")).value =
-          excel.TextCellValue("Type");
-      sheet.cell(excel.CellIndex.indexByString("D1")).value =
-          excel.TextCellValue("Amount");
-      sheet.cell(excel.CellIndex.indexByString("E1")).value =
-          excel.TextCellValue("Balance");
-      sheet.cell(excel.CellIndex.indexByString("F1")).value =
-          excel.TextCellValue("Status");
-
-      for (int i = 0; i < statements.length; i++) {
-        var statement = statements[i];
-        String amountDisplay =
-            TransactionCard(transaction: statement, onTap: () {})
-                .getAmountDisplay();
-        String fullType =
-            "${statement.extraType?.toLowerCase() ?? ''}-${statement.transactionType?.toLowerCase() ?? ''}";
-        sheet.cell(excel.CellIndex.indexByString("A${i + 2}")).value =
-            excel.TextCellValue(statement.transactionDate != null
-                ? DateFormat('yyyy-MM-dd')
-                    .format(DateTime.parse(statement.transactionDate!))
-                : 'N/A');
-        sheet.cell(excel.CellIndex.indexByString("B${i + 2}")).value =
-            excel.TextCellValue(statement.transactionId ?? 'N/A');
-        sheet.cell(excel.CellIndex.indexByString("C${i + 2}")).value =
-            excel.TextCellValue(statement.transactionType ?? 'N/A');
-        sheet.cell(excel.CellIndex.indexByString("D${i + 2}")).value =
-            excel.TextCellValue(amountDisplay);
-        sheet.cell(excel.CellIndex.indexByString("E${i + 2}")).value =
-            excel.TextCellValue(
-                '${fullType.contains('credit-exchange') ? TransactionCard(transaction: statement, onTap: () {}).getCurrencySymbol(statement.to_currency) : TransactionCard(transaction: statement, onTap: () {}).getCurrencySymbol(statement.fromCurrency)}${statement.balance?.toStringAsFixed(2) ?? '0.00'}');
-        sheet
-            .cell(excel.CellIndex.indexByString("F${i + 2}"))
-            .value = excel.TextCellValue(statement.transactionStatus?.isEmpty ??
-                true
-            ? 'Unknown'
-            : (statement.transactionStatus!.toLowerCase() == 'succeeded'
-                ? 'Success'
-                : statement.transactionStatus!.substring(0, 1).toUpperCase() +
-                    statement.transactionStatus!.substring(1).toLowerCase()));
-      }
-
-      final directory = await getApplicationDocumentsDirectory();
-      final path =
-          "${directory.path}/statements_${DateTime.now().millisecondsSinceEpoch}.xlsx";
-      File(path)
-        ..createSync(recursive: true)
-        ..writeAsBytesSync(excelInstance.encode()!);
-
-      await OpenFile.open(path);
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Excel file downloaded successfully!')));
+      final fileName = "statements_${DateTime.now().millisecondsSinceEpoch}.xlsx";
+      final filePath = await EnhancedExportUtils.createExcelWithProperEncoding(
+        transactions: statements,
+        fileName: fileName,
+        title: "Statement Report",
+      );
+      
+      await OpenFile.open(filePath);
+      EnhancedExportUtils.showSuccessSnackBar(
+        context,
+        'Excel file downloaded successfully!',
+        filePath,
+      );
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error downloading Excel: $e')));
+      EnhancedExportUtils.showErrorSnackBar(
+        context,
+        'Error downloading Excel: $e',
+      );
     }
   }
 
   Future<void> _generatePDF(List<TransactionListDetails> statements) async {
     try {
-      final pdf = pw.Document();
-      pdf.addPage(
-        pw.MultiPage(
-          pageFormat: PdfPageFormat.a4,
-          build: (pw.Context context) {
-            return [
-              pw.Header(level: 0, child: pw.Text("Statement List")),
-              pw.Table.fromTextArray(
-                headers: [
-                  'Date',
-                  'Transaction ID',
-                  'Type',
-                  'Amount',
-                  'Balance',
-                  'Status'
-                ],
-                data: statements.map((statement) {
-                  String amountDisplay =
-                      TransactionCard(transaction: statement, onTap: () {})
-                          .getAmountDisplay();
-                  String fullType =
-                      "${statement.extraType?.toLowerCase() ?? ''}-${statement.transactionType?.toLowerCase() ?? ''}";
-                  return [
-                    statement.transactionDate != null
-                        ? DateFormat('yyyy-MM-dd')
-                            .format(DateTime.parse(statement.transactionDate!))
-                        : 'N/A',
-                    statement.transactionId ?? 'N/A',
-                    statement.transactionType ?? 'N/A',
-                    amountDisplay,
-                    '${fullType.contains('credit-exchange') ? TransactionCard(transaction: statement, onTap: () {}).getCurrencySymbol(statement.to_currency) : TransactionCard(transaction: statement, onTap: () {}).getCurrencySymbol(statement.fromCurrency)}${statement.balance?.toStringAsFixed(2) ?? '0.00'}',
-                    statement.transactionStatus?.isEmpty ?? true
-                        ? 'Unknown'
-                        : (statement.transactionStatus!.toLowerCase() ==
-                                'succeeded'
-                            ? 'Success'
-                            : statement.transactionStatus!
-                                    .substring(0, 1)
-                                    .toUpperCase() +
-                                statement.transactionStatus!
-                                    .substring(1)
-                                    .toLowerCase()),
-                  ];
-                }).toList(),
-              ),
-            ];
-          },
-        ),
+      final fileName = "statements_${DateTime.now().millisecondsSinceEpoch}.pdf";
+      final filePath = await EnhancedExportUtils.createPDFWithProperEncoding(
+        transactions: statements,
+        fileName: fileName,
+        title: "Statement Report",
       );
-
-      final directory = await getApplicationDocumentsDirectory();
-      final path =
-          "${directory.path}/statements_${DateTime.now().millisecondsSinceEpoch}.pdf";
-      final file = File(path);
-      await file.writeAsBytes(await pdf.save());
-
-      await OpenFile.open(path);
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('PDF generated successfully!')));
+      
+      await OpenFile.open(filePath);
+      EnhancedExportUtils.showSuccessSnackBar(
+        context,
+        'PDF generated successfully!',
+        filePath,
+      );
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error generating PDF: $e')));
+      EnhancedExportUtils.showErrorSnackBar(
+        context,
+        'Error generating PDF: $e',
+      );
     }
   }
 
@@ -725,42 +641,13 @@ class TransactionCard extends StatefulWidget {
       {super.key, required this.transaction, required this.onTap});
 
   String getAmountDisplay() {
-    String transType = transaction.transactionType?.toLowerCase() ?? '';
-    String? extraType = transaction.extraType?.toLowerCase();
-    String fullType = "$extraType-$transType";
-    String currencySymbol = fullType.contains('credit-exchange')
-        ? getCurrencySymbol(transaction.to_currency)
-        : getCurrencySymbol(transaction.fromCurrency);
-
-    double displayAmount = transaction.amount ?? 0.0;
-    double fees = transaction.fees ?? 0.0;
-    double cryptobillAmount = fees + displayAmount;
-    double? conversionAmount = transaction.conversionAmount != null
-        ? double.tryParse(transaction.conversionAmount!) ?? 0.0
-        : null;
-
-    if (fullType == 'credit-exchange' && conversionAmount != null)
-      return "+$currencySymbol${conversionAmount.toStringAsFixed(2)}";
-    if (fullType == 'credit-add money' && conversionAmount != null)
-      return "+$currencySymbol${conversionAmount.toStringAsFixed(2)}";
-    if (transType == 'add money')
-      return "+$currencySymbol${displayAmount.toStringAsFixed(2)}";
-    if (fullType == 'credit-crypto' && conversionAmount != null)
-      return "+$currencySymbol${displayAmount.toStringAsFixed(2)}";
-    if (fullType == 'debit-crypto' && conversionAmount != null)
-      return "-$currencySymbol${cryptobillAmount.toStringAsFixed(2)}";
-    if (transType == 'external transfer' ||
-        transType == 'beneficiary transfer money' ||
-        transType == 'exchange') {
-      return "-$currencySymbol${(fees + displayAmount).toStringAsFixed(2)}";
-    }
-    return "$currencySymbol${displayAmount.toStringAsFixed(2)}";
+    // Use the enhanced utility method for consistent formatting with proper encoding
+    return EnhancedExportUtils.getAmountDisplayWithEncoding(transaction);
   }
 
   String getCurrencySymbol(String? currencyCode) {
-    if (currencyCode == null) return '';
-    if (currencyCode == "AWG") return 'ƒ';
-    return NumberFormat.simpleCurrency(name: currencyCode).currencySymbol;
+    // Use the enhanced utility method for consistent currency symbols with proper encoding
+    return EnhancedExportUtils.getCurrencySymbolWithEncoding(currencyCode);
   }
 
   @override

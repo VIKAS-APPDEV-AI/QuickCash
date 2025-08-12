@@ -22,6 +22,10 @@
   <img src="ScreenShots/image2.png" width="120" alt="Crypto Trading" /><npsp>
   <img src="ScreenShots/image3.png" width="120" alt="Money Transfer" /><npsp>
   <img src="ScreenShots/image4.png" width="120" alt="Biometric Login" /><npsp>
+  <img src="ScreenShots/image5.png" width="120" alt="Biometric Login" /><npsp>
+  <img src="ScreenShots/image6.png" width="120" alt="Biometric Login" /><npsp>
+  <img src="ScreenShots/image7.png" width="120" alt="Biometric Login" /><npsp>
+  <img src="ScreenShots/image8.png" width="120" alt="Biometric Login" /><npsp>
 </p>
 
 ---
